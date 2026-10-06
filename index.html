@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#1b1209">
+<title>Pintje</title>
+<style>
+  :root {
+    --bg: #1b1209;
+    --bg-2: #2a1c0e;
+    --text: #fbefd9;
+    --muted: #c9b48f;
+    --beer-top: #f7c548;
+    --beer-bottom: #d98a12;
+    --foam: #fffaf0;
+    --glass: rgba(255, 255, 255, 0.18);
+    --accent: #f7c548;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: radial-gradient(ellipse at top, var(--bg-2), var(--bg) 70%);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 16px;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  header { text-align: center; }
+  h1 { margin: 0; font-size: 2.2rem; letter-spacing: 0.02em; }
+  .sub { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
+
+  .stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .glass-wrap {
+    transition: transform 0.25s ease-out;
+    transform-origin: 50% 90%;
+  }
+  .glass-wrap.drinking { transform: rotate(-38deg) translateY(-10px); }
+
+  svg.glass { width: min(56vw, 220px); height: auto; display: block; overflow: visible; }
+
+  .bubble { fill: rgba(255, 255, 255, 0.55); }
+
+  .status {
+    min-height: 1.6em;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 8px 0 16px;
+  }
+
+  .controls { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; }
+  button {
+    font: inherit;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: 0;
+    border-radius: 999px;
+    padding: 16px 20px;
+    cursor: pointer;
+    touch-action: none;
+  }
+  #drink { background: var(--accent); color: #2a1a05; }
+  #drink:active { filter: brightness(0.92); }
+  #refill { background: transparent; color: var(--text); border: 2px solid var(--muted); }
+  .hidden { display: none !important; }
+
+  .stats { display: flex; gap: 24px; justify-content: center; margin-top: 16px; color: var(--muted); font-size: 0.9rem; }
+  .stats b { color: var(--text); font-size: 1.2rem; display: block; text-align: center; }
+
+  .hint { color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: 8px; }
+  #tilt { background: none; color: var(--muted); text-decoration: underline; padding: 4px; font-size: 0.85rem; font-weight: 500; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>🍺 Pintje</h1>
+    <p class="sub">Schol! Een frisse pint, altijd binnen handbereik.</p>
+  </header>
+
+  <div class="stage">
+    <div class="glass-wrap" id="glassWrap">
+      <svg class="glass" viewBox="0 0 200 300" aria-label="Glas bier">
+        <defs>
+          <linearGradient id="beerGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#f7c548"/>
+            <stop offset="1" stop-color="#d98a12"/>
+          </linearGradient>
+          <clipPath id="glassClip">
+            <path d="M30 20 L170 20 L152 280 Q150 290 140 290 L60 290 Q50 290 48 280 Z"/>
+          </clipPath>
+        </defs>
+
+        <g clip-path="url(#glassClip)">
+          <rect id="beer" x="0" y="40" width="200" height="260" fill="url(#beerGrad)"/>
+          <g id="bubbles"></g>
+          <g id="foam">
+            <rect id="foamRect" x="0" y="20" width="200" height="24" fill="#fffaf0"/>
+            <circle cx="40" cy="22" r="12" fill="#fffaf0"/>
+            <circle cx="70" cy="18" r="14" fill="#fffaf0"/>
+            <circle cx="102" cy="20" r="13" fill="#fffaf0"/>
+            <circle cx="134" cy="17" r="14" fill="#fffaf0"/>
+            <circle cx="162" cy="22" r="11" fill="#fffaf0"/>
+          </g>
+        </g>
+
+        <path d="M30 20 L170 20 L152 280 Q150 290 140 290 L60 290 Q50 290 48 280 Z"
+              fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M44 40 L56 260" stroke="rgba(255,255,255,0.35)" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="status" id="status" aria-live="polite">Hou ingedrukt om te drinken</div>
+
+  <div class="controls">
+    <button id="drink">Hou vast om te drinken</button>
+    <button id="refill" class="hidden">Nog ene! 🍻</button>
+    <button id="tilt" class="hidden">Kantel je telefoon om te drinken</button>
+  </div>
+
+  <div class="stats">
+    <div><b id="today">0</b>vandaag</div>
+    <div><b id="total">0</b>in totaal</div>
+  </div>
+  <p class="hint">Drink met mate. Een pintje is geen water. 😉</p>
+
+<script>
+(() => {
+  const TOP = 40, BOTTOM = 290;           // beer surface range inside the glass (SVG units)
+  const DRINK_SECONDS = 4;                 // time to empty a full pint while holding
+  const beer = document.getElementById('beer');
+  const foam = document.getElementById('foam');
+  const bubbles = document.getElementById('bubbles');
+  const glassWrap = document.getElementById('glassWrap');
+  const status = document.getElementById('status');
+  const drinkBtn = document.getElementById('drink');
+  const refillBtn = document.getElementById('refill');
+  const tiltBtn = document.getElementById('tilt');
+  const todayEl = document.getElementById('today');
+  const totalEl = document.getElementById('total');
+
+  let level = 1;          // 1 = full, 0 = empty
+  let drinking = false;
+  let last = 0;
+
+  // ---- persistence (best effort) ----
+  const todayKey = new Date().toISOString().slice(0, 10);
+  let stats = { total: 0, day: todayKey, today: 0 };
+  try {
+    const saved = JSON.parse(localStorage.getItem('pintje') || 'null');
+    if (saved) stats = saved;
+  } catch (e) {}
+  if (stats.day !== todayKey) { stats.day = todayKey; stats.today = 0; }
+  const save = () => { try { localStorage.setItem('pintje', JSON.stringify(stats)); } catch (e) {} };
+  const renderStats = () => { todayEl.textContent = stats.today; totalEl.textContent = stats.total; };
+  renderStats();
+
+  // ---- sound ----
+  let audio;
+  const ctx = () => (audio ||= new (window.AudioContext || window.webkitAudioContext)());
+  function gulp() {
+    const a = ctx(), t = a.currentTime;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(180, t);
+    o.frequency.exponentialRampToValueAtTime(70, t + 0.12);
+    g.gain.setValueAtTime(0.25, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    o.connect(g).connect(a.destination);
+    o.start(t); o.stop(t + 0.16);
+  }
+  function burp() {
+    const a = ctx(), t = a.currentTime;
+    const o = a.createOscillator(), g = a.createGain(), lfo = a.createOscillator(), lg = a.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(95, t);
+    o.frequency.linearRampToValueAtTime(65, t + 0.6);
+    lfo.frequency.value = 28; lg.gain.value = 20;
+    lfo.connect(lg).connect(o.frequency);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.3, t + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.65);
+    o.connect(g).connect(a.destination);
+    o.start(t); lfo.start(t); o.stop(t + 0.7); lfo.stop(t + 0.7);
+  }
+
+  // ---- bubbles ----
+  function spawnBubble() {
+    if (level <= 0.02) return;
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const x = 60 + Math.random() * 80;
+    c.setAttribute('cx', x);
+    c.setAttribute('cy', BOTTOM - 4);
+    c.setAttribute('r', 1.5 + Math.random() * 2.5);
+    c.setAttribute('class', 'bubble');
+    bubbles.appendChild(c);
+    const dur = 1500 + Math.random() * 1500;
+    const start = performance.now();
+    (function rise(now) {
+      const p = (now - start) / dur;
+      const surf = TOP + (1 - level) * (BOTTOM - TOP);
+      const y = BOTTOM - 4 - p * (BOTTOM - 4 - surf);
+      c.setAttribute('cy', y);
+      c.setAttribute('cx', x + Math.sin(p * 12) * 2);
+      if (p < 1 && y > surf + 2) requestAnimationFrame(rise); else c.remove();
+    })(start);
+  }
+  setInterval(spawnBubble, 220);
+
+  // ---- render ----
+  function render() {
+    const surface = TOP + (1 - level) * (BOTTOM - TOP);
+    beer.setAttribute('y', surface);
+    foam.setAttribute('transform', `translate(0 ${surface - TOP})`);
+    foam.style.opacity = level > 0.01 ? Math.min(1, 0.4 + level) : 0;
+  }
+
+  const messages = ['Glug glug glug…', 'Mmm, lekker fris!', 'Ad fundum! 🍺', 'Bijna leeg…'];
+  let gulpTimer = 0;
+
+  function tick(now) {
+    if (!drinking) return;
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    level = Math.max(0, level - dt / DRINK_SECONDS);
+    gulpTimer -= dt;
+    if (gulpTimer <= 0) { gulp(); gulpTimer = 0.45; navigator.vibrate?.(20); }
+    status.textContent = level < 0.25 ? messages[3] : messages[Math.floor((1 - level) * 3) % 3];
+    render();
+    if (level <= 0) return finish();
+    requestAnimationFrame(tick);
+  }
+
+  function start() {
+    if (level <= 0 || drinking) return;
+    try { ctx().resume(); } catch (e) {}
+    drinking = true;
+    glassWrap.classList.add('drinking');
+    last = performance.now();
+    gulpTimer = 0;
+    requestAnimationFrame(tick);
+  }
+  function stop() {
+    if (!drinking) return;
+    drinking = false;
+    glassWrap.classList.remove('drinking');
+    if (level > 0) status.textContent = 'Nog niet leeg, drink door!';
+  }
+  function finish() {
+    drinking = false;
+    glassWrap.classList.remove('drinking');
+    stats.today++; stats.total++;
+    save(); renderStats();
+    burp();
+    navigator.vibrate?.([60, 40, 120]);
+    status.textContent = 'Burp! Pintje op. 🎉';
+    drinkBtn.classList.add('hidden');
+    refillBtn.classList.remove('hidden');
+  }
+  function refill() {
+    refillBtn.classList.add('hidden');
+    drinkBtn.classList.remove('hidden');
+    status.textContent = 'Wordt getapt…';
+    const from = level, t0 = performance.now();
+    (function pour(now) {
+      const p = Math.min(1, (now - t0) / 1200);
+      level = from + (1 - from) * (1 - Math.pow(1 - p, 3));
+      render();
+      if (p < 1) requestAnimationFrame(pour);
+      else status.textContent = 'Vers getapt! Hou ingedrukt om te drinken';
+    })(t0);
+  }
+
+  drinkBtn.addEventListener('pointerdown', e => { e.preventDefault(); start(); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => drinkBtn.addEventListener(ev, stop));
+  refillBtn.addEventListener('click', refill);
+  document.addEventListener('keydown', e => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); level > 0 ? start() : refill(); } });
+  document.addEventListener('keyup', e => { if (e.code === 'Space') stop(); });
+
+  // ---- tilt to drink (phones) ----
+  function onOrient(e) {
+    if (e.beta == null) return;
+    // Phone held upright is ~90°; tipping the top toward your face (like a glass) pushes beta past it.
+    if (e.beta > 115 && level > 0) start(); else stop();
+  }
+  function enableTilt() {
+    window.addEventListener('deviceorientation', onOrient);
+    tiltBtn.textContent = 'Kantelen staat aan 📱';
+    tiltBtn.disabled = true;
+  }
+  if ('DeviceOrientationEvent' in window && matchMedia('(pointer: coarse)').matches) {
+    tiltBtn.classList.remove('hidden');
+    tiltBtn.addEventListener('click', async () => {
+      try {
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+          if (await DeviceOrientationEvent.requestPermission() !== 'granted') return;
+        }
+        enableTilt();
+      } catch (e) {}
+    });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
