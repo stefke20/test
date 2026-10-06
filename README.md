@@ -5,14 +5,15 @@ this is a test
 
 A Belgian beer idle game. Open `index.html` in a browser (works great on a phone).
 
-- **Tap**: tap the glass for a sip, hold the button (or space bar), or tilt your phone to drink. Every sip earns 🎟️ bonnekes.
-- **Rarities**: 63 beers in 11 tiers: Gewoon, Ongewoon, Zeldzaam, Episch, Legendarisch, Smaragd, Robijn, Saffier, Diamant, Regenboog and Mythisch (0.01%).
-- **Kroeg (idle)**: hire staff and businesses that drink for you: rietje, stamgast, Nonkel Jos, studentenclub, kermis-bierkraam, bierfestival, trappistenabdij, bierpijpleiding and the hemelse brouwerij. There are 40+ upgrades. Staff only drink common beers; the rare ones are for you.
-- **Golden bottle caps** pop up at random: Happy Hour, Rondje van de zaak, Slokkenstorm or a Gouden fust.
-- **Prestige**: open a new kroeg for permanent ⭐ kroegsterren (+5% each).
-- **Offline earnings**: your staff keep drinking at half speed while you're away (up to 8 hours).
-- **Levels, XP and skill tree**: XP by rarity, skill points per level, 9 skills over 3 tiers.
-- **Rewards**: beer crates (3 beers, at least one zeldzaam) from achievements, every 5 levels and a daily streak bonus.
-- **Stijl**: 12 unlockable glasses and 14 backgrounds.
-- **Brokken**: from your 11th pint of the day, each pint you drink yourself adds 5% chance to throw up. That blocks drinking for 5 seconds.
+- **Tap**: tap the glass for a sip, hold the button (or space bar), or tilt your phone. Only your own drinking moves the glass and fills your collection.
+- **Beers & rarities**: 102 beers in 16 tiers, from Gewoon to Parel, Smaragd, Robijn, Saffier, Amethist, Diamant, Obsidiaan, Regenboog, Kosmisch, Mythisch (0.01%) and Goddelijk (0.001%).
+- **Biertypes & collection rewards**: complete types (pils, trappisten, lambiek, Vlaams rood, …) and collection milestones for permanent bonnekes bonuses and crates.
+- **Kroeg (idle)**: 14 kinds of staff and businesses earn bonnekes in the background, with 90+ upgrades and a prestige reset (kroegsterren). Offline earnings run at 50% (more with the Nachtploeg skill).
+- **Golden bottle caps**: random buffs, each with its own full-screen background effect (disco, ticket rain, bubble storm, lucky clovers, beer rain, golden rays).
+- **Tapwedstrijd**: a minigame where you pour the perfect pint onto the fill line.
+- **Daily quests, levels and an 18-skill tree** over four tiers.
+- **Crates**: bak, krat and vat, plus an "Alles openen" button.
+- **Stijl**: 9 UI themes (colours, corners, fonts), 19 glasses and 23 backgrounds.
+- **Brokken**: from your 11th pint of the day you might throw up.
+- **Alles wissen**: wipe all progress (local and on the leaderboard) from the Stijl tab.
 - **Ranglijst**: a shared leaderboard when opened through the claude.ai artifact link.
