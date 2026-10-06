@@ -24,7 +24,8 @@ A Belgian beer idle game. Open `index.html` in a browser (works great on a phone
 - **Tap combos**: fast tapping builds a combo up to ×3.5, with 4% "perfecte slok" crits (×10).
 - **Golden bubbles** rise in your glass every 15–35 s. Tap them for bonnekes, XP or a short ×3 boost.
 - **Uitdagingen**: short timed challenges (taps, combos, pints, ad fundum, bubbles) for bonnekes and XP.
-- **Vlaamse memes**: 18 memes, including "Gij hed het lef nie veur in mijne auto te zitten" from Nonkel Jos, collected in a memeboek.
+- **Seizoenen**: nine yearly seasons by calendar date (herfstbierfeesten, Halloween, Sinterklaas, kerst, oudejaar, carnaval, lente/Pasen, terrasjesweer, 21 juli). Each brings bonuses, 17 seasonal beers in total, its own events, a background, ambient effects and a daily gift.
+- **Brouwmeester (prestige)**: from level 25 you can reset everything for hopbellen. How many you get scales with your level, collection, kroegsterren, total bonnekes and beer types. Spend them in a 14-node brewery tree with permanent bonuses.
 - **Nu in het café**: see who else has Pintje open, shout "Schol!" for a shared bonus, and hear about other players' rare finds live.
 - **Alles wissen**: wipe all progress (local and on the leaderboard) from the Stijl tab.
 - **Ranglijst**: a shared leaderboard when opened through the claude.ai artifact link.
