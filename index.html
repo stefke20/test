@@ -285,7 +285,7 @@
   .overlay .big-t { font-family: var(--display); font-size: calc(1.9rem * var(--dscale)); text-wrap: balance; line-height: 1.15; }
   .overlay .sub { color: var(--muted); font-size: 0.9rem; max-width: 34ch; line-height: 1.4; }
   .overlay .cards { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 440px; }
-  .overlay .card { width: 92px; padding: 8px 6px; border-radius: var(--r-card); background: var(--panel-solid); border: 2px solid currentColor; display: flex; flex-direction: column; align-items: center; gap: 4px; animation: pop 0.5s cubic-bezier(.2, 1.6, .4, 1) both; }
+  .overlay .card { animation: pop 0.5s cubic-bezier(.2, 1.6, .4, 1) both; }
   .overlay .card .nm { color: var(--text); font-weight: 700; font-size: 0.76rem; line-height: 1.15; -webkit-text-fill-color: var(--text); text-shadow: none; }
   .overlay .card .chip { font-size: 0.58rem; padding: 1px 5px; }
   .overlay .card .cnt { color: var(--muted); font-size: 0.7rem; -webkit-text-fill-color: var(--muted); text-shadow: none; }
@@ -310,6 +310,25 @@
   .overlay .pickrow { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .overlay .pick { width: 92px; height: 132px; border-radius: var(--r-card); border: 2px solid var(--accent); background: repeating-linear-gradient(45deg, var(--panel-solid) 0 10px, #3b2412 10px 20px); font-family: var(--display); font-size: 2rem; color: var(--accent); }
   .ev-ico { font-size: 3rem; line-height: 1; }
+  .vitrine { display: flex; gap: 8px; flex-wrap: wrap; }
+  .vitrine .card, .overlay .card { width: 92px; padding: 8px 6px; border-radius: var(--r-card); background: var(--panel-solid); border: 2px solid currentColor; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  .vitrine .card .nm { color: var(--text); font-weight: 700; font-size: 0.76rem; line-height: 1.15; -webkit-text-fill-color: var(--text); text-shadow: none; }
+  .vitrine .card .chip { font-size: 0.58rem; padding: 1px 5px; }
+  .vitrine .card .cnt { color: var(--muted); font-size: 0.7rem; -webkit-text-fill-color: var(--muted); text-shadow: none; }
+  .vitrine .card .swatch { width: 24px; height: 38px; border-radius: 4px 4px 7px 7px; border-top: 7px solid var(--foam, #fff); }
+  .dog { display: flex; align-items: center; gap: 12px; }
+  .dog .face { font-size: 3rem; line-height: 1; }
+  .dog.happy .face { animation: wag 0.25s ease-in-out 6 alternate; }
+  @keyframes wag { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }
+  .dog b { font-family: var(--display); font-size: calc(1.2rem * var(--dscale)); }
+  .dog .m { font-size: 0.8rem; color: var(--muted); line-height: 1.35; }
+  .btnrow { display: flex; gap: 8px; }
+  .btnrow > * { flex: 1; }
+  .peers { display: flex; gap: 6px; flex-wrap: wrap; }
+  .peer { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font-size: 0.8rem; max-width: 100%; }
+  .peer img { width: 24px; height: 24px; border-radius: 50%; }
+  .peer.me { border-color: var(--accent); }
+  .peer small { color: var(--muted); }
   .stattile b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
   canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 26; width: 100%; height: 100%; }
 
@@ -358,7 +377,7 @@
     <section class="panel" id="tap" role="tabpanel">
       <div class="wallet">
         <div class="amt">🎟️ <span id="bon">0</span></div>
-        <div class="rate">personeel: <span id="bonRate">0</span> bonnekes/s</div>
+        <div class="rate">personeel: <span id="bonRate">0</span> bonnekes/s<span id="liveCount"></span></div>
       </div>
       <div class="buffs" id="buffs"></div>
       <div class="stage" id="stage">
@@ -442,6 +461,18 @@
         <div class="lead" style="margin:0" id="mgInfo"></div>
         <button class="solid" id="mgPlay">🎯 Spelen</button>
       </div>
+      <h2>Bierpong</h2>
+      <div class="mgcard">
+        <div class="lead" style="margin:0">Tien ballen, tien bekers. Tik één keer om te mikken en een tweede keer voor de afstand.</div>
+        <div class="row"><div><b id="pongBest">0</b>beste score</div><div><b id="pongToday">0</b>vandaag gespeeld</div><div><b id="pongClears">0</b>keer alle bekers</div></div>
+        <div class="lead" style="margin:0" id="pongInfo"></div>
+        <button class="solid" id="pongPlay">🏓 Spelen</button>
+      </div>
+      <h2>Caféhond</h2>
+      <div class="mgcard">
+        <div class="dog" id="dogBox"><div class="face" id="dogFace">🐶</div><div><b>Bobbie</b> <span class="chip" id="dogLvl">lvl 0</span><div class="m" id="dogInfo"></div></div></div>
+        <div class="btnrow"><button class="solid" id="dogPet">Aaien</button><button class="solid gold" id="dogFeed">Voederen</button></div>
+      </div>
       <h2>Dagopdrachten</h2>
       <p class="lead" id="questLead">Elke dag drie nieuwe opdrachten.</p>
       <div class="list" id="questList"></div>
@@ -462,6 +493,8 @@
     <section class="panel" id="collectie" role="tabpanel" hidden>
       <h2>Collectie</h2>
       <div class="progress"><div class="bar"><div class="fill" id="colFill"></div></div><span id="colLabel">0</span></div>
+      <h3>Vitrinekast <span class="odds">je zes zeldzaamste bieren</span></h3>
+      <div class="vitrine" id="vitrine"></div>
       <h3>Collectiebeloningen <span class="odds">elke mijlpaal geeft voor altijd +2% bonnekes</span></h3>
       <div class="grid" id="colRewards"></div>
       <h3>Biertypes <span class="odds">een volledig type geeft voor altijd extra bonnekes</span></h3>
@@ -490,6 +523,10 @@
 
     <!-- RANGLIJST -->
     <section class="panel" id="ranglijst" role="tabpanel" hidden>
+      <h2>Nu in het café</h2>
+      <p class="lead" id="liveLead">Wie Pintje nu open heeft, zie je hier.</p>
+      <div class="peers" id="peerList"></div>
+      <button class="solid" id="scholBtn" style="margin-top:8px" hidden>🍻 Schol! roepen naar iedereen</button>
       <h2>Ranglijst</h2>
       <p class="lead">Gerangschikt op punten: elke pint die je zelf drinkt telt mee volgens zijn zeldzaamheid.</p>
       <div class="list" id="board"><div class="empty">De ranglijst wordt geladen…</div></div>
@@ -873,6 +910,10 @@
     { id: 'events25',   ico: '🎲', name: 'Er gebeurt altijd iets', desc: 'Maak 25 voorvallen mee',         ok: s => s.events >= 25 },
     { id: 'quiz10',     ico: '🧠', name: 'Bierprofessor',        desc: 'Beantwoord 10 kroegquizvragen juist',     ok: s => s.quizRight >= 10, crate: 'bak' },
     { id: 'dief5',      ico: '🚓', name: 'Dievenvanger',         desc: 'Vang 5 bonnekesdieven',                   ok: s => s.thieves >= 5 },
+    { id: 'pong10',     ico: '🏓', name: 'Bierpongkoning',       desc: 'Raak alle 10 bekers in één spelletje',    ok: s => s.pong.clears >= 1, crate: 'bak' },
+    { id: 'hond5',      ico: '🐕', name: 'Beste vriend',         desc: 'Breng Bobbie naar level 5',               ok: s => s.dog.lvl >= 5 },
+    { id: 'hond20',     ico: '🦮', name: 'Hondenfluisteraar',    desc: 'Breng Bobbie naar level 20',              ok: s => s.dog.lvl >= 20, crate: 'krat' },
+    { id: 'gezellig',   ico: '🥂', name: 'Gezelligheid troef',   desc: 'Roep 10 keer Schol! naar andere drinkers', ok: s => s.schols >= 10 },
     { id: 'tapper',     ico: '🎯', name: 'Tapper',               desc: 'Speel de tapwedstrijd',                   ok: s => s.mg.plays >= 1 },
     { id: 'tapkampioen',ico: '🏆', name: 'Tapkampioen',          desc: 'Haal 450 in de tapwedstrijd',             ok: s => s.mg.best >= 450, crate: 'bak' },
     { id: 'perfect',    ico: '💯', name: 'Perfect getapt',       desc: 'Tap 25 perfecte rondes',                  ok: s => s.mg.perfects >= 25 },
@@ -910,6 +951,8 @@
     mgscore:{ ico: '💯', text: g => `Haal ${g} punten in één tapwedstrijd`, goal: () => pick([250, 300, 350]), max: true },
     buy:    { ico: '🏪', text: g => `Neem ${g} personeel aan`, goal: () => pick([5, 10, 25]) },
     rare:   { ico: '🔷', text: g => `Drink zelf ${g} zeldzaam bier of beter`, goal: () => pick([1, 2, 3]) },
+    pong:   { ico: '🏓', text: g => `Speel ${g}× bierpong`, goal: () => pick([1, 2]) },
+    pet:    { ico: '🐶', text: g => `Aai Bobbie ${g} keer`, goal: () => pick([1, 2]) },
     earn:   { ico: '🎟️', text: g => `Verdien ${fmt(g)} bonnekes`, goal: () => Math.max(1000, Math.round(staffIncome() * 900 / 100) * 100) },
   };
 
@@ -944,6 +987,9 @@
     { t: 'Kuisploeg opgeroepen naar plaatselijk café: "Het was weer zover."', ok: s => s.pukes >= 1 },
     { t: 'Dokter waarschuwt: "Na tien pintjes wordt alles een gok."', ok: s => s.today >= 8 },
     { t: 'Tapwedstrijd: jury noemt schuimkraag "bijna poëtisch".', ok: s => s.mg.best >= 400 },
+    { t: 'Caféhond Bobbie verkozen tot Hond van het Jaar. Hij was de enige kandidaat.', ok: s => s.dog.lvl >= 3 },
+    { t: 'Bierpongtornooi: winnaar raakte alle bekers en daarna de deur.', ok: s => s.pong.best >= 6 },
+    { t: 'Happy hour verlengd tot "zolang het duurt".' },
     { t: 'Alcoholcontrole aan het café. Iedereen blijkt te voet.', ok: s => s.events >= 1 },
     { t: 'Bonnekesdief opgepakt: "Ik wou gewoon een pintje."', ok: s => s.thieves >= 1 },
     { t: 'Stroompanne in het dorp. Café draait gewoon door bij kaarslicht.', ok: s => s.events >= 3 },
@@ -964,6 +1010,7 @@
     crates: { bak: 0, krat: 0, vat: 0 }, opened: 0, streak: 0, lastDaily: '', lastLevel: 1, lastSeen: 0, pukes: 0,
     mg: { best: 0, plays: 0, perfects: 0, day: '', today: 0 }, quests: null, questsDone: 0, questDays: 0,
     zat: 0, zatAt: 0, events: 0, quizRight: 0, thieves: 0, playSecs: 0,
+    dog: { lvl: 0, lastPet: 0, pets: 0 }, pong: { best: 0, plays: 0, clears: 0, day: '', today: 0 }, schols: 0,
   });
   let S = blank();
   let wipedBefore = false;
@@ -975,6 +1022,8 @@
       if (typeof S.crates === 'number') S.crates = { bak: Math.min(S.crates, 3), krat: 0, vat: 0 };
       S.crates = Object.assign({ bak: 0, krat: 0, vat: 0 }, S.crates);
       S.mg = Object.assign(blank().mg, S.mg || {});
+      S.dog = Object.assign(blank().dog, S.dog || {});
+      S.pong = Object.assign(blank().pong, S.pong || {});
       if ((saved.v || 0) < 3) {
         // v3: staff pints no longer give XP; rebuild XP from the collection and hand back the skill points
         S.xp = BEERS.reduce((x, b) => x + Math.min(S.counts[b.id] || 0, 2000) * RARITIES[b.r].xp, 0);
@@ -1022,16 +1071,28 @@
   // =====================================================================
   const buffs = { prod: null, click: null, luck: null };
   const buffMult = k => buffs[k] && buffs[k].until > performance.now() ? buffs[k].mult : 1;
+  // real-world clock bonuses
+  let TB = [];
+  function refreshTimeBuffs() {
+    const d = new Date(), h = d.getHours(), wd = d.getDay(), out = [];
+    if (h >= 17 && h < 19) out.push({ k: 'click', mult: 2, name: 'Happy hour 17–19 u: eigen slokken ×2' });
+    if (((wd === 5 || wd === 6) && h >= 20) || ((wd === 6 || wd === 0) && h < 3)) out.push({ k: 'prod', mult: 1.5, name: 'Weekend: personeel ×1,5' });
+    if (wd === 0 && h >= 10 && h < 13) out.push({ k: 'xp', mult: 1.5, name: 'Zondagsmatinee: XP ×1,5' });
+    if (wd === 1) out.push({ k: 'luck', mult: 1.2, name: 'Blauwe maandag: geluk ×1,2' });
+    TB = out;
+  }
+  refreshTimeBuffs();
+  const timeMult = k => TB.filter(b => b.k === k).reduce((m, b) => m * b.mult, 1);
   const starMult = () => 1 + S.stars * 0.05;
   const setMult = () => 1 + S.sets.reduce((t, id) => t + (SETS.find(x => x.id === id)?.bonus || 0), 0) + S.colRewards.length * 0.02;
-  const allBonMult = () => Math.pow(1.5, ['bon1', 'bon2', 'bon3', 'bon4', 'bon5', 'bon6', 'bon7'].filter(has).length) * starMult() * setMult() * (1 + rank('legende') * 0.15);
+  const allBonMult = () => Math.pow(1.5, ['bon1', 'bon2', 'bon3', 'bon4', 'bon5', 'bon6', 'bon7'].filter(has).length) * starMult() * setMult() * (1 + rank('legende') * 0.15) * (1 + S.dog.lvl * 0.02);
   const bldMult = id => Math.pow(BLD_UP_MULT, UPGRADES.filter(u => u.bld === id && has(u.id)).length);
   const bldSps = b => b.sps * bldMult(b.id) * (1 + rank('tap') * 0.1);
   const baseSps = () => BUILDINGS.reduce((t, b) => t + (S.bld[b.id] || 0) * bldSps(b), 0);
-  const sps = () => baseSps() * buffMult('prod');
+  const sps = () => baseSps() * buffMult('prod') * timeMult('prod');
   const staffIncome = () => sps() * allBonMult();
   const ownMult = () => (1 + rank('fooi') * 0.1);
-  const clickMult = () => (has('klik1') ? 2 : 1) * (has('klik2') ? 2 : 1) * (has('klik6') ? 2 : 1) * buffMult('click');
+  const clickMult = () => (has('klik1') ? 2 : 1) * (has('klik2') ? 2 : 1) * (has('klik6') ? 2 : 1) * buffMult('click') * timeMult('click');
   const clickPct = () => ['klik3', 'klik4', 'klik5', 'klik7'].filter(has).length * 0.01;
   // value of one sip YOU take
   const sipValue = () => allBonMult() * clickMult() * ownMult() + staffIncome() * clickPct() * buffMult('click');
@@ -1050,7 +1111,7 @@
   // ROLLING
   // =====================================================================
   function weights() {
-    const luck = (1 + rank('geluk') * 0.15) * buffMult('luck'), edel = 1 + rank('edel') * 0.5;
+    const luck = (1 + rank('geluk') * 0.15) * buffMult('luck') * timeMult('luck'), edel = 1 + rank('edel') * 0.5;
     const w = RARITIES.map((r, i) => r.weight * (i >= 2 ? luck : 1) * (i >= GEM && i <= COSMIC ? edel : 1));
     if (rank('arnoldus')) { w[MYTHIC] *= 10; w[DIVINE] *= 10; }
     return w;
@@ -1207,15 +1268,16 @@
     if (secondChance) queueToast('🎲 Tweede kans! Opnieuw getapt.');
     applyBeer();
     const r = current.r;
-    if (r >= GEM) reveal(current);
+    if (r >= GEM) { reveal(current); announceFind(current); }
     else if (r >= 3) confetti(r === 4 ? 140 : 80);
     if (r >= 2) fanfare(r);
+    sendPresence();
     if (navigator.vibrate && r >= 3) navigator.vibrate(r >= 4 ? [80, 50, 80, 50, 200] : [60, 40, 60]);
     fullHold = drinking;
     return POUR_MSG[r];
   }
 
-  const xpMult = () => 1 + rank('kenner') * 0.1;
+  const xpMult = () => (1 + rank('kenner') * 0.1) * timeMult('xp');
   function gainPints(beer, n, src) {
     if (n <= 0) return;
     const first = !(S.counts[beer.id] > 0);
@@ -1707,6 +1769,7 @@
     { id: 'brouwerij', w: 1.5, ok: () => true },
     { id: 'vreemde',   w: 0.6, ok: () => true },
     { id: 'mop',       w: 2,   ok: () => true },
+    { id: 'hond',      w: 1.5, ok: () => S.dog.lvl >= 3 },
   ];
   let nextEventAt = performance.now() + (90 + Math.random() * 90) * 1000;
   function maybeEvent(t) {
@@ -1776,6 +1839,11 @@
       dirty = true;
     },
     dief() {
+      if (S.dog.lvl >= 5 && Math.random() < 0.5) {
+        S.thieves++; const bon = Math.max(100, Math.round(S.bon * 0.02)); addBon(bon);
+        overlay(`<div class="ev-ico">🐕🦹</div><div class="big-t">Bobbie grijpt in!</div><div class="sub">Een dief wilde je bonnekes stelen, maar Bobbie beet hem in zijn broek. Als excuus laat hij ${fmt(bon)} bonnekes achter.</div>`);
+        dirty = true; return;
+      }
       eventBusy = true;
       const b = document.createElement('button');
       b.className = 'thief'; b.setAttribute('aria-label', 'Vang de dief');
@@ -1845,6 +1913,15 @@
       addCrate('bak');
       overlay('<div class="ev-ico">🕵️</div><div class="big-t">Een vreemde trakteert</div><div class="sub">Een man in een lange regenjas zet een bak bier op je tafel, knikt, en verdwijnt. +1 bak bier.</div>');
     },
+    hond() {
+      const x = Math.random();
+      let what;
+      if (x < 0.1) { addCrate('krat'); what = 'een hele krat bier'; }
+      else if (x < 0.4) { addCrate('bak'); what = 'een bak bier'; }
+      else { const bon = income60(180); addBon(bon); what = `een zakje met ${fmt(bon)} bonnekes`; }
+      overlay(`<div class="ev-ico">${dogFace()}</div><div class="big-t">Bobbie brengt iets mee</div><div class="sub">Bobbie komt kwispelend aanlopen met ${what} in zijn bek. Brave hond!</div>`);
+      dirty = true;
+    },
     mop() {
       const bon = income60(20);
       choiceCard('🗣️', 'Een stamgast vertelt een mop', pick(JOKES), [
@@ -1853,6 +1930,223 @@
       ]);
     },
   };
+
+  // =====================================================================
+  // CAFÉHOND BOBBIE
+  // =====================================================================
+  const DOG_MAX = 20, PET_COOLDOWN = 20 * 60000;
+  const dogFace = () => ['🐶', '🐕', '🦮', '🐕‍🦺', '👑'][Math.min(4, Math.floor(S.dog.lvl / 5))] + (S.dog.lvl >= DOG_MAX ? '🐕' : '');
+  const dogFeedCost = () => Math.round(500 * Math.pow(3, S.dog.lvl));
+  function renderDog() {
+    const d = S.dog, left = d.lastPet + PET_COOLDOWN - Date.now();
+    setText($('dogFace'), dogFace());
+    setText($('dogLvl'), `lvl ${d.lvl}`);
+    setText($('dogInfo'), `Elk level geeft +2% bonnekes (nu +${d.lvl * 2}%).${d.lvl >= 3 ? ' Brengt soms cadeautjes mee.' : ' Vanaf level 3 brengt hij cadeautjes mee.'}${d.lvl >= 5 ? ' Bijt dieven.' : ' Vanaf level 5 bijt hij dieven.'}`);
+    const pet = $('dogPet');
+    pet.disabled = left > 0;
+    setText(pet, left > 0 ? `Aaien (over ${Math.ceil(left / 60000)} min)` : '🤚 Aaien');
+    const feed = $('dogFeed');
+    feed.disabled = d.lvl >= DOG_MAX || S.bon < dogFeedCost();
+    setText(feed, d.lvl >= DOG_MAX ? 'Bobbie is volgroeid' : `🦴 Voederen (🎟️ ${fmt(dogFeedCost())})`);
+  }
+  function wagDog() { const b = $('dogBox'); b.classList.remove('happy'); void b.offsetWidth; b.classList.add('happy'); }
+  $('dogPet').addEventListener('click', () => {
+    if (Date.now() - S.dog.lastPet < PET_COOLDOWN) return;
+    S.dog.lastPet = Date.now(); S.dog.pets++;
+    const bon = income60(120), xp = Math.round(xpToNext(levelInfo(S.xp).lvl) * 0.05 * xpMult());
+    addBon(bon); S.xp += xp;
+    questProg('pet', 1);
+    queueToast(`🐶 Bobbie kwispelt! +${fmt(bon)} 🎟️ · +${fmt(xp)} XP`);
+    wake(); tone(900, now(), 0.08, 'square', 0.06); tone(1100, now() + 0.1, 0.08, 'square', 0.06);
+    wagDog(); save(); dirty = true; renderDog();
+  });
+  $('dogFeed').addEventListener('click', () => {
+    const cost = dogFeedCost();
+    if (S.dog.lvl >= DOG_MAX || S.bon < cost) return;
+    S.bon -= cost; S.dog.lvl++;
+    queueToast(`🦴 Bobbie is nu level ${S.dog.lvl}: +${S.dog.lvl * 2}% bonnekes`);
+    wake(); ching(); wagDog(); save(); dirty = true; renderDog();
+  });
+
+  // =====================================================================
+  // MINIGAME: BIERPONG
+  // =====================================================================
+  const pongFactor = () => (S.pong.day === todayKey() && S.pong.today >= 5 ? 0.2 : 1) * (1 + rank('vasthand') * 0.2);
+  function pongPlay() {
+    if (mgOpen) return;
+    stop(); wake();
+    mgOpen = true;
+    const CUPS = [];
+    [[4, 70], [3, 102], [2, 134], [1, 166]].forEach(([n, y]) => { for (let i = 0; i < n; i++) CUPS.push({ x: 150 + (i - (n - 1) / 2) * 34, y, hit: false }); });
+    const o = document.createElement('div');
+    o.className = 'mg';
+    o.innerHTML = `<div class="top"><b>🏓 Bierpong</b><span id="pgBalls">🔴 × 10</span><span id="pgScore">0 / 10</span></div>
+      <div class="field"><svg viewBox="0 0 300 420" aria-hidden="true">
+        <defs><linearGradient id="tbl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a5a3a"/><stop offset="1" stop-color="#173322"/></linearGradient></defs>
+        <path d="M60 20 L240 20 L290 410 L10 410 Z" fill="url(#tbl)" stroke="#e8e0c8" stroke-width="3"/>
+        <line x1="150" y1="20" x2="150" y2="410" stroke="#e8e0c8" stroke-width="1.5" opacity="0.4"/>
+        <g id="pgCups">${CUPS.map((c, i) => `<g id="cup${i}"><circle cx="${c.x}" cy="${c.y}" r="15" fill="#d0283f" stroke="#fff" stroke-width="2"/><circle cx="${c.x}" cy="${c.y}" r="10" fill="#f6c445"/></g>`).join('')}</g>
+        <line id="pgAimX" x1="150" x2="150" y1="20" y2="400" stroke="#fff35c" stroke-width="2" stroke-dasharray="6 6"/>
+        <line id="pgAimY" x1="20" x2="280" y1="120" y2="120" stroke="#5fc8ff" stroke-width="2" stroke-dasharray="6 6" opacity="0"/>
+        <circle id="pgBall" cx="150" cy="380" r="8" fill="#fffaf0" stroke="#c9b48f"/>
+      </svg></div>
+      <div class="msg" id="pgMsg">Tik om te mikken<small>Eerst links-rechts, dan de afstand.</small></div>
+      <div class="actions"><button class="big" id="pgTap" style="background:var(--accent);color:var(--on-accent)">🎯 Mik</button><button class="big outline" id="pgQuit">Stoppen</button></div>`;
+    document.body.appendChild(o);
+    const q = id => o.querySelector('#' + id);
+    let balls = 10, hits = 0, phase = 'aimx', ax = 150, ay = 120, t0 = performance.now(), raf = 0, fly = null;
+    const speed = () => 1.6 + (10 - balls) * 0.12;
+    function loop(t) {
+      const k = (t - t0) / 1000;
+      if (phase === 'aimx') { ax = 150 + Math.sin(k * speed()) * 80; q('pgAimX').setAttribute('x1', ax); q('pgAimX').setAttribute('x2', ax); }
+      if (phase === 'aimy') { ay = 118 + Math.sin(k * speed() * 1.15) * 62; q('pgAimY').setAttribute('y1', ay); q('pgAimY').setAttribute('y2', ay); }
+      if (phase === 'fly' && fly) {
+        const p = Math.min(1, (t - fly.start) / 650);
+        const x = 150 + (ax - 150) * p, y = 380 + (ay - 380) * p - Math.sin(p * Math.PI) * 120;
+        q('pgBall').setAttribute('cx', x); q('pgBall').setAttribute('cy', y); q('pgBall').setAttribute('r', 8 - Math.sin(p * Math.PI) * -4);
+        if (p >= 1) { fly = null; land(); }
+      }
+      raf = requestAnimationFrame(loop);
+    }
+    function land() {
+      const cup = CUPS.find(c => !c.hit && Math.hypot(c.x - ax, c.y - ay) < 14);
+      if (cup) {
+        cup.hit = true; hits++;
+        const g = q('cup' + CUPS.indexOf(cup)); g.style.transition = 'opacity 0.4s'; g.style.opacity = 0.12;
+        q('pgMsg').innerHTML = `PLONS! 🎯<small>${hits === 10 ? 'Alle bekers!' : 'Raak!'}</small>`;
+        tone(500, now(), 0.06, 'sine', 0.15); tone(250, now() + 0.05, 0.2, 'triangle', 0.12);
+        navigator.vibrate?.(40);
+      } else {
+        q('pgMsg').innerHTML = `Mis!<small>${Math.hypot(150 - ax, 0) > 100 ? 'Te ver naast.' : 'Net ernaast.'}</small>`;
+        tone(160, now(), 0.15, 'sine', 0.1);
+      }
+      q('pgScore').textContent = `${hits} / 10`;
+      q('pgBalls').textContent = `🔴 × ${balls}`;
+      if (balls <= 0 || hits === 10) return setTimeout(finish, 900);
+      setTimeout(() => {
+        if (!mgOpen) return;
+        q('pgBall').setAttribute('cx', 150); q('pgBall').setAttribute('cy', 380); q('pgBall').setAttribute('r', 8);
+        q('pgAimY').setAttribute('opacity', 0); q('pgAimX').setAttribute('opacity', 1);
+        phase = 'aimx'; t0 = performance.now(); q('pgTap').textContent = '🎯 Mik'; q('pgTap').disabled = false;
+        q('pgMsg').innerHTML = 'Tik om te mikken<small>Eerst links-rechts, dan de afstand.</small>';
+      }, 800);
+    }
+    function tap() {
+      if (phase === 'aimx') { phase = 'aimy'; t0 = performance.now(); q('pgAimY').setAttribute('opacity', 1); q('pgTap').textContent = '🎯 Gooi'; q('pgMsg').innerHTML = 'Nu de afstand<small>Tik als de blauwe lijn op een beker staat.</small>'; }
+      else if (phase === 'aimy') { phase = 'fly'; balls--; fly = { start: performance.now() }; q('pgTap').disabled = true; tone(700, now(), 0.05, 'triangle', 0.08); }
+      else if (phase === 'done') { close(); pongPlay(); }
+    }
+    function finish() {
+      phase = 'done';
+      const f = pongFactor();
+      const bon = Math.round((200 + staffIncome() * 300) * hits / 10 * f);
+      const xp = Math.round(xpToNext(levelInfo(S.xp).lvl) * 0.12 * hits / 10 * f * xpMult());
+      addBon(bon); S.xp += xp;
+      if (S.pong.day !== todayKey()) { S.pong.day = todayKey(); S.pong.today = 0; }
+      S.pong.today++; S.pong.plays++;
+      const best = hits > S.pong.best; if (best) S.pong.best = hits;
+      let extra = '';
+      if (hits === 10) { S.pong.clears++; addCrate('bak'); extra = ' · +1 bak'; confetti(140); fanfare(5); } else fanfare(hits >= 6 ? 3 : 2);
+      questProg('pong', 1);
+      q('pgMsg').innerHTML = `${best ? '🏆 Nieuw record! ' : ''}${hits} van de 10 bekers<small>+${fmt(bon)} 🎟️ · +${fmt(xp)} XP${extra}${f < 1 ? ' (verminderde beloning na 5 spelletjes vandaag)' : ''}</small>`;
+      q('pgTap').textContent = 'Nog eens'; q('pgTap').disabled = false;
+      save(); dirty = true;
+    }
+    q('pgTap').addEventListener('click', tap);
+    const kd = e => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); if (!q('pgTap').disabled) tap(); } };
+    document.addEventListener('keydown', kd);
+    function close() { cancelAnimationFrame(raf); document.removeEventListener('keydown', kd); o.remove(); mgOpen = false; renderVisible(); }
+    q('pgQuit').addEventListener('click', close);
+    raf = requestAnimationFrame(loop);
+  }
+  $('pongPlay').addEventListener('click', pongPlay);
+
+  // =====================================================================
+  // LIVE CAFÉ (room): who's here, Schol!, rare finds
+  // =====================================================================
+  let room = null, lastPresence = '', scholReadyAt = 0;
+  const lastScholFrom = {};
+  const others = () => room ? room.peers().filter(p => p.kind === 'viewer' && !p.isMe) : [];
+  async function nameOf(by) {
+    if (!by || !user) return 'Een drinker';
+    try { const ps = await user.profiles([by]); return (ps[by] && ps[by].name) || 'Een drinker'; } catch (e) { return 'Een drinker'; }
+  }
+  function sendPresence() {
+    if (!room || !current) return;
+    const p = { lvl: levelInfo(S.xp).lvl, beer: current.id };
+    const k = JSON.stringify(p);
+    if (k === lastPresence) return;
+    lastPresence = k;
+    room.presence(p).catch(() => {});
+  }
+  let peerSeq = 0;
+  async function renderPeers() {
+    const el = $('peerList'), seq = ++peerSeq;
+    if (!room) { $('liveLead').textContent = 'Live meedrinken werkt als je Pintje opent via de gedeelde link op claude.ai.'; el.textContent = ''; return; }
+    const ps = room.peers().filter(p => p.kind === 'viewer');
+    const seen = new Map();
+    ps.forEach(p => { const key = p.by || p.peer; if (!seen.has(key) || p.isMe) seen.set(key, p); });
+    const list = [...seen.values()];
+    const ids = list.map(p => p.by).filter(Boolean);
+    const prof = user && ids.length ? await user.profiles(ids) : {};
+    if (seq !== peerSeq) return;
+    el.textContent = '';
+    list.sort((a, b) => b.isMe - a.isMe).forEach(p => {
+      const pr = (p.by && prof[p.by]) || {};
+      const chip = document.createElement('div'); chip.className = 'peer' + (p.isMe ? ' me' : '');
+      const img = document.createElement('img'); img.alt = ''; if (pr.avatarUrl) img.src = pr.avatarUrl;
+      const nm = document.createElement('span');
+      const beer = BEER[p.presence && p.presence.beer];
+      const lvl = Number.isInteger(p.presence && p.presence.lvl) ? p.presence.lvl : null;
+      nm.textContent = (pr.name || (p.isMe ? 'Jij' : 'Een drinker')) + (p.isMe ? ' (jij)' : '');
+      const sm = document.createElement('small');
+      sm.textContent = [lvl ? `lvl ${lvl}` : '', beer ? beer.name : ''].filter(Boolean).join(' · ');
+      chip.append(img, nm); if (sm.textContent) { chip.append(' '); chip.append(sm); }
+      el.appendChild(chip);
+    });
+    const n = others().length;
+    $('liveLead').textContent = n ? `${n} andere drinker${n > 1 ? 's' : ''} ${n > 1 ? 'hebben' : 'heeft'} Pintje nu open. Roep Schol! voor een bonus voor iedereen.` : 'Je zit alleen aan de toog. Deel de link en drink samen.';
+    $('scholBtn').hidden = n === 0;
+    setText($('liveCount'), n ? ` · 👥 ${n + 1} in het café` : '');
+  }
+  $('scholBtn').addEventListener('click', () => {
+    if (!room || performance.now() < scholReadyAt) return;
+    const n = others().length;
+    if (!n) return;
+    scholReadyAt = performance.now() + 30000;
+    room.emit('schol', {}).then(() => {
+      S.schols++;
+      const bon = income60(10) * Math.min(5, n); addBon(bon);
+      queueToast(`🍻 SCHOL! naar ${n} drinker${n > 1 ? 's' : ''} · +${fmt(bon)} 🎟️`);
+      wake(); ching(); confetti(40); dirty = true;
+    }).catch(() => queueToast('Je kan hier enkel meekijken: Schol! roepen lukt niet.'));
+    const b = $('scholBtn'); b.disabled = true; setTimeout(() => { b.disabled = false; }, 30000);
+  });
+  async function initRoom() {
+    try { room = window.claude && await window.claude.use('room'); } catch (e) { room = null; }
+    if (!room) { renderPeers(); return; }
+    room.onPeers(() => { if (activeTab() === 'ranglijst') renderPeers(); else { const n = others().length; setText($('liveCount'), n ? ` · 👥 ${n + 1} in het café` : ''); } }, () => { room = null; renderPeers(); });
+    room.on('schol', async m => {
+      if (m.sameTab || m.kind !== 'viewer') return;
+      const key = m.by || m.peer;
+      const name = await nameOf(m.by);
+      if (!lastScholFrom[key] || performance.now() - lastScholFrom[key] > 20000) {
+        lastScholFrom[key] = performance.now();
+        const bon = income60(10); addBon(bon);
+        queueToast(`🍻 ${name} roept Schol! +${fmt(bon)} 🎟️`);
+      } else queueToast(`🍻 ${name} roept Schol!`);
+      tone(1200, now(), 0.1, 'triangle', 0.08);
+    });
+    room.on('vondst', async m => {
+      if (m.isMe || m.kind !== 'viewer') return;
+      const b = m.data && typeof m.data.id === 'string' ? BEER[m.data.id] : null;
+      if (!b || b.r < GEM) return;
+      queueToast(`🔔 ${await nameOf(m.by)} vond ${RARITIES[b.r].label.toLowerCase()}: ${b.name}!`);
+    });
+    sendPresence();
+    renderPeers();
+  }
+  function announceFind(b) { if (room && b.r >= GEM) room.emit('vondst', { id: b.id }).catch(() => {}); }
 
   // =====================================================================
   // MINIGAME: TAPWEDSTRIJD
@@ -2026,7 +2320,8 @@
     setText($('kRate'), fmt(inc));
     setText($('kPints'), fmt(S.staffPints));
     const t = performance.now();
-    const b = [buffs.prod, buffs.click, buffs.luck].filter(x => x && x.until > t).map(x => `<span class="buff">${x.name} · ${Math.ceil((x.until - t) / 1000)}s</span>`).join('');
+    const b = [buffs.prod, buffs.click, buffs.luck].filter(x => x && x.until > t).map(x => `<span class="buff">${x.name} · ${Math.ceil((x.until - t) / 1000)}s</span>`).join('')
+      + TB.map(x => `<span class="buff" style="background:var(--panel-solid);color:var(--accent);border:1px solid var(--accent)">${x.name}</span>`).join('');
     if ($('buffs').innerHTML !== b) $('buffs').innerHTML = b;
     let cr = Object.keys(CRATES).filter(k => S.crates[k] > 0).map(k => `<button class="crate-btn ${k}" data-crate="${k}">${CRATES[k].ico} ${CRATES[k].name} (${S.crates[k]})</button>`).join('');
     if (crateTotal() > 1) cr += `<button class="crate-btn all" data-crate="all">Alles openen (${crateTotal()})</button>`;
@@ -2138,6 +2433,11 @@
 
   function renderSpel() {
     ensureQuests();
+    renderDog();
+    setText($('pongBest'), String(S.pong.best));
+    setText($('pongToday'), String(S.pong.day === todayKey() ? S.pong.today : 0));
+    setText($('pongClears'), String(S.pong.clears));
+    setText($('pongInfo'), `Beloning per beker: bonnekes en XP. Alle 10 raak geeft een bak bier.${pongFactor() < 1 ? ' Na 5 spelletjes per dag krijg je 20% van de beloning.' : ''}`);
     setText($('mgBest'), String(S.mg.best));
     setText($('mgToday'), String(S.mg.day === todayKey() ? S.mg.today : 0));
     setText($('mgPerf'), String(S.mg.perfects));
@@ -2167,6 +2467,8 @@
     const u = uniqueCount(S);
     $('colFill').style.width = (u / BEERS.length * 100) + '%';
     $('colLabel').textContent = `${u} / ${BEERS.length}`;
+    const top = BEERS.filter(b => S.counts[b.id] > 0).sort((a, b) => b.r - a.r || (S.counts[b.id] - S.counts[a.id])).slice(0, 6);
+    $('vitrine').innerHTML = top.length ? top.map(b => beerCardHtml(b, 0, S.counts[b.id])).join('') : '<div class="empty" style="width:100%">Nog leeg. Drink je eerste pintje!</div>';
     const cr = $('colRewards'); cr.textContent = '';
     COL_MILESTONES.forEach(ms => {
       const done = S.colRewards.includes(ms.n);
@@ -2358,7 +2660,7 @@
     if (tab === 'skills') renderSkills();
     if (tab === 'collectie') renderCollection();
     if (tab === 'stijl') renderStyle();
-    if (tab === 'ranglijst') { renderBoard(); renderStats(); }
+    if (tab === 'ranglijst') { renderBoard(); renderStats(); renderPeers(); }
   }
   document.querySelectorAll('nav button').forEach(btn => btn.addEventListener('click', () => {
     stop();
@@ -2451,10 +2753,11 @@
     if (dt < 5) S.playSecs += dt;
     if (fx || fxWasOn) { drawFx(t); fxWasOn = !!fx; }
     uiAcc += dt; slowAcc += dt; saveAcc += dt;
-    if (uiAcc > 0.25) { uiAcc = 0; renderWallet(); if (activeTab() === 'kroeg') renderKroeg(); }
+    if (uiAcc > 0.25) { uiAcc = 0; renderWallet(); if (activeTab() === 'kroeg') renderKroeg(); if (activeTab() === 'spel') renderDog(); }
     if (slowAcc > 1) {
       // slowly sober up: one pint less on the meter every 15 minutes
       if (S.zat > 0 && Date.now() - S.zatAt > 15 * 60000) { S.zat--; S.zatAt = Date.now(); dirty = true; }
+      refreshTimeBuffs(); sendPresence();
     }
     if (slowAcc > 1) { slowAcc = 0; checkProgress(); if (dirty) { dirty = false; renderVisible(); schedulePush(); } }
     if (saveAcc > 5) { saveAcc = 0; save(); }
@@ -2500,7 +2803,7 @@
       ['📖', 'Soorten gevonden', `${uniqueCount(S)}/${BEERS.length}`], ['🎟️', 'Bonnekes ooit verdiend', fmt(S.bonAll)], ['⭐', 'Kroegsterren', fmt(S.stars)],
       ['🧢', 'Gouden doppen', fmt(S.caps)], ['🎲', 'Voorvallen', fmt(S.events)], ['🧠', 'Quizvragen juist', fmt(S.quizRight)],
       ['🚓', 'Dieven gevangen', fmt(S.thieves)], ['📦', 'Bakken geopend', fmt(S.opened)], ['🤮', 'Keer gebrokt', fmt(S.pukes)],
-      ['🎯', 'Beste tapwedstrijd', `${S.mg.best} / 500`], ['📅', 'Dagen op rij', fmt(S.streak)], ['⏱️', 'Speeltijd', `${h} u ${m} min`],
+      ['🎯', 'Beste tapwedstrijd', `${S.mg.best} / 500`], ['🏓', 'Beste bierpong', `${S.pong.best} / 10`], ['🐶', 'Bobbie', `level ${S.dog.lvl}`], ['🥂', 'Schol! geroepen', fmt(S.schols)], ['📅', 'Dagen op rij', fmt(S.streak)], ['⏱️', 'Speeltijd', `${h} u ${m} min`],
     ];
     const el = $('statList'); el.textContent = '';
     rows.forEach(([ico, label, val]) => {
@@ -2628,7 +2931,8 @@
   renderWallet(); renderTapStats(); renderKroeg();
   requestAnimationFrame(t => { lastFrame = t; requestAnimationFrame(frame); });
   initShared();
-  if (location.protocol === 'file:' && location.hash === '#debug') window.pintjeDebug = { event: id => EVENT_RUN[id](), state: () => S, puke };
+  initRoom();
+  if (location.protocol === 'file:' && location.hash === '#debug') window.pintjeDebug = { event: id => EVENT_RUN[id](), state: () => S, puke, pong: pongPlay };
 })();
 </script>
 </body>

@@ -17,5 +17,10 @@ A Belgian beer idle game. Open `index.html` in a browser (works great on a phone
 - **Brokken**: once the zatheidsmeter passes 10 you might throw up, which resets the meter to zero. The meter also drops by one every 15 minutes.
 - **Voorvallen**: random events every few minutes, like a kroegquiz with Belgian beer trivia, a police breath test, a bonnekes thief to catch, a broken tap to fix, a power cut, a kermis, a brewery visit, a stranger buying a crate, and stamgasten telling jokes.
 - **Statistieken** on the Top tab.
+- **Bierpong**: a second minigame. Aim left-right, then for distance, with ten balls for ten cups.
+- **Caféhond Bobbie**: pet him every 20 minutes and feed him to level up (+2% bonnekes per level). He brings gifts and bites thieves.
+- **Clock bonuses**: happy hour 17–19 h (own sips ×2), weekend evenings (staff ×1.5), Sunday matinee (XP ×1.5) and blauwe maandag (luck ×1.2).
+- **Vitrinekast**: your six rarest beers on display.
+- **Nu in het café**: see who else has Pintje open, shout "Schol!" for a shared bonus, and hear about other players' rare finds live.
 - **Alles wissen**: wipe all progress (local and on the leaderboard) from the Stijl tab.
 - **Ranglijst**: a shared leaderboard when opened through the claude.ai artifact link.
