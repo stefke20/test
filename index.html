@@ -81,6 +81,18 @@
   .stats { display: flex; gap: 24px; justify-content: center; margin-top: 16px; color: var(--muted); font-size: 0.9rem; }
   .stats b { color: var(--text); font-size: 1.2rem; display: block; text-align: center; }
 
+  .badge {
+    margin: 0 auto 4px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #3b2412;
+    border: 1px solid #c9a46b;
+    color: #f3dcb0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
   .hint { color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: 8px; }
   #tilt { background: none; color: var(--muted); text-decoration: underline; padding: 4px; font-size: 0.85rem; font-weight: 500; }
 </style>
@@ -96,8 +108,8 @@
       <svg class="glass" viewBox="0 0 200 300" aria-label="Glas bier">
         <defs>
           <linearGradient id="beerGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#f7c548"/>
-            <stop offset="1" stop-color="#d98a12"/>
+            <stop id="beerTop" offset="0" stop-color="#f7c548"/>
+            <stop id="beerBottom" offset="1" stop-color="#d98a12"/>
           </linearGradient>
           <clipPath id="glassClip">
             <path d="M30 20 L170 20 L152 280 Q150 290 140 290 L60 290 Q50 290 48 280 Z"/>
@@ -124,6 +136,7 @@
     </div>
   </div>
 
+  <div class="badge hidden" id="badge">🏆 Westvleteren 12! Een zeldzaamheid…</div>
   <div class="status" id="status" aria-live="polite">Hou ingedrukt om te drinken</div>
 
   <div class="controls">
@@ -135,6 +148,7 @@
   <div class="stats">
     <div><b id="today">0</b>vandaag</div>
     <div><b id="total">0</b>in totaal</div>
+    <div><b id="wv">0</b>Westvleteren</div>
   </div>
   <p class="hint">Drink met mate. Een pintje is geen water. 😉</p>
 
@@ -152,6 +166,13 @@
   const tiltBtn = document.getElementById('tilt');
   const todayEl = document.getElementById('today');
   const totalEl = document.getElementById('total');
+  const wvEl = document.getElementById('wv');
+  const badge = document.getElementById('badge');
+  const beerTop = document.getElementById('beerTop');
+  const beerBottom = document.getElementById('beerBottom');
+
+  const WV_CHANCE = 0.2;   // kans dat er een Westvleteren 12 getapt wordt
+  let isWV = false;
 
   let level = 1;          // 1 = full, 0 = empty
   let drinking = false;
@@ -166,7 +187,8 @@
   } catch (e) {}
   if (stats.day !== todayKey) { stats.day = todayKey; stats.today = 0; }
   const save = () => { try { localStorage.setItem('pintje', JSON.stringify(stats)); } catch (e) {} };
-  const renderStats = () => { todayEl.textContent = stats.today; totalEl.textContent = stats.total; };
+  stats.wv ||= 0;
+  const renderStats = () => { todayEl.textContent = stats.today; totalEl.textContent = stats.total; wvEl.textContent = stats.wv; };
   renderStats();
 
   // ---- sound ----
@@ -221,6 +243,15 @@
   }
   setInterval(spawnBubble, 220);
 
+  // ---- which beer ----
+  function pickBeer() {
+    isWV = Math.random() < WV_CHANCE;
+    beerTop.setAttribute('stop-color', isWV ? '#7a3b16' : '#f7c548');
+    beerBottom.setAttribute('stop-color', isWV ? '#3a1806' : '#d98a12');
+    foam.querySelectorAll('rect, circle').forEach(el => el.setAttribute('fill', isWV ? '#ead2a8' : '#fffaf0'));
+    badge.classList.toggle('hidden', !isWV);
+  }
+
   // ---- render ----
   function render() {
     const surface = TOP + (1 - level) * (BOTTOM - TOP);
@@ -264,16 +295,18 @@
     drinking = false;
     glassWrap.classList.remove('drinking');
     stats.today++; stats.total++;
+    if (isWV) stats.wv++;
     save(); renderStats();
     burp();
     navigator.vibrate?.([60, 40, 120]);
-    status.textContent = 'Burp! Pintje op. 🎉';
+    status.textContent = isWV ? 'Burp! Een Westvleteren op. Hemels! 🙏' : 'Burp! Pintje op. 🎉';
     drinkBtn.classList.add('hidden');
     refillBtn.classList.remove('hidden');
   }
   function refill() {
     refillBtn.classList.add('hidden');
     drinkBtn.classList.remove('hidden');
+    pickBeer();
     status.textContent = 'Wordt getapt…';
     const from = level, t0 = performance.now();
     (function pour(now) {
@@ -281,7 +314,7 @@
       level = from + (1 - from) * (1 - Math.pow(1 - p, 3));
       render();
       if (p < 1) requestAnimationFrame(pour);
-      else status.textContent = 'Vers getapt! Hou ingedrukt om te drinken';
+      else status.textContent = isWV ? 'Jackpot! Rechtstreeks van de abdij 🏆' : 'Vers getapt! Hou ingedrukt om te drinken';
     })(t0);
   }
 
@@ -314,6 +347,8 @@
     });
   }
 
+  pickBeer();
+  if (isWV) status.textContent = 'Jackpot! Rechtstreeks van de abdij 🏆';
   render();
 })();
 </script>
