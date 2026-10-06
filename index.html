@@ -2,354 +2,1016 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#1b1209">
 <title>Pintje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
+  /* Layout: one-screen café app — header, swappable panel (tap / collectie / glazen / ranglijst), tab bar like a row of beer mats. */
   :root {
+    color-scheme: dark;
     --bg: #1b1209;
     --bg-2: #2a1c0e;
+    --panel: #26190c;
+    --line: #4a341c;
     --text: #fbefd9;
     --muted: #c9b48f;
-    --beer-top: #f7c548;
-    --beer-bottom: #d98a12;
-    --foam: #fffaf0;
-    --glass: rgba(255, 255, 255, 0.18);
     --accent: #f7c548;
+    --on-accent: #2a1a05;
+    --r0: #b3a690;   /* gewoon */
+    --r1: #6cc070;   /* ongewoon */
+    --r2: #58a9e6;   /* zeldzaam */
+    --r3: #b88aee;   /* episch */
+    --r4: #f0913a;   /* legendarisch */
+    --r5: #ffd75e;   /* mythisch */
+    --display: "Alfa Slab One", "Rockwell", Georgia, serif;
+    --body: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
-    background: radial-gradient(ellipse at top, var(--bg-2), var(--bg) 70%);
+    background: radial-gradient(ellipse at top, var(--bg-2), var(--bg) 70%) var(--bg);
     color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px 16px;
+    font-family: var(--body);
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  header { text-align: center; }
-  h1 { margin: 0; font-size: 2.2rem; letter-spacing: 0.02em; }
-  .sub { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
-
-  .stage {
-    flex: 1;
+  .app {
+    height: 100%;
+    max-width: 480px;
+    margin: 0 auto;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+    flex-direction: column;
+    padding: 12px 16px 0;
   }
-  .glass-wrap {
-    transition: transform 0.25s ease-out;
-    transform-origin: 50% 90%;
+  header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 4px 8px; }
+  h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 1.9rem; letter-spacing: 0.01em; color: var(--accent); }
+  .points { text-align: right; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .points b { display: block; color: var(--text); font-size: 1.15rem; }
+
+  .lvl { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; max-width: 200px; }
+  .lvl .badge {
+    font-family: var(--display); font-size: 0.95rem; background: var(--accent); color: var(--on-accent);
+    border-radius: 8px; padding: 2px 8px; flex: none; font-variant-numeric: tabular-nums;
   }
+  .lvl .xpwrap { flex: 1; min-width: 0; font-size: 0.7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .lvl .bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-bottom: 2px; }
+  .lvl .fill { height: 100%; background: linear-gradient(90deg, var(--r2), var(--r3)); width: 0; transition: width 0.5s; }
+  .sp-dot { color: var(--accent); font-weight: 700; }
+  .xpdrop {
+    position: absolute; left: 50%; top: 40%; transform: translate(-50%, 0); font-family: var(--display); font-size: 1.4rem;
+    pointer-events: none; animation: xpup 1.6s ease-out forwards; text-shadow: 0 2px 6px #000a; white-space: nowrap;
+  }
+  @keyframes xpup { from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.1); } to { opacity: 0; transform: translate(-50%, -80px); } }
+
+  /* ---- skills ---- */
+  .sp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .sp-count { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tier { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+  .skill {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px;
+    display: flex; flex-direction: column; gap: 4px; min-width: 0;
+  }
+  .skill.maxed { border-color: var(--accent); }
+  .skill.locked { opacity: 0.5; }
+  .skill .top { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+  .skill .top span { font-size: 1.2rem; }
+  .skill .m { color: var(--muted); font-size: 0.78rem; line-height: 1.3; }
+  .skill .eff { font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+  .pips { display: flex; gap: 3px; }
+  .pips i { width: 12px; height: 6px; border-radius: 2px; background: var(--line); }
+  .pips i.on { background: var(--accent); }
+  .skill button, .ghost {
+    margin-top: 2px; border: 0; border-radius: 8px; padding: 7px; font-weight: 700; background: var(--accent); color: var(--on-accent);
+  }
+  .skill button:disabled { background: var(--line); color: var(--muted); cursor: default; }
+  .ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); padding: 5px 10px; font-weight: 600; font-size: 0.8rem; }
+
+  main { flex: 1; min-height: 0; position: relative; }
+  .panel { position: absolute; inset: 0; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 12px; }
+  .panel[hidden] { display: none !important; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.3rem; margin: 8px 0 4px; }
+  h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; margin: 16px 0 8px; }
+  .lead { color: var(--muted); margin: 0 0 8px; font-size: 0.9rem; }
+
+  /* ---- tap ---- */
+  #tap { align-items: center; justify-content: space-between; overflow: hidden; }
+  .stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; width: 100%; position: relative; }
+  .glass-wrap { transition: transform 0.25s ease-out; transform-origin: 50% 90%; height: 100%; display: flex; align-items: center; }
   .glass-wrap.drinking { transform: rotate(-38deg) translateY(-10px); }
+  svg.glass { height: min(100%, 300px); width: auto; max-width: 60vw; display: block; overflow: visible; }
+  .glass-wrap.mythic svg.glass { animation: halo 1.6s ease-in-out infinite alternate; }
+  @keyframes halo { from { filter: drop-shadow(0 0 6px #ffd75e88); } to { filter: drop-shadow(0 0 22px #ffd75e); } }
 
-  svg.glass { width: min(56vw, 220px); height: auto; display: block; overflow: visible; }
+  body.zat-1 .stage { animation: sway 4s ease-in-out infinite; }
+  body.zat-2 .stage { animation: sway 2.6s ease-in-out infinite; --sway: 4deg; }
+  body.zat-3 .stage { animation: sway 1.8s ease-in-out infinite; --sway: 7deg; filter: blur(0.6px); }
+  @keyframes sway { 0%, 100% { transform: rotate(calc(var(--sway, 2deg) * -1)); } 50% { transform: rotate(var(--sway, 2deg)); } }
 
-  .bubble { fill: rgba(255, 255, 255, 0.55); }
-
-  .status {
-    min-height: 1.6em;
-    text-align: center;
-    font-size: 1.15rem;
-    font-weight: 600;
-    margin: 8px 0 16px;
+  .beer-card { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .beer-card.pop { animation: pop 0.5s cubic-bezier(.2, 1.6, .4, 1); }
+  @keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
+  .beer-name { font-family: var(--display); font-size: 1.35rem; line-height: 1.15; text-wrap: balance; }
+  .beer-meta { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .chip {
+    display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor;
   }
+  .new { background: var(--accent); color: var(--on-accent); border-color: var(--accent); margin-left: 4px; }
+  .r0 { color: var(--r0); } .r1 { color: var(--r1); } .r2 { color: var(--r2); }
+  .r3 { color: var(--r3); } .r4 { color: var(--r4); }
+  .r5 { color: var(--r5); text-shadow: 0 0 8px #ffd75e99; }
 
-  .controls { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; }
-  button {
-    font: inherit;
-    font-weight: 700;
-    font-size: 1.1rem;
-    border: 0;
-    border-radius: 999px;
-    padding: 16px 20px;
-    cursor: pointer;
-    touch-action: none;
+  .status { min-height: 1.5em; text-align: center; font-size: 1.05rem; font-weight: 600; margin: 6px 0 10px; }
+  .controls { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 360px; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .big {
+    font-weight: 700; font-size: 1.1rem; border: 0; border-radius: 999px; padding: 15px 20px; touch-action: none;
   }
-  #drink { background: var(--accent); color: #2a1a05; }
+  #drink { background: var(--accent); color: var(--on-accent); }
   #drink:active { filter: brightness(0.92); }
   #refill { background: transparent; color: var(--text); border: 2px solid var(--muted); }
+  .link { background: none; border: 0; color: var(--muted); text-decoration: underline; padding: 4px; font-size: 0.85rem; }
   .hidden { display: none !important; }
+  .stats { display: flex; gap: 20px; justify-content: center; margin-top: 10px; color: var(--muted); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+  .stats b { color: var(--text); font-size: 1.1rem; display: block; text-align: center; }
+  .meter { width: 100%; max-width: 360px; margin-top: 8px; font-size: 0.75rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .meter .bar { flex: 1; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .meter .fill { height: 100%; background: linear-gradient(90deg, var(--r1), var(--accent), var(--r4)); width: 0; transition: width 0.4s; }
 
-  .stats { display: flex; gap: 24px; justify-content: center; margin-top: 16px; color: var(--muted); font-size: 0.9rem; }
-  .stats b { color: var(--text); font-size: 1.2rem; display: block; text-align: center; }
-
-  .badge {
-    margin: 0 auto 4px;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: #3b2412;
-    border: 1px solid #c9a46b;
-    color: #f3dcb0;
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-align: center;
+  /* ---- collectie ---- */
+  .progress { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .progress .bar { flex: 1; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .progress .fill { height: 100%; background: var(--accent); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .tile {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px;
+    background: var(--panel); border: 1px solid var(--line); min-width: 0;
   }
+  .tile .swatch { width: 18px; height: 30px; border-radius: 3px 3px 5px 5px; flex: none; border-top: 5px solid var(--foam, #fff); }
+  .tile .t { min-width: 0; }
+  .tile .n { font-weight: 600; font-size: 0.9rem; line-height: 1.15; }
+  .tile .m { color: var(--muted); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+  .tile.locked { opacity: 0.5; }
+  .tile.locked .swatch { background: var(--line) !important; border-top-color: var(--line); }
+  .odds { color: var(--muted); font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 6px; }
+  .ach { display: flex; flex-direction: column; gap: 6px; }
+  .ach .tile .swatch { display: none; }
+  .ach .ico { font-size: 1.3rem; width: 28px; text-align: center; flex: none; }
 
-  .hint { color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: 8px; }
-  #tilt { background: none; color: var(--muted); text-decoration: underline; padding: 4px; font-size: 0.85rem; font-weight: 500; }
+  /* ---- glazen ---- */
+  .skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+  .skin {
+    background: var(--panel); border: 2px solid var(--line); border-radius: 12px; padding: 10px 6px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+  }
+  .skin svg { width: 46px; height: 70px; }
+  .skin .n { font-weight: 600; font-size: 0.9rem; }
+  .skin .m { color: var(--muted); font-size: 0.72rem; line-height: 1.2; }
+  .skin.on { border-color: var(--accent); }
+  .skin:disabled { cursor: default; opacity: 0.45; }
+
+  /* ---- ranglijst ---- */
+  .board { display: flex; flex-direction: column; gap: 6px; }
+  .row {
+    display: grid; grid-template-columns: 28px 32px 1fr auto; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line);
+  }
+  .row.me { border-color: var(--accent); }
+  .row .rank { font-family: var(--display); text-align: center; font-variant-numeric: tabular-nums; }
+  .row img { width: 32px; height: 32px; border-radius: 50%; }
+  .row .who { min-width: 0; }
+  .row .nm { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .sub { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .row .pts { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+  .empty { color: var(--muted); padding: 16px; text-align: center; border: 1px dashed var(--line); border-radius: 10px; }
+
+  /* ---- tab bar ---- */
+  nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding-block: 8px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); }
+  nav button {
+    position: relative; background: none; border: 0; border-radius: 10px; padding: 6px 2px; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.75rem; font-weight: 600;
+  }
+  nav button span { font-size: 1.3rem; line-height: 1; }
+  nav button .dot { position: absolute; top: 2px; right: 18%; width: 9px; height: 9px; border-radius: 50%; background: var(--r4); }
+  nav button[aria-selected="true"] { color: var(--accent); background: var(--panel); }
+
+  /* ---- overlays ---- */
+  .toast {
+    position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -150%);
+    background: var(--panel); border: 1px solid var(--accent); color: var(--text); padding: 10px 16px; border-radius: 12px;
+    font-weight: 600; z-index: 20; transition: transform 0.35s ease, visibility 0.35s; max-width: calc(100% - 32px); text-align: center;
+    visibility: hidden;
+  }
+  .toast { transform: translate(-50%, calc(-100% - 40px)); }
+  .toast.show { transform: translate(-50%, 0); visibility: visible; }
+  .mythic-overlay {
+    position: fixed; inset: 0; z-index: 15; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; padding: 16px; text-align: center; background: radial-gradient(circle, #5a4210f8, #1b1209fc 70%); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    animation: fadein 0.6s ease;
+  }
+  .mythic-overlay .big-t { font-family: var(--display); font-size: 2rem; color: var(--r5); text-shadow: 0 0 20px #ffd75e; text-wrap: balance; }
+  @keyframes fadein { from { opacity: 0; } }
+  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 14; width: 100%; height: 100%; }
+
+  @media (prefers-reduced-motion: reduce) {
+    body[class*="zat-"] .stage { animation: none !important; filter: none !important; }
+    .glass-wrap, .beer-card.pop, .glass-wrap.mythic svg.glass { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
+<div class="app">
   <header>
-    <h1>🍺 Pintje</h1>
-    <p class="sub">Schol! Een frisse pint, altijd binnen handbereik.</p>
+    <h1>Pintje</h1>
+    <div class="lvl" title="Level en XP">
+      <div class="badge" id="lvlBadge">Lvl 1</div>
+      <div class="xpwrap"><div class="bar"><div class="fill" id="xpFill"></div></div><span id="xpLabel">0 / 60 XP</span></div>
+    </div>
+    <div class="points"><b id="hdrPoints">0</b>punten</div>
   </header>
 
-  <div class="stage">
-    <div class="glass-wrap" id="glassWrap">
-      <svg class="glass" viewBox="0 0 200 300" aria-label="Glas bier">
-        <defs>
-          <linearGradient id="beerGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop id="beerTop" offset="0" stop-color="#f7c548"/>
-            <stop id="beerBottom" offset="1" stop-color="#d98a12"/>
-          </linearGradient>
-          <clipPath id="glassClip">
-            <path d="M30 20 L170 20 L152 280 Q150 290 140 290 L60 290 Q50 290 48 280 Z"/>
-          </clipPath>
-        </defs>
+  <main>
+    <!-- TAP -->
+    <section class="panel" id="tap" role="tabpanel">
+      <div class="stage">
+        <div class="glass-wrap" id="glassWrap">
+          <svg class="glass" viewBox="0 0 200 300" aria-label="Glas bier">
+            <defs>
+              <linearGradient id="beerGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop id="beerTop" offset="0" stop-color="#f7c548"/>
+                <stop id="beerBottom" offset="1" stop-color="#d98a12"/>
+              </linearGradient>
+              <clipPath id="glassClip"><path id="clipPath" d=""/></clipPath>
+            </defs>
+            <g id="decorBack"></g>
+            <g clip-path="url(#glassClip)">
+              <rect id="beer" x="0" y="40" width="200" height="250" fill="url(#beerGrad)"/>
+              <g id="bubbles"></g>
+              <g id="foam">
+                <rect x="0" y="-20" width="200" height="24"/>
+                <circle cx="40" cy="-18" r="12"/>
+                <circle cx="70" cy="-22" r="14"/>
+                <circle cx="102" cy="-20" r="13"/>
+                <circle cx="134" cy="-23" r="14"/>
+                <circle cx="162" cy="-18" r="11"/>
+              </g>
+            </g>
+            <path id="outline" d="" fill="none" stroke-width="4" stroke-linejoin="round"/>
+            <g id="decorFront"></g>
+          </svg>
+        </div>
+      </div>
 
-        <g clip-path="url(#glassClip)">
-          <rect id="beer" x="0" y="40" width="200" height="260" fill="url(#beerGrad)"/>
-          <g id="bubbles"></g>
-          <g id="foam">
-            <rect id="foamRect" x="0" y="20" width="200" height="24" fill="#fffaf0"/>
-            <circle cx="40" cy="22" r="12" fill="#fffaf0"/>
-            <circle cx="70" cy="18" r="14" fill="#fffaf0"/>
-            <circle cx="102" cy="20" r="13" fill="#fffaf0"/>
-            <circle cx="134" cy="17" r="14" fill="#fffaf0"/>
-            <circle cx="162" cy="22" r="11" fill="#fffaf0"/>
-          </g>
-        </g>
+      <div class="beer-card" id="beerCard">
+        <div><span class="chip" id="beerRarity">Gewoon</span><span class="chip new hidden" id="beerNew">Nieuw!</span></div>
+        <div class="beer-name" id="beerName">Jupiler</div>
+        <div class="beer-meta" id="beerMeta">5,2% · pils</div>
+      </div>
 
-        <path d="M30 20 L170 20 L152 280 Q150 290 140 290 L60 290 Q50 290 48 280 Z"
-              fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="4" stroke-linejoin="round"/>
-        <path d="M44 40 L56 260" stroke="rgba(255,255,255,0.35)" stroke-width="6" stroke-linecap="round"/>
-      </svg>
-    </div>
-  </div>
+      <div class="status" id="status" aria-live="polite">Hou ingedrukt om te drinken</div>
 
-  <div class="badge hidden" id="badge">🏆 Westvleteren 12! Een zeldzaamheid…</div>
-  <div class="status" id="status" aria-live="polite">Hou ingedrukt om te drinken</div>
+      <div class="controls">
+        <button class="big" id="drink">Hou vast om te drinken</button>
+        <button class="big hidden" id="refill">Nog ene! 🍻</button>
+        <button class="link hidden" id="tilt">Kantel je telefoon om te drinken</button>
+      </div>
 
-  <div class="controls">
-    <button id="drink">Hou vast om te drinken</button>
-    <button id="refill" class="hidden">Nog ene! 🍻</button>
-    <button id="tilt" class="hidden">Kantel je telefoon om te drinken</button>
-  </div>
+      <div class="meter" title="Zatheidsmeter: hoeveel pintjes vandaag">
+        <span>Zatheidsmeter</span><div class="bar"><div class="fill" id="zatFill"></div></div><span id="zatLabel">nuchter</span>
+      </div>
+      <div class="stats">
+        <div><b id="today">0</b>vandaag</div>
+        <div><b id="total">0</b>in totaal</div>
+        <div><b id="uniq">0</b>soorten</div>
+      </div>
+    </section>
 
-  <div class="stats">
-    <div><b id="today">0</b>vandaag</div>
-    <div><b id="total">0</b>in totaal</div>
-    <div><b id="wv">0</b>Westvleteren</div>
-  </div>
-  <p class="hint">Drink met mate. Een pintje is geen water. 😉</p>
+    <!-- COLLECTIE -->
+    <section class="panel" id="collectie" role="tabpanel" hidden>
+      <h2>Collectie</h2>
+      <div class="progress"><div class="bar"><div class="fill" id="colFill"></div></div><span id="colLabel">0 / 21</span></div>
+      <div id="colList"></div>
+      <h3>Prestaties</h3>
+      <div class="ach" id="achList"></div>
+    </section>
+
+    <!-- GLAZEN -->
+    <section class="panel" id="glazen" role="tabpanel" hidden>
+      <h2>Glazen</h2>
+      <p class="lead">Speel glazen vrij door te drinken. Tik op een glas om het te gebruiken.</p>
+      <div class="skins" id="skinList"></div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="panel" id="skills" role="tabpanel" hidden>
+      <div class="sp-head">
+        <h2>Skillboom</h2>
+        <div><span class="sp-count" id="spCount">0</span> skillpunten <button class="ghost" id="respec">Reset</button></div>
+      </div>
+      <p class="lead">Elk level geeft 1 skillpunt. Zeldzamere bieren geven meer XP: gewoon 10 · ongewoon 25 · zeldzaam 60 · episch 200 · legendarisch 1.000 · mythisch 25.000.</p>
+      <div id="skillTree"></div>
+    </section>
+
+    <!-- RANGLIJST -->
+    <section class="panel" id="ranglijst" role="tabpanel" hidden>
+      <h2>Ranglijst</h2>
+      <p class="lead">Punten per pint: gewoon 1 · ongewoon 3 · zeldzaam 10 · episch 40 · legendarisch 250 · mythisch 10.000</p>
+      <div class="board" id="board"><div class="empty">De ranglijst wordt geladen…</div></div>
+    </section>
+  </main>
+
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-tab="tap"><span>🍺</span>Tap</button>
+    <button role="tab" aria-selected="false" data-tab="collectie"><span>📖</span>Collectie</button>
+    <button role="tab" aria-selected="false" data-tab="glazen"><span>🥂</span>Glazen</button>
+    <button role="tab" aria-selected="false" data-tab="skills"><span>🌳</span>Skills<i class="dot hidden" id="spDot"></i></button>
+    <button role="tab" aria-selected="false" data-tab="ranglijst"><span>🏆</span>Ranglijst</button>
+  </nav>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<canvas id="confetti" hidden></canvas>
 
 <script>
 (() => {
-  const TOP = 40, BOTTOM = 290;           // beer surface range inside the glass (SVG units)
-  const DRINK_SECONDS = 4;                 // time to empty a full pint while holding
-  const beer = document.getElementById('beer');
-  const foam = document.getElementById('foam');
-  const bubbles = document.getElementById('bubbles');
-  const glassWrap = document.getElementById('glassWrap');
-  const status = document.getElementById('status');
-  const drinkBtn = document.getElementById('drink');
-  const refillBtn = document.getElementById('refill');
-  const tiltBtn = document.getElementById('tilt');
-  const todayEl = document.getElementById('today');
-  const totalEl = document.getElementById('total');
-  const wvEl = document.getElementById('wv');
-  const badge = document.getElementById('badge');
-  const beerTop = document.getElementById('beerTop');
-  const beerBottom = document.getElementById('beerBottom');
+  // ================= DATA =================
+  const RARITIES = [
+    { key: 'gewoon',       label: 'Gewoon',       weight: 55,    pts: 1 },
+    { key: 'ongewoon',     label: 'Ongewoon',     weight: 25,    pts: 3 },
+    { key: 'zeldzaam',     label: 'Zeldzaam',     weight: 13,    pts: 10 },
+    { key: 'episch',       label: 'Episch',       weight: 5,     pts: 40 },
+    { key: 'legendarisch', label: 'Legendarisch', weight: 1.99,  pts: 250 },
+    { key: 'mythisch',     label: 'Mythisch',     weight: 0.01,  pts: 10000 },
+  ];
+  const BEERS = [
+    { id: 'jupiler',      name: 'Jupiler',                  r: 0, abv: 5.2,  style: 'pils',          c: ['#f6c445', '#dc9417'], foam: '#fffaf0' },
+    { id: 'stella',       name: 'Stella Artois',            r: 0, abv: 5.2,  style: 'pils',          c: ['#f3c94e', '#d99a1c'], foam: '#fffaf0' },
+    { id: 'maes',         name: 'Maes',                     r: 0, abv: 5.2,  style: 'pils',          c: ['#f5c84a', '#d79318'], foam: '#fffaf0' },
+    { id: 'primus',       name: 'Primus',                   r: 0, abv: 5.2,  style: 'pils',          c: ['#f2be40', '#d08912'], foam: '#fffaf0' },
+    { id: 'cristal',      name: 'Cristal',                  r: 0, abv: 5.0,  style: 'pils',          c: ['#f8d360', '#e2a524'], foam: '#fffaf0' },
+    { id: 'duvel',        name: 'Duvel',                    r: 1, abv: 8.5,  style: 'sterk blond',   c: ['#f9d978', '#e8b23a'], foam: '#ffffff' },
+    { id: 'leffe',        name: 'Leffe Blond',              r: 1, abv: 6.6,  style: 'abdijbier',     c: ['#f0b232', '#c97a0e'], foam: '#fff6e6' },
+    { id: 'hoegaarden',   name: 'Hoegaarden',               r: 1, abv: 4.9,  style: 'witbier',       c: ['#f8e7b0', '#ecd28a'], foam: '#ffffff' },
+    { id: 'kwak',         name: 'Pauwel Kwak',              r: 1, abv: 8.4,  style: 'amber',         c: ['#d9822b', '#9c4a10'], foam: '#f5e6c8' },
+    { id: 'omer',         name: 'Omer',                     r: 1, abv: 8.0,  style: 'sterk blond',   c: ['#f7cf5a', '#e0a020'], foam: '#ffffff' },
+    { id: 'westmalle',    name: 'Westmalle Tripel',         r: 2, abv: 9.5,  style: 'trappist',      c: ['#f4c24a', '#d9961a'], foam: '#fff8ea', trappist: true },
+    { id: 'orval',        name: 'Orval',                    r: 2, abv: 6.2,  style: 'trappist',      c: ['#f0a03a', '#c86f17'], foam: '#fbf1dc', trappist: true },
+    { id: 'chimay',       name: 'Chimay Blauw',             r: 2, abv: 9.0,  style: 'trappist',      c: ['#7b3a1b', '#3b170a'], foam: '#e9d3ad', trappist: true },
+    { id: 'rodenbach',    name: 'Rodenbach Grand Cru',      r: 2, abv: 6.0,  style: 'Vlaams rood',   c: ['#a8351f', '#5c160c'], foam: '#f2d9b8' },
+    { id: 'karmeliet',    name: 'Tripel Karmeliet',         r: 2, abv: 8.4,  style: 'tripel',        c: ['#f6cf55', '#dfa224'], foam: '#ffffff' },
+    { id: 'westvleteren', name: 'Westvleteren 12',          r: 3, abv: 10.2, style: 'trappist',      c: ['#7a3b16', '#3a1806'], foam: '#ead2a8', trappist: true },
+    { id: 'rochefort',    name: 'Rochefort 10',             r: 3, abv: 11.3, style: 'trappist',      c: ['#5e2a12', '#2a0f05'], foam: '#e2c79c', trappist: true },
+    { id: 'bernardus',    name: 'St. Bernardus Abt 12',     r: 3, abv: 10.0, style: 'quadrupel',     c: ['#6b3015', '#2f1207'], foam: '#e6cda4' },
+    { id: 'cantillon',    name: 'Cantillon Gueuze',         r: 4, abv: 5.5,  style: 'lambiek',       c: ['#f4c14f', '#d9932a'], foam: '#fff6e0', lambic: true },
+    { id: 'fonteinen',    name: '3 Fonteinen Oude Geuze',   r: 4, abv: 6.0,  style: 'lambiek',       c: ['#f0b545', '#cf8622'], foam: '#fff3d6', lambic: true },
+    { id: 'arnoldus',     name: 'Het Gouden Pintje van Sint-Arnoldus', r: 5, abv: null, style: 'gebrouwen door de patroonheilige zelf', c: ['#fff1a8', '#e0a800'], foam: '#fffbe0' },
+  ];
+  const BEER = Object.fromEntries(BEERS.map(b => [b.id, b]));
 
-  const WV_CHANCE = 0.2;   // kans dat er een Westvleteren 12 getapt wordt
-  let isWV = false;
+  // Glass shapes in a 200×300 box. Rim at y=20, full beer surface at y=40, `bottom` = deepest beer point.
+  const SKINS = [
+    { id: 'vaasje', name: 'Vaasje', bottom: 286, bx: [60, 140], stroke: 'rgba(255,255,255,0.55)',
+      d: 'M30 20 L170 20 L152 280 Q150 290 140 290 L60 290 Q50 290 48 280 Z',
+      front: '<path d="M44 40 L56 260" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>',
+      unlock: 'Standaard', ok: () => true },
+    { id: 'tulp', name: 'Tulpglas', bottom: 210, bx: [70, 130], stroke: 'rgba(255,255,255,0.55)',
+      d: 'M55 20 C40 60 22 100 32 140 C42 180 80 200 92 212 L92 272 L60 284 L140 284 L108 272 L108 212 C120 200 158 180 168 140 C178 100 160 60 145 20 Z',
+      front: '<path d="M44 70 C36 110 40 140 52 160" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>',
+      unlock: 'Drink 10 pintjes', ok: s => s.total >= 10 },
+    { id: 'kwak', name: 'Kwakglas', bottom: 290, bx: [75, 125], stroke: 'rgba(255,255,255,0.55)',
+      d: 'M70 20 L130 20 L122 170 C122 190 160 210 160 245 C160 280 130 292 100 292 C70 292 40 280 40 245 C40 210 78 190 78 170 Z',
+      back: '<rect x="22" y="110" width="12" height="190" rx="3" fill="#8a5a2b"/><rect x="166" y="110" width="12" height="190" rx="3" fill="#8a5a2b"/><rect x="16" y="288" width="168" height="12" rx="3" fill="#6e4520"/>',
+      front: '<rect x="22" y="150" width="156" height="12" rx="4" fill="#9b6833"/>',
+      unlock: 'Drink ne Kwak', ok: s => s.counts.kwak > 0 },
+    { id: 'kelk', name: 'Trappistenkelk', bottom: 156, bx: [80, 120], stroke: 'rgba(255,255,255,0.55)',
+      d: 'M30 20 L170 20 C170 110 140 150 108 158 L108 255 L150 280 L150 288 L50 288 L50 280 L92 255 L92 158 C60 150 30 110 30 20 Z',
+      front: '<path d="M44 40 C44 90 58 120 76 136" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>',
+      unlock: 'Drink een trappist', ok: s => BEERS.some(b => b.trappist && s.counts[b.id] > 0) },
+    { id: 'geuze', name: 'Geuzeglas', bottom: 286, bx: [65, 135], stroke: 'rgba(255,255,255,0.55)',
+      d: 'M50 20 L150 20 L146 284 Q146 290 140 290 L60 290 Q54 290 54 284 Z',
+      front: '<path d="M62 40 L66 270" stroke="rgba(255,255,255,0.3)" stroke-width="5" stroke-linecap="round"/>',
+      unlock: 'Drink een geuze', ok: s => BEERS.some(b => b.lambic && s.counts[b.id] > 0) },
+    { id: 'pul', name: 'Bierpul', bottom: 284, bx: [55, 135], stroke: 'rgba(255,255,255,0.6)',
+      d: 'M40 20 L150 20 L150 280 Q150 290 140 290 L50 290 Q40 290 40 280 Z',
+      front: '<path d="M150 70 C196 70 196 210 150 210" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="12" stroke-linecap="round"/>' +
+             '<g fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="3"><circle cx="70" cy="90" r="12"/><circle cx="120" cy="90" r="12"/><circle cx="70" cy="150" r="12"/><circle cx="120" cy="150" r="12"/><circle cx="70" cy="210" r="12"/><circle cx="120" cy="210" r="12"/></g>',
+      unlock: 'Drink 50 pintjes', ok: s => s.total >= 50 },
+    { id: 'goud', name: 'Gouden Kelk', bottom: 156, bx: [80, 120], stroke: '#ffd75e',
+      d: 'M30 20 L170 20 C170 110 140 150 108 158 L108 255 L150 280 L150 288 L50 288 L50 280 L92 255 L92 158 C60 150 30 110 30 20 Z',
+      back: '<path d="M92 158 L108 158 L108 255 L150 280 L150 288 L50 288 L50 280 L92 255 Z" fill="#e0a800"/>',
+      front: '<path d="M30 20 L170 20" stroke="#fff1a8" stroke-width="8" stroke-linecap="round"/><g fill="#fff1a8"><circle cx="64" cy="268" r="4"/><circle cx="100" cy="274" r="4"/><circle cx="136" cy="268" r="4"/></g>',
+      unlock: 'Vind het Gouden Pintje', ok: s => s.counts.arnoldus > 0 },
+  ];
+  const SKIN = Object.fromEntries(SKINS.map(s => [s.id, s]));
 
-  let level = 1;          // 1 = full, 0 = empty
-  let drinking = false;
-  let last = 0;
+  const ACH = [
+    { id: 'eerste',    ico: '🍺', name: 'Eerste pint',          desc: 'Drink je eerste pintje',              ok: s => s.total >= 1 },
+    { id: 'stamgast',  ico: '🪑', name: 'Stamgast',             desc: 'Drink 10 pintjes',                    ok: s => s.total >= 10 },
+    { id: 'pilier',    ico: '🏛️', name: 'Pilier van de toog',   desc: 'Drink 50 pintjes',                    ok: s => s.total >= 50 },
+    { id: 'legende',   ico: '👑', name: 'Levende legende',      desc: 'Drink 100 pintjes',                   ok: s => s.total >= 100 },
+    { id: 'adfundum',  ico: '⚡', name: 'Ad fundum',            desc: 'Drink een volle pint zonder loslaten', ok: s => !!s.flags.adfundum },
+    { id: 'nonkel',    ico: '🥴', name: 'Zatte nonkel',         desc: 'Drink 5 pintjes op één dag',          ok: s => s.today >= 5 },
+    { id: 'nachtuil',  ico: '🦉', name: 'Nachtuil',             desc: 'Drink een pint tussen middernacht en 5 uur', ok: s => !!s.flags.nachtuil },
+    { id: 'trappist',  ico: '⛪', name: 'Trappistenkenner',     desc: 'Proef alle vijf trappisten',          ok: s => BEERS.filter(b => b.trappist).every(b => s.counts[b.id] > 0) },
+    { id: 'lambiek',   ico: '🍾', name: 'Lambiekliefhebber',    desc: 'Proef beide geuzes',                  ok: s => BEERS.filter(b => b.lambic).every(b => s.counts[b.id] > 0) },
+    { id: 'half',      ico: '📖', name: 'Halve collectie',      desc: 'Verzamel 11 soorten',                 ok: s => uniqueCount(s) >= 11 },
+    { id: 'vol',       ico: '🏆', name: 'Volledige collectie',  desc: 'Verzamel alle 21 soorten',            ok: s => uniqueCount(s) >= BEERS.length },
+    { id: 'graal',     ico: '✨', name: 'De Heilige Graal',     desc: 'Vind het Gouden Pintje (0,01%)',      ok: s => s.counts.arnoldus > 0 },
+  ];
 
-  // ---- persistence (best effort) ----
-  const todayKey = new Date().toISOString().slice(0, 10);
-  let stats = { total: 0, day: todayKey, today: 0 };
+  // XP per pint, by rarity
+  const XP = [10, 25, 60, 200, 1000, 25000];
+  const xpToNext = lvl => Math.round(60 * Math.pow(lvl, 1.35));
+  function levelInfo(xp) {
+    let lvl = 1, rest = xp;
+    while (rest >= xpToNext(lvl)) { rest -= xpToNext(lvl); lvl++; }
+    return { lvl, into: rest, need: xpToNext(lvl) };
+  }
+
+  // Skill tree: tier 1 is open, deeper tiers need ranks in the skill above.
+  const SKILLS = [
+    { id: 'slok',    tier: 1, ico: '💨', name: 'Snelle slokker',   max: 5, desc: 'Drink sneller.',                         eff: n => `−${n * 10}% drinktijd` },
+    { id: 'kenner',  tier: 1, ico: '🎓', name: 'Bierkenner',       max: 5, desc: 'Meer XP per pint.',                     eff: n => `+${n * 10}% XP` },
+    { id: 'geluk',   tier: 1, ico: '🍀', name: 'Gelukzak',         max: 5, desc: 'Zeldzame en betere bieren komen vaker.', eff: n => `×${(1 + n * 0.15).toFixed(2).replace('.', ',')} kans op zeldzaam+` },
+    { id: 'dubbel',  tier: 2, ico: '🍻', name: 'Dubbel tappen',    max: 5, desc: 'Kans dat een pint dubbel telt (2× XP, 2× in je collectie).', eff: n => `${n * 5}% kans`, req: ['slok', 2] },
+    { id: 'lever',   tier: 2, ico: '🫀', name: 'IJzeren lever',    max: 3, desc: 'De zatheidsmeter stijgt trager.',       eff: n => `${n * 2} pintjes uitstel`, req: ['kenner', 2] },
+    { id: 'kans',    tier: 2, ico: '🎲', name: 'Tweede kans',      max: 5, desc: 'Kans dat een gewone pint opnieuw getapt wordt.', eff: n => `${n * 8}% herkansing`, req: ['geluk', 2] },
+    { id: 'arnoldus',tier: 3, ico: '😇', name: 'Zegen van Sint-Arnoldus', max: 1, desc: 'Tien keer meer kans op het Gouden Pintje.', eff: n => n ? '0,1% mythisch' : '0,01% → 0,1%', req: ['dubbel', 3], req2: ['kans', 3] },
+  ];
+  const SK = Object.fromEntries(SKILLS.map(k => [k.id, k]));
+
+  const TOASTS = ['Schol!', 'Santé!', 'Gezondheid!', 'Op ons!', 'Ad fundum!', 'Nog ene en dan naar huis…', 'Proost, maat!', 'Da was er ene!'];
+
+  // ================= STATE =================
+  const TOP = 40;
+  const todayKey = () => new Date().toISOString().slice(0, 10);
+  const blank = () => ({ counts: {}, total: 0, day: todayKey(), today: 0, skin: 'vaasje', ach: [], flags: {}, xp: 0, skills: {} });
+  let S = blank();
   try {
-    const saved = JSON.parse(localStorage.getItem('pintje') || 'null');
-    if (saved) stats = saved;
+    const saved = JSON.parse(localStorage.getItem('pintje2') || 'null');
+    if (saved) S = Object.assign(blank(), saved);
+    else {
+      const old = JSON.parse(localStorage.getItem('pintje') || 'null');  // eerdere versie van de app
+      if (old && old.total) {
+        S.total = old.total; S.today = old.day === todayKey() ? old.today : 0;
+        if (old.wv) S.counts.westvleteren = old.wv;
+        if (old.total - (old.wv || 0) > 0) S.counts.jupiler = old.total - (old.wv || 0);
+      }
+    }
   } catch (e) {}
-  if (stats.day !== todayKey) { stats.day = todayKey; stats.today = 0; }
-  const save = () => { try { localStorage.setItem('pintje', JSON.stringify(stats)); } catch (e) {} };
-  stats.wv ||= 0;
-  const renderStats = () => { todayEl.textContent = stats.today; totalEl.textContent = stats.total; wvEl.textContent = stats.wv; };
-  renderStats();
+  if (S.day !== todayKey()) { S.day = todayKey(); S.today = 0; }
+  if (!SKIN[S.skin]) S.skin = 'vaasje';
+  if (!S.xp && S.total) S.xp = BEERS.reduce((x, b) => x + (S.counts[b.id] || 0) * XP[b.r], 0);  // retroactief
+  const rank = id => S.skills[id] || 0;
+  const spent = () => Object.values(S.skills).reduce((a, b) => a + b, 0);
+  const freePoints = () => levelInfo(S.xp).lvl - 1 - spent();
+  const save = () => { try { localStorage.setItem('pintje2', JSON.stringify(S)); } catch (e) {} };
 
-  // ---- sound ----
+  function uniqueCount(s) { return BEERS.filter(b => s.counts[b.id] > 0).length; }
+  function points(s) { return BEERS.reduce((p, b) => p + (s.counts[b.id] || 0) * RARITIES[b.r].pts, 0); }
+  function bestRarity(s) { return BEERS.reduce((m, b) => s.counts[b.id] > 0 ? Math.max(m, b.r) : m, -1); }
+  const fmtAbv = abv => abv == null ? '∞%' : abv.toFixed(1).replace('.', ',') + '%';
+  const nf = n => n.toLocaleString('nl-BE');
+
+  // ================= ELEMENTS =================
+  const $ = id => document.getElementById(id);
+  const beerRect = $('beer'), foam = $('foam'), bubbles = $('bubbles'), glassWrap = $('glassWrap');
+  const status = $('status'), drinkBtn = $('drink'), refillBtn = $('refill'), tiltBtn = $('tilt');
+
+  // ================= SOUND =================
   let audio;
   const ctx = () => (audio ||= new (window.AudioContext || window.webkitAudioContext)());
+  function tone(freq, t, dur, type = 'sine', vol = 0.18) {
+    const a = ctx(), o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.02);
+  }
   function gulp() {
-    const a = ctx(), t = a.currentTime;
-    const o = a.createOscillator(), g = a.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(180, t);
-    o.frequency.exponentialRampToValueAtTime(70, t + 0.12);
-    g.gain.setValueAtTime(0.25, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-    o.connect(g).connect(a.destination);
-    o.start(t); o.stop(t + 0.16);
+    try {
+      const a = ctx(), t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+      o.frequency.setValueAtTime(180, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.12);
+      g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      o.connect(g).connect(a.destination); o.start(t); o.stop(t + 0.16);
+    } catch (e) {}
   }
   function burp() {
-    const a = ctx(), t = a.currentTime;
-    const o = a.createOscillator(), g = a.createGain(), lfo = a.createOscillator(), lg = a.createGain();
-    o.type = 'sawtooth';
-    o.frequency.setValueAtTime(95, t);
-    o.frequency.linearRampToValueAtTime(65, t + 0.6);
-    lfo.frequency.value = 28; lg.gain.value = 20;
-    lfo.connect(lg).connect(o.frequency);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.3, t + 0.05);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.65);
-    o.connect(g).connect(a.destination);
-    o.start(t); lfo.start(t); o.stop(t + 0.7); lfo.stop(t + 0.7);
+    try {
+      const a = ctx(), t = a.currentTime;
+      const o = a.createOscillator(), g = a.createGain(), lfo = a.createOscillator(), lg = a.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(95, t); o.frequency.linearRampToValueAtTime(65, t + 0.6);
+      lfo.frequency.value = 28; lg.gain.value = 20; lfo.connect(lg).connect(o.frequency);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.3, t + 0.05); g.gain.exponentialRampToValueAtTime(0.001, t + 0.65);
+      o.connect(g).connect(a.destination); o.start(t); lfo.start(t); o.stop(t + 0.7); lfo.stop(t + 0.7);
+    } catch (e) {}
+  }
+  function fanfare(r) {
+    if (r < 2) return;
+    try {
+      const t = ctx().currentTime;
+      const notes = r >= 5 ? [523, 659, 784, 1047, 1319, 1568, 2093] : r >= 4 ? [523, 659, 784, 1047, 1319] : r >= 3 ? [523, 659, 784, 1047] : [659, 988];
+      notes.forEach((f, i) => tone(f, t + i * 0.09, r >= 5 ? 0.9 : 0.35, 'triangle', 0.12));
+    } catch (e) {}
   }
 
-  // ---- bubbles ----
+  // ================= GLASS =================
+  let level = 1, drinking = false, last = 0, current = null, fullHold = false;
+
+  function applySkin() {
+    const sk = SKIN[S.skin];
+    $('clipPath').setAttribute('d', sk.d);
+    $('outline').setAttribute('d', sk.d);
+    $('outline').setAttribute('stroke', sk.stroke);
+    $('decorBack').innerHTML = sk.back || '';
+    $('decorFront').innerHTML = sk.front || '';
+    render();
+  }
+  function applyBeer() {
+    const b = current, r = RARITIES[b.r];
+    $('beerTop').setAttribute('stop-color', b.c[0]);
+    $('beerBottom').setAttribute('stop-color', b.c[1]);
+    foam.setAttribute('fill', b.foam);
+    glassWrap.classList.toggle('mythic', b.r === 5);
+    const chip = $('beerRarity');
+    chip.textContent = r.label; chip.className = 'chip r' + b.r;
+    $('beerName').textContent = b.name;
+    $('beerMeta').textContent = `${fmtAbv(b.abv)} · ${b.style}`;
+    $('beerNew').classList.toggle('hidden', (S.counts[b.id] || 0) > 0);
+    const card = $('beerCard'); card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop');
+  }
+  function render() {
+    const bottom = SKIN[S.skin].bottom;
+    const surface = TOP + (1 - level) * (bottom - TOP);
+    beerRect.setAttribute('y', surface);
+    beerRect.setAttribute('height', Math.max(0, bottom - surface + 6));
+    foam.setAttribute('transform', `translate(0 ${surface})`);
+    foam.style.opacity = level > 0.01 ? Math.min(1, 0.4 + level) : 0;
+  }
+
   function spawnBubble() {
-    if (level <= 0.02) return;
+    if (level <= 0.02 || document.hidden) return;
+    const sk = SKIN[S.skin], bottom = sk.bottom, mythic = current && current.r === 5;
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    const x = 60 + Math.random() * 80;
-    c.setAttribute('cx', x);
-    c.setAttribute('cy', BOTTOM - 4);
-    c.setAttribute('r', 1.5 + Math.random() * 2.5);
-    c.setAttribute('class', 'bubble');
+    const x = sk.bx[0] + Math.random() * (sk.bx[1] - sk.bx[0]);
+    c.setAttribute('r', (mythic ? 2 : 1.5) + Math.random() * 2.5);
+    c.setAttribute('fill', mythic ? '#fffbe0' : 'rgba(255,255,255,0.55)');
     bubbles.appendChild(c);
-    const dur = 1500 + Math.random() * 1500;
-    const start = performance.now();
+    const dur = 1500 + Math.random() * 1500, start = performance.now();
     (function rise(now) {
       const p = (now - start) / dur;
-      const surf = TOP + (1 - level) * (BOTTOM - TOP);
-      const y = BOTTOM - 4 - p * (BOTTOM - 4 - surf);
-      c.setAttribute('cy', y);
-      c.setAttribute('cx', x + Math.sin(p * 12) * 2);
+      const surf = TOP + (1 - level) * (bottom - TOP);
+      const y = bottom - 4 - p * (bottom - 4 - surf);
+      c.setAttribute('cy', y); c.setAttribute('cx', x + Math.sin(p * 12) * 2);
       if (p < 1 && y > surf + 2) requestAnimationFrame(rise); else c.remove();
     })(start);
   }
   setInterval(spawnBubble, 220);
 
-  // ---- which beer ----
-  function pickBeer() {
-    isWV = Math.random() < WV_CHANCE;
-    beerTop.setAttribute('stop-color', isWV ? '#7a3b16' : '#f7c548');
-    beerBottom.setAttribute('stop-color', isWV ? '#3a1806' : '#d98a12');
-    foam.querySelectorAll('rect, circle').forEach(el => el.setAttribute('fill', isWV ? '#ead2a8' : '#fffaf0'));
-    badge.classList.toggle('hidden', !isWV);
+  // ================= TAPPING (the roll) =================
+  function weights() {
+    const luck = 1 + rank('geluk') * 0.15;
+    const w = RARITIES.map((r, i) => r.weight * (i >= 2 ? luck : 1));
+    if (rank('arnoldus')) w[5] *= 10;
+    return w;
+  }
+  function rollTier() {
+    const w = weights(), sum = w.reduce((a, b) => a + b, 0);
+    let x = Math.random() * sum;
+    for (let i = w.length - 1; i >= 0; i--) { if (x < w[i]) return i; x -= w[i]; }
+    return 0;
+  }
+  let secondChance = false;
+  function rollBeer() {
+    let tier = rollTier();
+    secondChance = false;
+    if (tier === 0 && Math.random() < rank('kans') * 0.08) { tier = rollTier(); secondChance = true; }
+    const pool = BEERS.filter(b => b.r === tier);
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function pourNew(animated) {
+    current = rollBeer();
+    applyBeer();
+    const r = current.r;
+    if (secondChance) setTimeout(() => toast('🎲 Tweede kans! Opnieuw getapt.'), 300);
+    const msg = ['Vers getapt!', 'Oh, iets anders!', 'Zeldzaam! Goe gezien.', 'EPISCH! Rechtstreeks van de abdij 🏆', 'LEGENDARISCH! 🔥', ''][r];
+    if (r === 5) showMythic();
+    else if (r >= 3) confetti(r === 4 ? 160 : 90);
+    if (animated) fanfare(r);
+    if (navigator.vibrate && r >= 3) navigator.vibrate(r >= 4 ? [80, 50, 80, 50, 200] : [60, 40, 60]);
+    return msg;
   }
 
-  // ---- render ----
-  function render() {
-    const surface = TOP + (1 - level) * (BOTTOM - TOP);
-    beer.setAttribute('y', surface);
-    foam.setAttribute('transform', `translate(0 ${surface - TOP})`);
-    foam.style.opacity = level > 0.01 ? Math.min(1, 0.4 + level) : 0;
-  }
-
-  const messages = ['Glug glug glug…', 'Mmm, lekker fris!', 'Ad fundum! 🍺', 'Bijna leeg…'];
+  // ================= DRINKING =================
+  const DRINK_MSG = ['Glug glug glug…', 'Mmm, lekker!', 'Ad fundum! 🍺'];
   let gulpTimer = 0;
+  function drinkSeconds() { return (current.abv == null ? 7 : 3 + current.abv * 0.15) * (1 - rank('slok') * 0.1); }
 
   function tick(now) {
     if (!drinking) return;
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
-    level = Math.max(0, level - dt / DRINK_SECONDS);
+    level = Math.max(0, level - dt / drinkSeconds());
     gulpTimer -= dt;
     if (gulpTimer <= 0) { gulp(); gulpTimer = 0.45; navigator.vibrate?.(20); }
-    status.textContent = level < 0.25 ? messages[3] : messages[Math.floor((1 - level) * 3) % 3];
+    status.textContent = level < 0.25 ? 'Bijna leeg…' : DRINK_MSG[Math.floor((1 - level) * 3) % 3];
     render();
     if (level <= 0) return finish();
     requestAnimationFrame(tick);
   }
-
   function start() {
     if (level <= 0 || drinking) return;
     try { ctx().resume(); } catch (e) {}
     drinking = true;
+    fullHold = level >= 0.999;
     glassWrap.classList.add('drinking');
-    last = performance.now();
-    gulpTimer = 0;
+    last = performance.now(); gulpTimer = 0;
     requestAnimationFrame(tick);
   }
   function stop() {
     if (!drinking) return;
-    drinking = false;
+    drinking = false; fullHold = false;
     glassWrap.classList.remove('drinking');
     if (level > 0) status.textContent = 'Nog niet leeg, drink door!';
   }
   function finish() {
     drinking = false;
     glassWrap.classList.remove('drinking');
-    stats.today++; stats.total++;
-    if (isWV) stats.wv++;
-    save(); renderStats();
+    if (S.day !== todayKey()) { S.day = todayKey(); S.today = 0; }
+    const mult = Math.random() < rank('dubbel') * 0.05 ? 2 : 1;
+    S.counts[current.id] = (S.counts[current.id] || 0) + mult;
+    S.total += mult; S.today += mult;
+    const gained = Math.round(XP[current.r] * mult * (1 + rank('kenner') * 0.1));
+    const lvlBefore = levelInfo(S.xp).lvl;
+    S.xp += gained;
+    const lvlAfter = levelInfo(S.xp).lvl;
+    xpDrop(gained, mult);
+    if (fullHold) S.flags.adfundum = true;
+    const h = new Date().getHours();
+    if (h < 5) S.flags.nachtuil = true;
+    fullHold = false;
+    const newAch = checkAchievements();
+    save(); renderAll(); pushScore();
     burp();
     navigator.vibrate?.([60, 40, 120]);
-    status.textContent = isWV ? 'Burp! Een Westvleteren op. Hemels! 🙏' : 'Burp! Pintje op. 🎉';
+    status.textContent = `Burp! ${current.name} op. ${TOASTS[Math.floor(Math.random() * TOASTS.length)]}`;
     drinkBtn.classList.add('hidden');
     refillBtn.classList.remove('hidden');
+    if (mult === 2) status.textContent = `🍻 Dubbel getapt! ${current.name} telt 2×.`;
+    if (lvlAfter > lvlBefore) {
+      setTimeout(() => {
+        toast(`⬆️ Level ${lvlAfter}! +${lvlAfter - lvlBefore} skillpunt${lvlAfter - lvlBefore > 1 ? 'en' : ''}`);
+        confetti(70); fanfare(3);
+      }, 400);
+    }
+    const delay = lvlAfter > lvlBefore ? 2900 : 600;
+    newAch.forEach((a, i) => setTimeout(() => toast(`🏅 ${a.name}!`), delay + i * 2600));
+    const unlocked = SKINS.filter(sk => sk.ok(S) && !S.seenSkins?.includes(sk.id) && sk.id !== 'vaasje');
+    if (unlocked.length) {
+      S.seenSkins = [...(S.seenSkins || []), ...unlocked.map(s => s.id)]; save();
+      unlocked.forEach((sk, i) => setTimeout(() => toast(`🥂 Nieuw glas: ${sk.name}`), delay + (newAch.length + i) * 2600));
+    }
   }
   function refill() {
     refillBtn.classList.add('hidden');
     drinkBtn.classList.remove('hidden');
-    pickBeer();
     status.textContent = 'Wordt getapt…';
+    try { ctx().resume(); } catch (e) {}
+    const msg = pourNew(true);
     const from = level, t0 = performance.now();
     (function pour(now) {
       const p = Math.min(1, (now - t0) / 1200);
       level = from + (1 - from) * (1 - Math.pow(1 - p, 3));
       render();
       if (p < 1) requestAnimationFrame(pour);
-      else status.textContent = isWV ? 'Jackpot! Rechtstreeks van de abdij 🏆' : 'Vers getapt! Hou ingedrukt om te drinken';
+      else status.textContent = msg || 'Hou ingedrukt om te drinken';
     })(t0);
+  }
+
+  function checkAchievements() {
+    const fresh = ACH.filter(a => !S.ach.includes(a.id) && a.ok(S));
+    S.ach.push(...fresh.map(a => a.id));
+    return fresh;
   }
 
   drinkBtn.addEventListener('pointerdown', e => { e.preventDefault(); start(); });
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => drinkBtn.addEventListener(ev, stop));
   refillBtn.addEventListener('click', refill);
-  document.addEventListener('keydown', e => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); level > 0 ? start() : refill(); } });
+  document.addEventListener('keydown', e => {
+    if (e.code !== 'Space' || e.repeat || $('tap').hidden) return;
+    e.preventDefault(); level > 0 ? start() : refill();
+  });
   document.addEventListener('keyup', e => { if (e.code === 'Space') stop(); });
 
-  // ---- tilt to drink (phones) ----
+  // tilt to drink (phones): upright ≈ 90°, tipping the top toward your face pushes beta past it
   function onOrient(e) {
-    if (e.beta == null) return;
-    // Phone held upright is ~90°; tipping the top toward your face (like a glass) pushes beta past it.
+    if (e.beta == null || $('tap').hidden) return;
     if (e.beta > 115 && level > 0) start(); else stop();
-  }
-  function enableTilt() {
-    window.addEventListener('deviceorientation', onOrient);
-    tiltBtn.textContent = 'Kantelen staat aan 📱';
-    tiltBtn.disabled = true;
   }
   if ('DeviceOrientationEvent' in window && matchMedia('(pointer: coarse)').matches) {
     tiltBtn.classList.remove('hidden');
     tiltBtn.addEventListener('click', async () => {
       try {
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-          if (await DeviceOrientationEvent.requestPermission() !== 'granted') return;
-        }
-        enableTilt();
+        if (typeof DeviceOrientationEvent.requestPermission === 'function' &&
+            await DeviceOrientationEvent.requestPermission() !== 'granted') return;
+        window.addEventListener('deviceorientation', onOrient);
+        tiltBtn.textContent = 'Kantelen staat aan 📱'; tiltBtn.disabled = true;
       } catch (e) {}
     });
   }
 
-  pickBeer();
-  if (isWV) status.textContent = 'Jackpot! Rechtstreeks van de abdij 🏆';
-  render();
+  // ================= OVERLAYS =================
+  let toastTimer;
+  function toast(text) {
+    const t = $('toast');
+    t.textContent = text; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2300);
+  }
+  function xpDrop(n, mult) {
+    const d = document.createElement('div');
+    d.className = 'xpdrop r' + current.r;
+    d.textContent = `+${nf(n)} XP` + (mult > 1 ? ' ×2' : '');
+    document.querySelector('.stage').appendChild(d);
+    setTimeout(() => d.remove(), 1700);
+  }
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function confetti(n, gold) {
+    if (reduceMotion) return;
+    const cv = $('confetti'), c = cv.getContext('2d');
+    cv.hidden = false; cv.width = innerWidth; cv.height = innerHeight;
+    const colors = gold ? ['#ffd75e', '#fff1a8', '#e0a800', '#ffffff'] : ['#f7c548', '#b88aee', '#58a9e6', '#6cc070', '#f0913a', '#fffaf0'];
+    const ps = Array.from({ length: n }, () => ({
+      x: innerWidth / 2, y: innerHeight * 0.4, vx: (Math.random() - 0.5) * 14, vy: -Math.random() * 14 - 4,
+      s: 4 + Math.random() * 5, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.4, col: colors[Math.floor(Math.random() * colors.length)],
+    }));
+    const t0 = performance.now();
+    (function frame(now) {
+      c.clearRect(0, 0, cv.width, cv.height);
+      ps.forEach(p => {
+        p.vy += 0.35; p.x += p.vx; p.y += p.vy; p.vx *= 0.99; p.rot += p.vr;
+        c.save(); c.translate(p.x, p.y); c.rotate(p.rot); c.fillStyle = p.col; c.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); c.restore();
+      });
+      if (now - t0 < 3000) requestAnimationFrame(frame); else { c.clearRect(0, 0, cv.width, cv.height); cv.hidden = true; }
+    })(t0);
+  }
+  function showMythic() {
+    const o = document.createElement('div');
+    o.className = 'mythic-overlay';
+    o.innerHTML = '<div class="chip r5">Mythisch · 0,01%</div><div class="big-t">✨ Het Gouden Pintje ✨</div><div class="beer-meta">Gebrouwen door Sint-Arnoldus, patroonheilige van de brouwers. Eén op tienduizend.</div><div class="beer-meta">Tik om verder te gaan</div>';
+    o.addEventListener('click', () => o.remove());
+    document.body.appendChild(o);
+    confetti(260, true);
+    setTimeout(() => o.remove(), 6000);
+  }
+
+  // ================= PANELS =================
+  function renderTapStats() {
+    $('today').textContent = S.today;
+    $('total').textContent = S.total;
+    $('uniq').textContent = uniqueCount(S);
+    $('hdrPoints').textContent = nf(points(S));
+    const eff = Math.max(0, S.today - rank('lever') * 2);
+    const zat = Math.min(eff, 10);
+    $('zatFill').style.width = zat * 10 + '%';
+    $('zatLabel').textContent = ['nuchter', 'nuchter', 'tipsy', 'tipsy', 'aangeschoten', 'aangeschoten', 'zat', 'zat', 'stomzat', 'stomzat', 'lazarus'][zat];
+    document.body.classList.remove('zat-1', 'zat-2', 'zat-3');
+    if (eff >= 3) document.body.classList.add(eff >= 10 ? 'zat-3' : eff >= 6 ? 'zat-2' : 'zat-1');
+    const li = levelInfo(S.xp);
+    $('lvlBadge').textContent = 'Lvl ' + li.lvl;
+    $('xpFill').style.width = (li.into / li.need * 100) + '%';
+    $('xpLabel').textContent = `${nf(li.into)} / ${nf(li.need)} XP`;
+    $('spDot').classList.toggle('hidden', freePoints() <= 0);
+  }
+
+  function renderCollection() {
+    const u = uniqueCount(S);
+    $('colFill').style.width = (u / BEERS.length * 100) + '%';
+    $('colLabel').textContent = `${u} / ${BEERS.length}`;
+    const list = $('colList'); list.textContent = '';
+    RARITIES.forEach((r, i) => {
+      const h = document.createElement('h3');
+      h.className = 'r' + i;
+      h.textContent = r.label;
+      const odds = document.createElement('span'); odds.className = 'odds';
+      odds.textContent = (r.weight < 1 ? r.weight.toFixed(2) : r.weight).toString().replace('.', ',') + '% kans';
+      h.appendChild(odds);
+      list.appendChild(h);
+      const g = document.createElement('div'); g.className = 'grid';
+      BEERS.filter(b => b.r === i).forEach(b => {
+        const n = S.counts[b.id] || 0;
+        const t = document.createElement('div'); t.className = 'tile' + (n ? '' : ' locked');
+        const sw = document.createElement('div'); sw.className = 'swatch';
+        sw.style.background = `linear-gradient(${b.c[0]}, ${b.c[1]})`; sw.style.setProperty('--foam', b.foam);
+        const tx = document.createElement('div'); tx.className = 't';
+        const nm = document.createElement('div'); nm.className = 'n'; nm.textContent = n ? b.name : '???';
+        const m = document.createElement('div'); m.className = 'm';
+        m.textContent = n ? `${fmtAbv(b.abv)} · ${n}× gedronken` : 'nog niet gevonden';
+        tx.append(nm, m); t.append(sw, tx); g.appendChild(t);
+      });
+      list.appendChild(g);
+    });
+    const al = $('achList'); al.textContent = '';
+    ACH.forEach(a => {
+      const got = S.ach.includes(a.id);
+      const t = document.createElement('div'); t.className = 'tile' + (got ? '' : ' locked');
+      t.innerHTML = '<div class="ico"></div><div class="t"><div class="n"></div><div class="m"></div></div>';
+      t.querySelector('.ico').textContent = got ? a.ico : '🔒';
+      t.querySelector('.n').textContent = a.name;
+      t.querySelector('.m').textContent = a.desc;
+      al.appendChild(t);
+    });
+  }
+
+  function renderSkins() {
+    const list = $('skinList'); list.textContent = '';
+    SKINS.forEach(sk => {
+      const ok = sk.ok(S);
+      const b = document.createElement('button');
+      b.className = 'skin' + (S.skin === sk.id ? ' on' : '');
+      b.disabled = !ok;
+      b.setAttribute('aria-pressed', S.skin === sk.id);
+      b.innerHTML = `<svg viewBox="0 0 200 300"><defs><clipPath id="pv-${sk.id}"><path d="${sk.d}"/></clipPath></defs>${sk.back || ''}` +
+        `<rect clip-path="url(#pv-${sk.id})" x="0" y="${ok ? 40 : 300}" width="200" height="${sk.bottom - 34}" fill="#e8a52a"/>` +
+        `<path d="${sk.d}" fill="none" stroke="${sk.stroke}" stroke-width="8"/>${sk.front || ''}</svg><div class="n"></div><div class="m"></div>`;
+      b.querySelector('.n').textContent = sk.name;
+      b.querySelector('.m').textContent = ok ? (S.skin === sk.id ? 'In gebruik' : 'Vrijgespeeld') : '🔒 ' + sk.unlock;
+      b.addEventListener('click', () => { S.skin = sk.id; save(); applySkin(); renderSkins(); pushScore(); });
+      list.appendChild(b);
+    });
+  }
+
+  function reqMet(k) {
+    return [k.req, k.req2].every(q => !q || rank(q[0]) >= q[1]);
+  }
+  function renderSkills() {
+    const free = freePoints();
+    $('spCount').textContent = free;
+    $('respec').disabled = spent() === 0;
+    const tree = $('skillTree'); tree.textContent = '';
+    [1, 2, 3].forEach(t => {
+      const h = document.createElement('h3');
+      h.textContent = ['', 'Basis', 'Gevorderd', 'Meesterbrouwer'][t];
+      tree.appendChild(h);
+      const row = document.createElement('div'); row.className = 'tier';
+      SKILLS.filter(k => k.tier === t).forEach(k => {
+        const n = rank(k.id), open = reqMet(k);
+        const c = document.createElement('div');
+        c.className = 'skill' + (n >= k.max ? ' maxed' : '') + (open ? '' : ' locked');
+        c.innerHTML = '<div class="top"><span></span><b></b></div><div class="m"></div><div class="pips"></div><div class="eff"></div><button></button>';
+        c.querySelector('.top span').textContent = open ? k.ico : '🔒';
+        c.querySelector('.top b').textContent = k.name;
+        const reqTxt = [k.req, k.req2].filter(Boolean).map(q => `${SK[q[0]].name} ${q[1]}`).join(' + ');
+        c.querySelector('.m').textContent = k.desc + (open ? '' : ` Vereist: ${reqTxt}.`);
+        c.querySelector('.pips').innerHTML = Array.from({ length: k.max }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('');
+        c.querySelector('.eff').textContent = n ? `Nu: ${k.eff(n)}` + (n < k.max ? ` · volgende: ${k.eff(n + 1)}` : '') : `Rang 1: ${k.eff(1)}`;
+        const b = c.querySelector('button');
+        b.textContent = n >= k.max ? 'Maximaal' : `Investeer (${n}/${k.max})`;
+        b.disabled = n >= k.max || !open || free <= 0;
+        b.addEventListener('click', () => {
+          if (freePoints() <= 0 || rank(k.id) >= k.max || !reqMet(k)) return;
+          S.skills[k.id] = rank(k.id) + 1; save(); renderAll(); pushScore();
+          try { ctx().resume(); tone(660, ctx().currentTime, 0.15, 'triangle', 0.12); tone(990, ctx().currentTime + 0.08, 0.2, 'triangle', 0.12); } catch (e) {}
+        });
+        row.appendChild(c);
+      });
+      tree.appendChild(row);
+    });
+  }
+  let respecArmed = false;
+  $('respec').addEventListener('click', () => {
+    const b = $('respec');
+    if (!respecArmed) { respecArmed = true; b.textContent = 'Zeker?'; setTimeout(() => { respecArmed = false; b.textContent = 'Reset'; }, 3000); return; }
+    respecArmed = false; b.textContent = 'Reset';
+    S.skills = {}; save(); renderAll(); pushScore(); toast('Skillpunten teruggezet');
+  });
+
+  function renderAll() { renderTapStats(); renderCollection(); renderSkins(); renderSkills(); renderBoard(); }
+
+  document.querySelectorAll('nav button').forEach(btn => btn.addEventListener('click', () => {
+    stop();
+    document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b === btn));
+    document.querySelectorAll('.panel').forEach(p => { p.hidden = p.id !== btn.dataset.tab; });
+    if (btn.dataset.tab === 'ranglijst') renderBoard();
+  }));
+
+  // ================= LEADERBOARD (shared db) =================
+  let db = null, user = null, uid = null, boardDocs = null, boardState = 'loading', canWrite = true;
+
+  function summary() {
+    return {
+      points: points(S), total: S.total, unique: uniqueCount(S), best: bestRarity(S),
+      counts: S.counts, ach: S.ach, skin: S.skin, xp: S.xp, level: levelInfo(S.xp).lvl, skills: S.skills, updatedAt: Date.now(),
+    };
+  }
+
+  let writing = false, writePending = false;
+  async function pushScore() {
+    if (!db || !uid || !canWrite) return;
+    writePending = true;
+    if (writing) return;
+    writing = true;
+    while (writePending) {
+      writePending = false;
+      try { await db.doc('scores/' + uid).set(summary()); }
+      catch (e) {
+        if (e && (e.code === 'invalid_argument' || e.code === 'not_granted' || e.code === 'revoked')) { canWrite = false; renderBoard(); }
+        else if (e && e.code === 'unavailable') { await new Promise(r => setTimeout(r, 800 + Math.random() * 800)); writePending = true; }
+        break;
+      }
+    }
+    writing = false;
+  }
+
+  let boardSeq = 0;
+  async function renderBoard() {
+    const el = $('board');
+    const seq = ++boardSeq;
+    if (boardState === 'off') {
+      el.innerHTML = '<div class="empty">De ranglijst werkt als je Pintje opent via de gedeelde link op claude.ai, ingelogd. Je eigen score blijft hier gewoon bewaard.</div>';
+      return;
+    }
+    if (!boardDocs) { el.innerHTML = '<div class="empty">De ranglijst wordt geladen…</div>'; return; }
+    const rows = boardDocs.filter(d => d.exists).map(d => ({ id: d.id, ...d.data() }));
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty">Nog niemand op de ranglijst. Drink een pintje en sta als eerste bovenaan!</div>';
+      return;
+    }
+    const ps = user ? await user.profiles(rows.map(r => r.id)) : {};
+    if (seq !== boardSeq) return;
+    el.textContent = '';
+    rows.forEach((r, i) => {
+      const p = ps[r.id] || {};
+      const isMe = r.id === uid;
+      const row = document.createElement('div'); row.className = 'row' + (isMe ? ' me' : '');
+      const rank = document.createElement('div'); rank.className = 'rank'; rank.textContent = ['🥇', '🥈', '🥉'][i] || (i + 1);
+      const img = document.createElement('img'); img.alt = ''; if (p.avatarUrl) img.src = p.avatarUrl;
+      const who = document.createElement('div'); who.className = 'who';
+      const nm = document.createElement('div'); nm.className = 'nm';
+      nm.textContent = (p.name || (isMe ? 'Jij' : 'Anonieme drinker')) + (isMe ? ' (jij)' : '');
+      const sub = document.createElement('div'); sub.className = 'sub';
+      const best = Number.isInteger(r.best) && r.best >= 0 ? RARITIES[r.best] : null;
+      sub.textContent = `Lvl ${r.level || 1} · ${nf(r.total || 0)} pintjes · ${r.unique || 0}/${BEERS.length} soorten`;
+      if (best) { const c = document.createElement('span'); c.className = 'chip r' + r.best; c.style.marginLeft = '6px'; c.textContent = best.label; sub.appendChild(c); }
+      who.append(nm, sub);
+      const pts = document.createElement('div'); pts.className = 'pts'; pts.textContent = nf(r.points || 0);
+      row.append(rank, img, who, pts);
+      el.appendChild(row);
+    });
+    if (!canWrite) {
+      const n = document.createElement('div'); n.className = 'empty';
+      n.textContent = 'Je kan meekijken, maar je eigen score komt niet op de ranglijst: vraag de eigenaar om je toegang te geven.';
+      el.appendChild(n);
+    }
+  }
+
+  async function initShared() {
+    if (!window.claude || typeof window.claude.use !== 'function') { boardState = 'off'; renderBoard(); return; }
+    try {
+      [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+      uid = user ? await user.id() : null;
+    } catch (e) { db = null; }
+    if (!db) { boardState = 'off'; renderBoard(); return; }
+    boardState = 'on';
+    if (user && typeof user.can === 'function') {
+      try { if (await user.can('data.write') === false) canWrite = false; } catch (e) {}
+    }
+    db.collection('scores').orderBy('points', 'desc').limit(50).onSnapshot(
+      snap => { boardDocs = snap.docs; renderBoard(); },
+      () => { boardState = 'off'; renderBoard(); }
+    );
+    if (!uid) { canWrite = false; return; }
+    // Merge progress from another device: keep the highest count per beer.
+    try {
+      const mine = await db.doc('scores/' + uid).get();
+      if (mine.exists) {
+        const r = mine.data();
+        let changed = false;
+        for (const [id, n] of Object.entries(r.counts || {})) {
+          if (BEER[id] && n > (S.counts[id] || 0)) { S.counts[id] = n; changed = true; }
+        }
+        const sum = Object.values(S.counts).reduce((a, b) => a + b, 0);
+        S.total = Math.max(S.total, r.total || 0, sum);
+        (r.ach || []).forEach(a => { if (!S.ach.includes(a)) { S.ach.push(a); changed = true; } });
+        if ((r.xp || 0) > S.xp) { S.xp = r.xp; changed = true; }
+        const rs = r.skills || {};
+        if (Object.values(rs).reduce((a, b) => a + b, 0) > spent()) { S.skills = { ...rs }; changed = true; }
+        if (changed) { checkAchievements(); save(); renderAll(); }
+        if (changed || points(S) !== r.points || S.total !== r.total || S.xp !== r.xp) pushScore();
+      } else if (S.total > 0) pushScore();
+    } catch (e) {}
+  }
+
+  // ================= BOOT =================
+  checkAchievements(); save();
+  pourNew(false);
+  status.textContent = current.r >= 2 ? (['', '', 'Zeldzaam! Goe gezien.', 'EPISCH! Rechtstreeks van de abdij 🏆', 'LEGENDARISCH! 🔥', ''][current.r] || 'Hou ingedrukt om te drinken') : 'Hou ingedrukt om te drinken';
+  applySkin();
+  renderAll();
+  initShared();
 })();
 </script>
 </body>
