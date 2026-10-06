@@ -1,31 +1,54 @@
-# test
-this is a test
+# 🍺 Pintje
 
-## 🍺 Pintje
+A Belgian beer idle game in Dutch (Flemish). You tap and drink virtual pintjes, collect more than a hundred Belgian beers, run your own café and work your way up to Brouwmeester.
 
-A Belgian beer idle game. Open `index.html` in a browser (works great on a phone).
+**▶️ Play:** https://claude.ai/artifact/4jJwLJMTMyrPWfAWo9L2bo (log in on claude.ai; this version has the shared leaderboard and the live café)
 
-- **Tap**: tap the glass for a sip, hold the button (or space bar), or tilt your phone. Only your own drinking moves the glass and fills your collection.
-- **Beers & rarities**: 102 beers in 16 tiers, from Gewoon to Parel, Smaragd, Robijn, Saffier, Amethist, Diamant, Obsidiaan, Regenboog, Kosmisch, Mythisch (0.01%) and Goddelijk (0.001%).
-- **Biertypes & collection rewards**: complete types (pils, trappisten, lambiek, Vlaams rood, …) and collection milestones for permanent bonnekes bonuses and crates.
-- **Kroeg (idle)**: 14 kinds of staff and businesses earn bonnekes in the background, with 90+ upgrades and a prestige reset (kroegsterren). Offline earnings run at 50% (more with the Nachtploeg skill).
-- **Golden bottle caps**: random buffs, each with its own full-screen background effect (disco, ticket rain, bubble storm, lucky clovers, beer rain, golden rays).
-- **Tapwedstrijd**: a minigame where you pour the perfect pint onto the fill line.
-- **Daily quests, levels and an 18-skill tree** over four tiers.
-- **Crates**: bak, krat and vat, plus an "Alles openen" button.
-- **Stijl**: 9 UI themes (colours, corners, fonts), 19 glasses and 23 backgrounds.
-- **Brokken**: once the zatheidsmeter passes 10 you might throw up, which resets the meter to zero. The meter also drops by one every 15 minutes.
-- **Voorvallen**: random events every few minutes, like a kroegquiz with Belgian beer trivia, a police breath test, a bonnekes thief to catch, a broken tap to fix, a power cut, a kermis, a brewery visit, a stranger buying a crate, and stamgasten telling jokes.
-- **Statistieken** on the Top tab.
-- **Bierpong**: a second minigame. Aim left-right, then for distance, with ten balls for ten cups.
-- **Caféhond Bobbie**: pet him every 20 minutes and feed him to level up (+2% bonnekes per level). He brings gifts and bites thieves.
-- **Clock bonuses**: happy hour 17–19 h (own sips ×2), weekend evenings (staff ×1.5), Sunday matinee (XP ×1.5) and blauwe maandag (luck ×1.2).
-- **Vitrinekast**: your six rarest beers on display.
-- **Tap combos**: fast tapping builds a combo up to ×3.5, with 4% "perfecte slok" crits (×10).
-- **Golden bubbles** rise in your glass every 15–35 s. Tap them for bonnekes, XP or a short ×3 boost.
-- **Uitdagingen**: short timed challenges (taps, combos, pints, ad fundum, bubbles) for bonnekes and XP.
-- **Seizoenen**: nine yearly seasons by calendar date (herfstbierfeesten, Halloween, Sinterklaas, kerst, oudejaar, carnaval, lente/Pasen, terrasjesweer, 21 juli). Each brings bonuses, 17 seasonal beers in total, its own events, a background, ambient effects and a daily gift.
-- **Brouwmeester (prestige)**: from level 25 you can reset everything for hopbellen. How many you get scales with your level, collection, kroegsterren, total bonnekes and beer types. Spend them in a 14-node brewery tree with permanent bonuses.
-- **Nu in het café**: see who else has Pintje open, shout "Schol!" for a shared bonus, and hear about other players' rare finds live.
-- **Alles wissen**: wipe all progress (local and on the leaderboard) from the Stijl tab.
-- **Ranglijst**: a shared leaderboard when opened through the claude.ai artifact link.
+The game also runs as a plain static site. Open `index.html` in a browser, or serve the folder with any static host.
+
+## Run locally
+
+```sh
+git clone https://github.com/stefke20/Pintje.git
+cd Pintje
+python3 -m http.server 8000   # then open http://localhost:8000
+```
+
+Progress is saved in your browser's local storage. The leaderboard and live café only work in the claude.ai version; everything else works anywhere.
+
+## Project structure
+
+```
+index.html        page markup: header, tabs and panels
+css/pintje.css    all styling, backgrounds and UI themes
+js/data.js        game data: beers, rarities, glasses, themes, seasons, buildings, skills, achievements
+js/state.js       save state, migrations, economy formulas, rolling beers
+js/audio.js       sound effects (Web Audio, no audio files)
+js/glass.js       the glass: pouring, drinking, tapping, brokken
+js/effects.js     toasts, overlays, confetti, crates, golden caps, background effects
+js/events.js      random events, tap combos, golden bubbles, challenges, seasons
+js/features.js    Brouwmeester prestige, café dog, Bierpong, live café, Tapwedstrijd, daily quests
+js/ui.js          panel rendering, navigation and progress checks
+js/main.js        main loop, leaderboard and boot
+```
+
+The scripts are plain classic scripts that share one global scope, loaded in the order above. There is no build step and there are no dependencies.
+
+For testing, open the local file with `#debug` (for example `index.html#debug`). That exposes `window.pintjeDebug` to trigger events, seasons and challenges. It is never available on the hosted version.
+
+## Features
+
+- **Tap & drink**: tap the glass for a sip, hold to drink, or tilt your phone. Tap combos, perfecte slokken, golden bubbles and short timed challenges.
+- **Beers**: 102 beers in 16 rarity tiers, from Gewoon to Goddelijk (0.001%), plus 17 seasonal beers. Complete beer types and collection milestones for permanent bonuses.
+- **Kroeg**: 14 kinds of staff and businesses earn bonnekes in the background, with 90+ upgrades and kroegsterren (a soft reset).
+- **Brouwmeester**: a full prestige reset from level 25 for hopbellen, spent in a 14-node brewery tree.
+- **Levels and skills**: XP from your own pints, crates, quests and minigames, and an 18-skill tree.
+- **Minigames**: Tapwedstrijd (pour onto the fill line) and Bierpong.
+- **Events**: kroegquiz, police check, thieves, broken tap, power cut, kermis, brewery visit, Nonkel Jos and his car, golden caps with full-screen effects.
+- **Seasons**: nine yearly seasons (herfst, Halloween, Sinterklaas, kerst, oudejaar, carnaval, lente, zomer, 21 juli) with bonuses, beers, events, backgrounds and a daily gift.
+- **Café life**: Bobbie the café dog, daily quests, a daily streak, crates (bak, krat, vat), clock bonuses such as happy hour.
+- **Stijl**: 9 UI themes, 19 glasses and 30+ backgrounds.
+- **Brokken**: drink too much and you might throw up.
+- **Social**: shared leaderboard, live "who's in the café" and shout Schol! to other players (claude.ai version).
+
+Drink met mate. 🍻
