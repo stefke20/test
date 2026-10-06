@@ -296,6 +296,21 @@
   .goldcap { position: fixed; z-index: 20; width: 58px; height: 58px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; background: radial-gradient(circle at 35% 30%, #fff6c0, #ffd75e 35%, #b88a00 70%); box-shadow: 0 0 18px #ffd75e, inset 0 0 0 5px #e0a800; animation: capspin 2.4s ease-in-out infinite, fadein 0.6s; font-size: 1.5rem; }
   .goldcap::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; background: repeating-conic-gradient(#e0a800 0 10deg, transparent 10deg 20deg); z-index: -1; }
   @keyframes capspin { 50% { transform: rotate(20deg) scale(1.08); } }
+  .thief { position: fixed; z-index: 21; border: 0; background: none; font-size: 2.6rem; padding: 6px; cursor: pointer; animation: thiefrun 6s linear forwards; filter: drop-shadow(0 4px 6px #000a); }
+  @keyframes thiefrun { from { left: -70px; } to { left: calc(100% + 20px); } }
+  .thief span { display: inline-block; animation: hop 0.3s ease-in-out infinite alternate; }
+  @keyframes hop { to { transform: translateY(-8px); } }
+  body.blackout .app { filter: brightness(0.45) sepia(0.5); transition: filter 0.6s; }
+  body.blackout .stage { filter: brightness(1.8); }
+  .overlay .choices { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 340px; }
+  .overlay .choices button { border: 2px solid var(--accent); background: var(--panel-solid); color: var(--text); border-radius: calc(var(--r-card) * 0.85); padding: 10px 12px; font-weight: 700; }
+  .overlay .choices button.primary { background: var(--accent); color: var(--on-accent); }
+  .overlay .choices button.right { background: var(--r6); border-color: var(--r6); color: #04140a; }
+  .overlay .choices button.wrong { background: var(--r7); border-color: var(--r7); color: #fff; }
+  .overlay .pickrow { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .overlay .pick { width: 92px; height: 132px; border-radius: var(--r-card); border: 2px solid var(--accent); background: repeating-linear-gradient(45deg, var(--panel-solid) 0 10px, #3b2412 10px 20px); font-family: var(--display); font-size: 2rem; color: var(--accent); }
+  .ev-ico { font-size: 3rem; line-height: 1; }
+  .stattile b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
   canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 26; width: 100%; height: 100%; }
 
   .puke { position: fixed; inset: 0; z-index: 24; display: flex; align-items: center; justify-content: center; touch-action: none; animation: pukein 0.25s ease-out; }
@@ -313,6 +328,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     body[class*="zat-"] .stage { animation: none !important; filter: none !important; }
+    .thief, .thief span { animation-duration: 6s !important; }
     .glass-wrap, .beer-card.pop, .glass-wrap.halo svg.glass, .goldcap, .bg-regenboog, .float, .xpdrop, .puke, .puke .word, .puke .drip, body.queasy .app, .overlay .card { animation: none !important; transition: none !important; }
   }
 </style>
@@ -386,7 +402,7 @@
         <button class="link hidden" id="tilt">Kantel je telefoon om te drinken</button>
       </div>
 
-      <div class="meter" title="Zatheidsmeter: hoeveel pintjes je vandaag zelf dronk">
+      <div class="meter" title="Zatheidsmeter: stijgt met elke pint die je zelf drinkt, zakt langzaam en valt terug op nul na het brokken">
         <span>Zatheidsmeter</span><div class="bar"><div class="fill" id="zatFill"></div></div><span id="zatLabel">nuchter</span>
       </div>
       <div class="stats">
@@ -477,6 +493,8 @@
       <h2>Ranglijst</h2>
       <p class="lead">Gerangschikt op punten: elke pint die je zelf drinkt telt mee volgens zijn zeldzaamheid.</p>
       <div class="list" id="board"><div class="empty">De ranglijst wordt geladen…</div></div>
+      <h2>Statistieken</h2>
+      <div class="grid" id="statList"></div>
     </section>
   </main>
 
@@ -852,6 +870,9 @@
     { id: 'reeks30',    ico: '🗓️', name: 'Meubelstuk',           desc: 'Kom 30 dagen na elkaar langs',            ok: s => s.streak >= 30, crate: 'krat' },
     { id: 'brokken',    ico: '🤮', name: 'Brokkenmaker',         desc: 'Brokkeeeuuuhhh na te veel pintjes',       ok: s => s.pukes >= 1 },
     { id: 'kuisploeg',  ico: '🪣', name: 'Vaste klant van de kuisploeg', desc: 'Brok 10 keer',                ok: s => s.pukes >= 10 },
+    { id: 'events25',   ico: '🎲', name: 'Er gebeurt altijd iets', desc: 'Maak 25 voorvallen mee',         ok: s => s.events >= 25 },
+    { id: 'quiz10',     ico: '🧠', name: 'Bierprofessor',        desc: 'Beantwoord 10 kroegquizvragen juist',     ok: s => s.quizRight >= 10, crate: 'bak' },
+    { id: 'dief5',      ico: '🚓', name: 'Dievenvanger',         desc: 'Vang 5 bonnekesdieven',                   ok: s => s.thieves >= 5 },
     { id: 'tapper',     ico: '🎯', name: 'Tapper',               desc: 'Speel de tapwedstrijd',                   ok: s => s.mg.plays >= 1 },
     { id: 'tapkampioen',ico: '🏆', name: 'Tapkampioen',          desc: 'Haal 450 in de tapwedstrijd',             ok: s => s.mg.best >= 450, crate: 'bak' },
     { id: 'perfect',    ico: '💯', name: 'Perfect getapt',       desc: 'Tap 25 perfecte rondes',                  ok: s => s.mg.perfects >= 25 },
@@ -923,6 +944,10 @@
     { t: 'Kuisploeg opgeroepen naar plaatselijk café: "Het was weer zover."', ok: s => s.pukes >= 1 },
     { t: 'Dokter waarschuwt: "Na tien pintjes wordt alles een gok."', ok: s => s.today >= 8 },
     { t: 'Tapwedstrijd: jury noemt schuimkraag "bijna poëtisch".', ok: s => s.mg.best >= 400 },
+    { t: 'Alcoholcontrole aan het café. Iedereen blijkt te voet.', ok: s => s.events >= 1 },
+    { t: 'Bonnekesdief opgepakt: "Ik wou gewoon een pintje."', ok: s => s.thieves >= 1 },
+    { t: 'Stroompanne in het dorp. Café draait gewoon door bij kaarslicht.', ok: s => s.events >= 3 },
+    { t: 'Kroegquiz: niemand weet hoe lambiek gist. Behalve één stamgast.', ok: s => s.quizRight >= 1 },
   ];
 
   // =====================================================================
@@ -938,6 +963,7 @@
     bon: 0, bonLife: 0, bonAll: 0, bld: {}, upg: [], stars: 0, taps: 0, caps: 0,
     crates: { bak: 0, krat: 0, vat: 0 }, opened: 0, streak: 0, lastDaily: '', lastLevel: 1, lastSeen: 0, pukes: 0,
     mg: { best: 0, plays: 0, perfects: 0, day: '', today: 0 }, quests: null, questsDone: 0, questDays: 0,
+    zat: 0, zatAt: 0, events: 0, quizRight: 0, thieves: 0, playSecs: 0,
   });
   let S = blank();
   let wipedBefore = false;
@@ -966,7 +992,7 @@
       }
     }
   } catch (e) {}
-  if (S.day !== todayKey()) { S.day = todayKey(); S.today = 0; }
+  if (S.day !== todayKey()) { S.day = todayKey(); S.today = 0; S.zat = 0; }
   if (!SKIN[S.skin]) S.skin = 'vaasje';
   if (!THEME[S.theme]) S.theme = 'klassiek';
   let wiping = false;
@@ -1216,13 +1242,13 @@
   let pukeUntil = 0;
   const puking = () => performance.now() < pukeUntil;
   function finishGlass() {
-    if (S.day !== todayKey()) { S.day = todayKey(); S.today = 0; }
+    if (S.day !== todayKey()) { S.day = todayKey(); S.today = 0; S.zat = 0; }
     const mult = Math.random() < rank('dubbel') * 0.04 ? 2 : 1;
     const beer = current;
     gainPints(beer, mult, 'own');
     const bonus = pintBonus(beer) * mult;
     addBon(bonus);
-    S.today += mult;
+    S.today += mult; S.zat += mult; S.zatAt = Date.now();
     questProg('drink', mult);
     if (beer.r >= 2) questProg('rare', mult);
     if (fullHold && drinking) S.flags.adfundum = true;
@@ -1230,7 +1256,7 @@
     fullHold = false;
     xpDrop(`+${fmt(Math.round(RARITIES[beer.r].xp * mult * xpMult()))} XP${mult > 1 ? ' ×2' : ''}`, `+${fmt(bonus)} 🎟️`, beer.r);
     const limit = 10 + rank('lever') * 2;
-    const willPuke = S.today > limit && Math.random() < Math.min(0.9, (S.today - limit) * 0.05);
+    const willPuke = S.zat > limit && Math.random() < Math.min(0.9, (S.zat - limit) * 0.05);
     status.textContent = mult === 2 ? `🍻 Dubbel getapt! ${beer.name} telt 2×.` : `Burp! ${beer.name} op. ${pick(TOASTS)}`;
     if (willPuke) { setTimeout(puke, 250); level = 0; drinking = false; glassWrap.classList.remove('drinking'); showRefill(); return; }
     burp(); navigator.vibrate?.([60, 40, 120]);
@@ -1364,7 +1390,7 @@
     const ms = 5000 - rank('emmer') * 2000;
     pukeUntil = performance.now() + ms;
     S.pukes++;
-    S.today = Math.max(0, S.today - 3);
+    S.zat = 0; S.zatAt = Date.now();   // alles eruit: terug nuchter
     dirty = true;
     retchSound();
     navigator.vibrate?.([100, 80, 100, 80, 400, 100, 600]);
@@ -1396,7 +1422,7 @@
       o.classList.add('out');
       setTimeout(() => o.remove(), 800);
       drinkBtn.disabled = false;
-      status.textContent = 'Oef, beter. Nog ene?';
+      status.textContent = 'Oef, alles eruit. Terug nuchter! Nog ene?';
     }, 250);
   }
 
@@ -1450,12 +1476,14 @@
     })(t0);
   }
   let overlayOpen = null;
-  function overlay(html, tint) {
+  function overlay(html, tint, noOk) {
     if (overlayOpen) overlayOpen.remove();
     const o = document.createElement('div');
     o.className = 'overlay';
     if (tint) o.style.setProperty('--ov', tint);
-    o.innerHTML = html + '<button class="ok">Schol!</button>';
+    o.innerHTML = html + (noOk ? '' : '<button class="ok">Schol!</button>');
+    o.close = () => { o.remove(); if (overlayOpen === o) overlayOpen = null; };
+    if (noOk) { document.body.appendChild(o); overlayOpen = o; return o; }
     const close = () => { o.remove(); if (overlayOpen === o) overlayOpen = null; };
     o.querySelector('.ok').addEventListener('click', close);
     document.body.appendChild(o);
@@ -1574,6 +1602,12 @@
       c.font = '24px serif'; c.textAlign = 'center';
       fx.parts.forEach(p => { p.y -= p.v / 60; c.fillText('🍀', p.x + Math.sin(p.y / 40 + p.sw) * 12, p.y); });
       fx.parts = fx.parts.filter(p => p.y > -30);
+    } else if (fx.kind === 'candle') {
+      c.fillStyle = 'rgba(0,0,0,0.6)'; c.fillRect(0, 0, w, h);
+      const fl = still ? 1 : 0.85 + Math.sin(age * 13) * 0.08 + Math.sin(age * 7.3) * 0.07;
+      const g = c.createRadialGradient(w / 2, h * 0.45, 10, w / 2, h * 0.45, Math.max(w, h) * 0.5 * fl);
+      g.addColorStop(0, 'rgba(255,190,90,0.35)'); g.addColorStop(1, 'rgba(255,140,40,0)');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
     } else if (fx.kind === 'gold') {
       c.fillStyle = 'rgba(60,40,0,0.3)'; c.fillRect(0, 0, w, h);
       const cx = w / 2, cy = h * 0.42, len = Math.hypot(w, h);
@@ -1628,6 +1662,197 @@
     ching(); confetti(60, RARITIES[MYTHIC].pal);
     dirty = true;
   }
+
+  // =====================================================================
+  // RANDOM EVENTS (voorvallen)
+  // =====================================================================
+  const QUIZ = [
+    ['Welke abdij brouwt Westvleteren?', ['Sint-Sixtusabdij', 'Abdij van Orval', 'Abdij van Scourmont']],
+    ['Wat betekent "Duvel"?', ['Duivel', 'Dubbel', 'Duif']],
+    ['Hoe gist lambiek?', ['Spontaan, met wilde gisten uit de lucht', 'Met gewone bakkersgist', 'Koud, zoals een pils']],
+    ['Wat is geuze?', ['Een mengeling van jonge en oude lambiek', 'Een donker abdijbier', 'Een pils met citroen']],
+    ['Welk fruit zit er in een kriek?', ['Zure kersen', 'Frambozen', 'Bosbessen']],
+    ['Wie is de patroonheilige van de brouwers?', ['Sint-Arnoldus', 'Sint-Niklaas', 'Sint-Maarten']],
+    ['Sinds wanneer staat de Belgische biercultuur op de Unesco-lijst?', ['2016', '1999', '2022']],
+    ['Uit welke stad komt Stella Artois?', ['Leuven', 'Gent', 'Brugge']],
+    ['Uit welk glas drink je een De Koninck in Antwerpen?', ['Een bolleke', 'Een fluit', 'Een kwakglas']],
+    ['Welke brouwerij legde een bierpijpleiding onder Brugge?', ['De Halve Maan', 'Duvel Moortgat', 'Palm']],
+    ['Wat voor bier is Hoegaarden?', ['Witbier', 'Tripel', 'Stout']],
+    ['Volgens de legende van Orval vond een gravin haar ring terug in de bek van een…', ['Forel', 'Zwaan', 'Kikker']],
+    ['In welke stad wordt Rodenbach gebrouwen?', ['Roeselare', 'Mechelen', 'Hasselt']],
+    ['Waarom heeft een kwakglas een houten houder?', ['Het was een glas voor koetsiers', 'Om het bier warm te houden', 'Omdat het glas te zwaar was']],
+    ['In welke streek wordt lambiek traditioneel gebrouwen?', ['Pajottenland en de Zennevallei', 'De Kempen', 'De Westhoek']],
+    ['Waar wordt Jupiler gebrouwen?', ['Jupille, bij Luik', 'Leuven', 'Oudenaarde']],
+    ['Welke abdij brouwt Chimay?', ['Abdij van Scourmont', 'Sint-Sixtusabdij', 'Abdij van Westmalle']],
+  ];
+  const JOKES = [
+    'Zegt de ene pint tegen de andere: "Gij ziet er wat schuimig uit vandaag."',
+    'Waarom drinken monniken trappist? Omdat ze anders de trap niet meer op geraken.',
+    'Wat zegt een geuze tegen een kriek? "Gij zijt precies wat rood aangelopen."',
+    '"Ik drink er maar ene," zei Nonkel Jos. In 1987.',
+    'Wat is de favoriete sport van een tapper? Schuimspringen.',
+    'Een stamgast komt binnen met een ladder. "Voor de hoge schuimkraag," zegt hij.',
+    'Waarom neemt een lambiek nooit de bus? Hij gist liever spontaan.',
+    'Hoe noem je een bier dat altijd te laat is? Een Westvleteren: daar wacht ge op.',
+  ];
+  let eventBusy = false;
+  const EVENTS = [
+    { id: 'quiz',      w: 3,   ok: () => true },
+    { id: 'rondje',    w: 2,   ok: () => S.bon > 500 },
+    { id: 'politie',   w: 2,   ok: () => S.zat >= 2 },
+    { id: 'dief',      w: 2,   ok: () => S.bon > 1000 },
+    { id: 'tapkapot',  w: 1.5, ok: () => baseSps() > 0 && buffMult('prod') === 1 },
+    { id: 'stroom',    w: 1.5, ok: () => true },
+    { id: 'kermis',    w: 1.2, ok: () => baseSps() > 0 && buffMult('prod') === 1 },
+    { id: 'brouwerij', w: 1.5, ok: () => true },
+    { id: 'vreemde',   w: 0.6, ok: () => true },
+    { id: 'mop',       w: 2,   ok: () => true },
+  ];
+  let nextEventAt = performance.now() + (90 + Math.random() * 90) * 1000;
+  function maybeEvent(t) {
+    if (t < nextEventAt) return;
+    if (mgOpen || overlayOpen || puking() || document.hidden || eventBusy || drinking) { nextEventAt = t + 15000; return; }
+    nextEventAt = t + (150 + Math.random() * 150) * 1000;
+    const pool = EVENTS.filter(e => e.ok()), sum = pool.reduce((a, e) => a + e.w, 0);
+    let x = Math.random() * sum, ev = pool[0];
+    for (const e of pool) { if (x < e.w) { ev = e; break; } x -= e.w; }
+    S.events++; dirty = true;
+    tone(880, now(), 0.12, 'triangle', 0.1); tone(660, now() + 0.12, 0.18, 'triangle', 0.1);
+    EVENT_RUN[ev.id]();
+  }
+  const income60 = k => Math.max(100, staffIncome() * k);
+  function choiceCard(ico, title, text, choices, tint) {
+    const o = overlay(`<div class="ev-ico">${ico}</div><div class="big-t">${esc(title)}</div><div class="sub">${esc(text)}</div><div class="choices"></div>`, tint, true);
+    const box = o.querySelector('.choices');
+    choices.forEach(c => {
+      const b = document.createElement('button');
+      b.textContent = c.label; if (c.cls) b.className = c.cls;
+      b.addEventListener('click', () => c.fn(b, o));
+      box.appendChild(b);
+    });
+    return o;
+  }
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const EVENT_RUN = {
+    quiz() {
+      const [q, answers] = pick(QUIZ), right = answers[0];
+      let done = false;
+      choiceCard('🧠', 'Kroegquiz!', q, shuffle([...answers]).map(a => ({ label: a, fn: (b, o) => {
+        if (done) return; done = true;
+        const ok = a === right;
+        o.querySelectorAll('.choices button').forEach(x => { if (x.textContent === right) x.className = 'right'; else if (x === b) x.className = 'wrong'; });
+        if (ok) {
+          S.quizRight++;
+          const bon = income60(120); addBon(bon);
+          const crate = Math.random() < 0.25; if (crate) addCrate('bak');
+          queueToast(`🧠 Juist! +${fmt(bon)} 🎟️${crate ? ' · +1 bak bier' : ''}`); ching();
+        } else { queueToast(`❌ Fout. Het was: ${right}`); tone(200, now(), 0.3, 'sawtooth', 0.08); }
+        dirty = true;
+        setTimeout(o.close, 1600);
+      } })));
+    },
+    rondje() {
+      const cost = Math.round(S.bon * 0.05);
+      choiceCard('🍻', 'Rondje geven?', `Het café zit vol stamgasten. Een rondje kost je ${fmt(cost)} bonnekes, maar brengt geluk.`, [
+        { label: `Rondje van de zaak! (−${fmt(cost)} 🎟️)`, cls: 'primary', fn: (b, o) => {
+          S.bon = Math.max(0, S.bon - cost);
+          buffs.luck = { mult: 2, until: performance.now() + 90000, name: 'Rondje-geluk ×2' };
+          const xp = Math.round(xpToNext(levelInfo(S.xp).lvl) * 0.1 * xpMult()); S.xp += xp;
+          queueToast(`🍻 Iedereen roept "Schol!" · +${fmt(xp)} XP · geluk ×2 voor 90 s`); startFx('beerrain', 6); fanfare(3);
+          dirty = true; o.close();
+        } },
+        { label: 'Nee merci, ik ben krap bij kas', fn: (b, o) => { queueToast('De stamgasten kijken je scheef aan.'); o.close(); } },
+      ]);
+    },
+    politie() {
+      const drunk = S.zat >= 5;
+      if (drunk) {
+        const fine = Math.round(S.bon * 0.05); S.bon = Math.max(0, S.bon - fine);
+        overlay(`<div class="ev-ico">🚓</div><div class="big-t">Alcoholcontrole!</div><div class="sub">De blaastest kleurt rood. Gelukkig ben je te voet, maar de agent schrijft toch een boete van ${fmt(fine)} bonnekes uit voor "openbare dronkenschap".</div>`, '#3a5aff88');
+      } else {
+        const bon = income60(60); addBon(bon);
+        overlay(`<div class="ev-ico">🚓</div><div class="big-t">Alcoholcontrole!</div><div class="sub">Blaastest groen. De agent is zo onder de indruk dat hij je ${fmt(bon)} bonnekes toestopt. "Voor uw verstandig drinkgedrag."</div>`, '#3a5aff88');
+      }
+      dirty = true;
+    },
+    dief() {
+      eventBusy = true;
+      const b = document.createElement('button');
+      b.className = 'thief'; b.setAttribute('aria-label', 'Vang de dief');
+      b.innerHTML = '<span>🦹</span>';
+      b.style.top = (120 + Math.random() * (innerHeight - 300)) + 'px';
+      document.body.appendChild(b);
+      queueToast('🦹 Een dief gaat ervandoor met je bonnekes! Tik hem!');
+      let caught = false;
+      b.addEventListener('click', () => {
+        if (caught) return; caught = true; b.remove(); eventBusy = false;
+        S.thieves++;
+        const bon = Math.max(100, Math.round(S.bon * 0.02)); addBon(bon);
+        queueToast(`🚓 Gevangen! Hij geeft je ${fmt(bon)} bonnekes als excuus.`); ching(); confetti(50); dirty = true;
+      });
+      setTimeout(() => {
+        if (caught) return; b.remove(); eventBusy = false;
+        const loss = Math.round(S.bon * 0.03); S.bon = Math.max(0, S.bon - loss);
+        queueToast(`💸 Ontsnapt… je bent ${fmt(loss)} bonnekes kwijt.`); dirty = true;
+      }, 6000);
+    },
+    tapkapot() {
+      buffs.prod = { mult: 0.5, until: performance.now() + 60000, name: 'Tap kapot ×0,5' };
+      let n = 0, fixed = false;
+      const NEED = 20;
+      const o = choiceCard('🔧', 'De tap is kapot!', `Je personeel drinkt maar half zo snel. Tik ${NEED} keer om de tap te repareren (8 seconden).`, [
+        { label: `🔧 Repareren (0/${NEED})`, cls: 'primary', fn: b => {
+          if (fixed) return;
+          n++; b.textContent = `🔧 Repareren (${n}/${NEED})`; tone(300 + n * 30, now(), 0.05, 'square', 0.05);
+          if (n >= NEED) {
+            fixed = true; buffs.prod = null;
+            const bon = income60(60); addBon(bon);
+            queueToast(`🔧 Gerepareerd! De brouwer geeft je ${fmt(bon)} bonnekes.`); ching(); dirty = true; o.close();
+          }
+        } },
+      ]);
+      setTimeout(() => { if (!fixed && overlayOpen === o) { o.close(); queueToast('⏱️ Te laat: de tap blijft een minuutje kapot.'); } }, 8000);
+    },
+    stroom() {
+      buffs.click = { mult: 5, until: performance.now() + 20000, name: 'Kaarslicht ×5' };
+      document.body.classList.add('blackout');
+      startFx('candle', 20);
+      setTimeout(() => document.body.classList.remove('blackout'), 20000);
+      queueToast('🕯️ Stroompanne! Bij kaarslicht leveren je slokken ×5 op. Drinken!');
+    },
+    kermis() {
+      buffs.prod = { mult: 3, until: performance.now() + 120000, name: 'Kermis ×3' };
+      startFx('disco', 120);
+      queueToast('🎡 Kermis in het dorp! Je personeel drinkt 2 minuten ×3.');
+      fanfare(3);
+    },
+    brouwerij() {
+      const beers = shuffle([rollBeer(), rollBeer(), rollBeer(2)]);
+      let done = false;
+      const o = overlay(`<div class="ev-ico">🏭</div><div class="big-t">Brouwerijbezoek</div><div class="sub">De brouwer laat je één fles kiezen uit zijn kelder.</div><div class="pickrow">${beers.map((_, i) => `<button class="pick" data-i="${i}">?</button>`).join('')}</div>`, null, true);
+      o.querySelectorAll('.pick').forEach(btn => btn.addEventListener('click', () => {
+        if (done) return; done = true;
+        const i = +btn.dataset.i, b = beers[i];
+        gainPints(b, 1, 'crate');
+        o.querySelector('.pickrow').innerHTML = beers.map((x, j) => `<div style="opacity:${j === i ? 1 : 0.4}">${beerCardHtml(x, j * 120)}</div>`).join('');
+        o.querySelector('.sub').textContent = `Je koos ${b.name}! +${fmt(Math.round(RARITIES[b.r].xp * xpMult()))} XP`;
+        fanfare(Math.max(2, b.r)); if (b.r >= 3) confetti(100, RARITIES[b.r].pal);
+        const ok = document.createElement('button'); ok.className = 'ok'; ok.textContent = 'Schol!'; ok.addEventListener('click', o.close); o.appendChild(ok);
+        dirty = true;
+      }));
+    },
+    vreemde() {
+      addCrate('bak');
+      overlay('<div class="ev-ico">🕵️</div><div class="big-t">Een vreemde trakteert</div><div class="sub">Een man in een lange regenjas zet een bak bier op je tafel, knikt, en verdwijnt. +1 bak bier.</div>');
+    },
+    mop() {
+      const bon = income60(20);
+      choiceCard('🗣️', 'Een stamgast vertelt een mop', pick(JOKES), [
+        { label: '😂 Haha!', cls: 'primary', fn: (b, o) => { addBon(bon); queueToast(`Hij is zo blij dat hij ${fmt(bon)} bonnekes geeft.`); o.close(); } },
+        { label: '😐 Die kende ik al', fn: (b, o) => { queueToast('De stamgast druipt beteuterd af.'); o.close(); } },
+      ]);
+    },
+  };
 
   // =====================================================================
   // MINIGAME: TAPWEDSTRIJD
@@ -1817,7 +2042,7 @@
     setText($('total'), fmt(S.total));
     setText($('uniq'), `${uniqueCount(S)}/${BEERS.length}`);
     setText($('ptsLabel'), fmt(points(S)));
-    const eff = Math.max(0, S.today - rank('lever') * 2), zat = Math.min(eff, 10);
+    const eff = Math.max(0, S.zat - rank('lever') * 2), zat = Math.min(eff, 10);
     $('zatFill').style.width = zat * 10 + '%';
     setText($('zatLabel'), ['nuchter', 'nuchter', 'tipsy', 'tipsy', 'aangeschoten', 'aangeschoten', 'zat', 'zat', 'stomzat', 'stomzat', 'lazarus'][zat]);
     document.body.classList.remove('zat-1', 'zat-2', 'zat-3');
@@ -2133,7 +2358,7 @@
     if (tab === 'skills') renderSkills();
     if (tab === 'collectie') renderCollection();
     if (tab === 'stijl') renderStyle();
-    if (tab === 'ranglijst') renderBoard();
+    if (tab === 'ranglijst') { renderBoard(); renderStats(); }
   }
   document.querySelectorAll('nav button').forEach(btn => btn.addEventListener('click', () => {
     stop();
@@ -2222,9 +2447,15 @@
       else if (current.r === DIVINE) { $('beerTop').setAttribute('stop-color', `hsl(48 100% ${88 + Math.sin(k * 3) * 8}%)`); }
     }
     if (capEl === null && t > nextCapAt && !mgOpen) { spawnCap(); nextCapAt = t + capInterval(); }
+    maybeEvent(t);
+    if (dt < 5) S.playSecs += dt;
     if (fx || fxWasOn) { drawFx(t); fxWasOn = !!fx; }
     uiAcc += dt; slowAcc += dt; saveAcc += dt;
     if (uiAcc > 0.25) { uiAcc = 0; renderWallet(); if (activeTab() === 'kroeg') renderKroeg(); }
+    if (slowAcc > 1) {
+      // slowly sober up: one pint less on the meter every 15 minutes
+      if (S.zat > 0 && Date.now() - S.zatAt > 15 * 60000) { S.zat--; S.zatAt = Date.now(); dirty = true; }
+    }
     if (slowAcc > 1) { slowAcc = 0; checkProgress(); if (dirty) { dirty = false; renderVisible(); schedulePush(); } }
     if (saveAcc > 5) { saveAcc = 0; save(); }
     requestAnimationFrame(frame);
@@ -2261,6 +2492,23 @@
       }
     }
     writing = false;
+  }
+  function renderStats() {
+    const h = Math.floor(S.playSecs / 3600), m = Math.floor(S.playSecs % 3600 / 60);
+    const rows = [
+      ['🍺', 'Zelf gedronken', fmt(S.total)], ['🏪', 'Door personeel', fmt(S.staffPints)], ['👆', 'Tikken op je glas', fmt(S.taps)],
+      ['📖', 'Soorten gevonden', `${uniqueCount(S)}/${BEERS.length}`], ['🎟️', 'Bonnekes ooit verdiend', fmt(S.bonAll)], ['⭐', 'Kroegsterren', fmt(S.stars)],
+      ['🧢', 'Gouden doppen', fmt(S.caps)], ['🎲', 'Voorvallen', fmt(S.events)], ['🧠', 'Quizvragen juist', fmt(S.quizRight)],
+      ['🚓', 'Dieven gevangen', fmt(S.thieves)], ['📦', 'Bakken geopend', fmt(S.opened)], ['🤮', 'Keer gebrokt', fmt(S.pukes)],
+      ['🎯', 'Beste tapwedstrijd', `${S.mg.best} / 500`], ['📅', 'Dagen op rij', fmt(S.streak)], ['⏱️', 'Speeltijd', `${h} u ${m} min`],
+    ];
+    const el = $('statList'); el.textContent = '';
+    rows.forEach(([ico, label, val]) => {
+      const t = document.createElement('div'); t.className = 'tile stattile';
+      t.innerHTML = '<div class="ico"></div><div class="t"><b></b><div class="m"></div></div>';
+      t.querySelector('.ico').textContent = ico; t.querySelector('b').textContent = val; t.querySelector('.m').textContent = label;
+      el.appendChild(t);
+    });
   }
   let boardSeq = 0;
   async function renderBoard() {
@@ -2380,6 +2628,7 @@
   renderWallet(); renderTapStats(); renderKroeg();
   requestAnimationFrame(t => { lastFrame = t; requestAnimationFrame(frame); });
   initShared();
+  if (location.protocol === 'file:' && location.hash === '#debug') window.pintjeDebug = { event: id => EVENT_RUN[id](), state: () => S, puke };
 })();
 </script>
 </body>

@@ -14,6 +14,8 @@ A Belgian beer idle game. Open `index.html` in a browser (works great on a phone
 - **Daily quests, levels and an 18-skill tree** over four tiers.
 - **Crates**: bak, krat and vat, plus an "Alles openen" button.
 - **Stijl**: 9 UI themes (colours, corners, fonts), 19 glasses and 23 backgrounds.
-- **Brokken**: from your 11th pint of the day you might throw up.
+- **Brokken**: once the zatheidsmeter passes 10 you might throw up, which resets the meter to zero. The meter also drops by one every 15 minutes.
+- **Voorvallen**: random events every few minutes, like a kroegquiz with Belgian beer trivia, a police breath test, a bonnekes thief to catch, a broken tap to fix, a power cut, a kermis, a brewery visit, a stranger buying a crate, and stamgasten telling jokes.
+- **Statistieken** on the Top tab.
 - **Alles wissen**: wipe all progress (local and on the leaderboard) from the Stijl tab.
 - **Ranglijst**: a shared leaderboard when opened through the claude.ai artifact link.
