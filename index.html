@@ -9,12 +9,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
-  /* Layout: one-screen café app — header, swappable panel (tap / collectie / glazen / ranglijst), tab bar like a row of beer mats. */
+  /* Layout: one-screen café game — header with level, news ticker, swappable panel, tab bar like a row of beer mats. Single dark café look. */
   :root {
     color-scheme: dark;
     --bg: #1b1209;
-    --bg-2: #2a1c0e;
-    --panel: #26190c;
+    --panel: #26190cdd;
+    --panel-solid: #26190c;
     --line: #4a341c;
     --text: #fbefd9;
     --muted: #c9b48f;
@@ -25,14 +25,21 @@
     --r2: #58a9e6;   /* zeldzaam */
     --r3: #b88aee;   /* episch */
     --r4: #f0913a;   /* legendarisch */
-    --r5: #ffd75e;   /* mythisch */
+    --r5: #3ddc84;   /* smaragd */
+    --r6: #ff4d6d;   /* robijn */
+    --r7: #5b8cff;   /* saffier */
+    --r8: #d9f6ff;   /* diamant */
+    --r9: #fff35c;   /* regenboog (base) */
+    --r10: #ffd75e;  /* mythisch */
+    --rainbow: linear-gradient(90deg, #ff5f5f, #ffb347, #fff35c, #5fff8a, #5fc8ff, #b05fff);
     --display: "Alfa Slab One", "Rockwell", Georgia, serif;
     --body: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
-    background: radial-gradient(ellipse at top, var(--bg-2), var(--bg) 70%) var(--bg);
+    background: radial-gradient(ellipse at top, #2a1c0e, #1b1209 70%) var(--bg);
+    background-attachment: fixed;
     color: var(--text);
     font-family: var(--body);
     overflow: hidden;
@@ -40,72 +47,58 @@
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .app {
-    height: 100%;
-    max-width: 480px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    padding: 12px 16px 0;
-  }
-  header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 4px 8px; }
-  h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 1.9rem; letter-spacing: 0.01em; color: var(--accent); }
-  .points { text-align: right; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .points b { display: block; color: var(--text); font-size: 1.15rem; }
 
-  .lvl { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; max-width: 200px; }
-  .lvl .badge {
-    font-family: var(--display); font-size: 0.95rem; background: var(--accent); color: var(--on-accent);
-    border-radius: 8px; padding: 2px 8px; flex: none; font-variant-numeric: tabular-nums;
-  }
-  .lvl .xpwrap { flex: 1; min-width: 0; font-size: 0.7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  /* ---- backgrounds (unlockable) ---- */
+  .bg-bruin     { background: radial-gradient(ellipse at top, #2a1c0e, #1b1209 70%) #1b1209; }
+  .bg-biljart   { background: radial-gradient(ellipse at 50% 30%, #1f5a3a, #0d2a1b 75%) #0d2a1b; }
+  .bg-kermis    { background: radial-gradient(circle at 10% 8%, #ff5fa266 0 3px, transparent 4px) 0 0 / 48px 48px, radial-gradient(circle at 60% 8%, #ffd75e66 0 3px, transparent 4px) 0 0 / 48px 48px, linear-gradient(#2b0f3a, #160a1f) #160a1f; }
+  .bg-abdij     { background: repeating-linear-gradient(0deg, #ffffff0a 0 1px, transparent 1px 36px), repeating-linear-gradient(90deg, #ffffff07 0 1px, transparent 1px 72px), radial-gradient(ellipse at top, #3a3226, #1a1611 75%) #1a1611; }
+  .bg-festival  { background: conic-gradient(from 200deg at 20% 0%, transparent 0 10deg, #5fc8ff26 10deg 20deg, transparent 20deg), conic-gradient(from 140deg at 80% 0%, transparent 0 10deg, #ff5fa226 10deg 20deg, transparent 20deg), linear-gradient(#0a0f2a, #05060f) #05060f; }
+  .bg-brugge    { background: repeating-linear-gradient(180deg, transparent 0 14px, #ffd75e10 14px 16px) bottom / 100% 40% no-repeat, linear-gradient(#0b1630, #050a18) #050a18; }
+  .bg-smaragd   { background: radial-gradient(ellipse at top, #0f4d33, #04170f 75%) #04170f; }
+  .bg-robijn    { background: radial-gradient(ellipse at top, #5a0f1f, #1a0409 75%) #1a0409; }
+  .bg-saffier   { background: radial-gradient(ellipse at top, #12306b, #050d22 75%) #050d22; }
+  .bg-diamant   { background: radial-gradient(circle at 20% 20%, #ffffff30 0 1px, transparent 2px) 0 0 / 37px 37px, radial-gradient(circle at 70% 60%, #bfefff40 0 1px, transparent 2px) 0 0 / 53px 53px, linear-gradient(#1c2a33, #0a1014) #0a1014; }
+  .bg-regenboog { background: linear-gradient(135deg, #3a0f2a, #3a2a0f, #0f3a1a, #0f2a3a, #2a0f3a, #3a0f2a) 0 0 / 400% 400% #1a0f1a; animation: rainbowbg 30s linear infinite; }
+  @keyframes rainbowbg { to { background-position: 400% 400%; } }
+  .bg-hemel     { background: radial-gradient(ellipse at 50% 0%, #8a6a24 0%, #4a3712 40%, #1e1508 80%) #1e1508; }
+  .bg-ster      { background: radial-gradient(circle, #ffffff 0 1px, transparent 1.5px) 0 0 / 61px 61px, radial-gradient(circle, #ffffffaa 0 1px, transparent 1.5px) 30px 20px / 43px 43px, linear-gradient(#0b0b24, #03030c) #03030c; }
+  .bg-goud      { background: radial-gradient(ellipse at top, #5a4210, #1b1209 75%) #1b1209; }
+  body[class*="bg-"] { background-attachment: fixed; }
+
+  .app { height: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; padding: 10px 16px 0; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 2px 4px; }
+  h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 1.7rem; color: var(--accent); }
+  .lvl { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; max-width: 220px; }
+  .lvl .badge { font-family: var(--display); font-size: 0.95rem; background: var(--accent); color: var(--on-accent); border-radius: 8px; padding: 2px 8px; flex: none; font-variant-numeric: tabular-nums; }
+  .lvl .xpwrap { flex: 1; min-width: 0; font-size: 0.7rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .lvl .bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-bottom: 2px; }
   .lvl .fill { height: 100%; background: linear-gradient(90deg, var(--r2), var(--r3)); width: 0; transition: width 0.5s; }
-  .sp-dot { color: var(--accent); font-weight: 700; }
-  .xpdrop {
-    position: absolute; left: 50%; top: 40%; transform: translate(-50%, 0); font-family: var(--display); font-size: 1.4rem;
-    pointer-events: none; animation: xpup 1.6s ease-out forwards; text-shadow: 0 2px 6px #000a; white-space: nowrap;
-  }
-  @keyframes xpup { from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.1); } to { opacity: 0; transform: translate(-50%, -80px); } }
-
-  /* ---- skills ---- */
-  .sp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-  .sp-count { font-weight: 700; font-variant-numeric: tabular-nums; }
-  .tier { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
-  .skill {
-    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px;
-    display: flex; flex-direction: column; gap: 4px; min-width: 0;
-  }
-  .skill.maxed { border-color: var(--accent); }
-  .skill.locked { opacity: 0.5; }
-  .skill .top { display: flex; align-items: center; gap: 6px; font-weight: 700; }
-  .skill .top span { font-size: 1.2rem; }
-  .skill .m { color: var(--muted); font-size: 0.78rem; line-height: 1.3; }
-  .skill .eff { font-size: 0.78rem; font-variant-numeric: tabular-nums; }
-  .pips { display: flex; gap: 3px; }
-  .pips i { width: 12px; height: 6px; border-radius: 2px; background: var(--line); }
-  .pips i.on { background: var(--accent); }
-  .skill button, .ghost {
-    margin-top: 2px; border: 0; border-radius: 8px; padding: 7px; font-weight: 700; background: var(--accent); color: var(--on-accent);
-  }
-  .skill button:disabled { background: var(--line); color: var(--muted); cursor: default; }
-  .ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); padding: 5px 10px; font-weight: 600; font-size: 0.8rem; }
+  .ticker { font-size: 0.78rem; color: var(--muted); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-block: 2px 4px; border-bottom: 1px solid var(--line); transition: opacity 0.4s; }
+  .ticker b { color: var(--accent); font-style: normal; margin-right: 6px; }
 
   main { flex: 1; min-height: 0; position: relative; }
   .panel { position: absolute; inset: 0; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 12px; }
   .panel[hidden] { display: none !important; }
   h2 { font-family: var(--display); font-weight: 400; font-size: 1.3rem; margin: 8px 0 4px; }
-  h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; margin: 16px 0 8px; }
-  .lead { color: var(--muted); margin: 0 0 8px; font-size: 0.9rem; }
+  h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; margin: 16px 0 8px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+  .lead { color: var(--muted); margin: 0 0 8px; font-size: 0.88rem; line-height: 1.35; }
 
   /* ---- tap ---- */
   #tap { align-items: center; justify-content: space-between; overflow: hidden; }
+  .wallet { text-align: center; padding-top: 6px; font-variant-numeric: tabular-nums; }
+  .wallet .amt { font-family: var(--display); font-size: 1.5rem; line-height: 1.1; }
+  .wallet .rate { font-size: 0.8rem; color: var(--muted); }
+  .buffs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; min-height: 0; }
+  .buff { font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-variant-numeric: tabular-nums; }
   .stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; width: 100%; position: relative; }
-  .glass-wrap { transition: transform 0.25s ease-out; transform-origin: 50% 90%; height: 100%; display: flex; align-items: center; }
+  .glass-wrap { transition: transform 0.25s ease-out; transform-origin: 50% 90%; height: 100%; display: flex; align-items: center; cursor: pointer; touch-action: manipulation; }
   .glass-wrap.drinking { transform: rotate(-38deg) translateY(-10px); }
-  svg.glass { height: min(100%, 300px); width: auto; max-width: 60vw; display: block; overflow: visible; }
-  .glass-wrap.mythic svg.glass { animation: halo 1.6s ease-in-out infinite alternate; }
-  @keyframes halo { from { filter: drop-shadow(0 0 6px #ffd75e88); } to { filter: drop-shadow(0 0 22px #ffd75e); } }
+  .glass-wrap.sip { animation: sip 0.18s ease-out; }
+  @keyframes sip { 50% { transform: rotate(-10deg) scale(0.97); } }
+  svg.glass { height: min(100%, 290px); width: auto; max-width: 58vw; display: block; overflow: visible; }
+  .glass-wrap.halo svg.glass { animation: halo 1.6s ease-in-out infinite alternate; }
+  @keyframes halo { from { filter: drop-shadow(0 0 6px var(--halo)); } to { filter: drop-shadow(0 0 22px var(--halo)); } }
 
   body.zat-1 .stage { animation: sway 4s ease-in-out infinite; }
   body.zat-2 .stage { animation: sway 2.6s ease-in-out infinite; --sway: 4deg; }
@@ -115,117 +108,178 @@
   .beer-card { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   .beer-card.pop { animation: pop 0.5s cubic-bezier(.2, 1.6, .4, 1); }
   @keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
-  .beer-name { font-family: var(--display); font-size: 1.35rem; line-height: 1.15; text-wrap: balance; }
+  .beer-name { font-family: var(--display); font-size: 1.3rem; line-height: 1.15; text-wrap: balance; }
   .beer-meta { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
-  .chip {
-    display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-    padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor;
-  }
+  .chip { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
   .new { background: var(--accent); color: var(--on-accent); border-color: var(--accent); margin-left: 4px; }
-  .r0 { color: var(--r0); } .r1 { color: var(--r1); } .r2 { color: var(--r2); }
-  .r3 { color: var(--r3); } .r4 { color: var(--r4); }
-  .r5 { color: var(--r5); text-shadow: 0 0 8px #ffd75e99; }
+  .r0 { color: var(--r0); } .r1 { color: var(--r1); } .r2 { color: var(--r2); } .r3 { color: var(--r3); } .r4 { color: var(--r4); }
+  .r5 { color: var(--r5); text-shadow: 0 0 8px #3ddc8466; }
+  .r6 { color: var(--r6); text-shadow: 0 0 8px #ff4d6d66; }
+  .r7 { color: var(--r7); text-shadow: 0 0 8px #5b8cff66; }
+  .r8 { color: var(--r8); text-shadow: 0 0 10px #d9f6ffaa; }
+  .r9 { background: var(--rainbow); -webkit-background-clip: text; background-clip: text; color: transparent; border-color: var(--r9) !important; }
+  .r10 { color: var(--r10); text-shadow: 0 0 8px #ffd75e99; }
 
-  .status { min-height: 1.5em; text-align: center; font-size: 1.05rem; font-weight: 600; margin: 6px 0 10px; }
+  .status { min-height: 1.4em; text-align: center; font-size: 1rem; font-weight: 600; margin: 4px 0 8px; }
   .controls { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 360px; }
+  .row2 { display: flex; gap: 8px; }
+  .row2 > * { flex: 1; }
   button { font: inherit; color: inherit; cursor: pointer; }
   button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-  .big {
-    font-weight: 700; font-size: 1.1rem; border: 0; border-radius: 999px; padding: 15px 20px; touch-action: none;
-  }
+  .big { font-weight: 700; font-size: 1.05rem; border: 0; border-radius: 999px; padding: 14px 18px; touch-action: none; }
   #drink { background: var(--accent); color: var(--on-accent); }
   #drink:active { filter: brightness(0.92); }
-  #refill { background: transparent; color: var(--text); border: 2px solid var(--muted); }
-  .link { background: none; border: 0; color: var(--muted); text-decoration: underline; padding: 4px; font-size: 0.85rem; }
+  .outline { background: transparent; color: var(--text); border: 2px solid var(--muted); }
+  .crate-btn { background: #3b2412; color: var(--text); border: 2px solid var(--r4); padding: 10px; border-radius: 999px; font-weight: 700; }
+  .link { background: none; border: 0; color: var(--muted); text-decoration: underline; padding: 2px; font-size: 0.8rem; }
   .hidden { display: none !important; }
-  .stats { display: flex; gap: 20px; justify-content: center; margin-top: 10px; color: var(--muted); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
-  .stats b { color: var(--text); font-size: 1.1rem; display: block; text-align: center; }
-  .meter { width: 100%; max-width: 360px; margin-top: 8px; font-size: 0.75rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .stats { display: flex; gap: 18px; justify-content: center; margin-top: 8px; color: var(--muted); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+  .stats b { color: var(--text); font-size: 1.05rem; display: block; text-align: center; }
+  .meter { width: 100%; max-width: 360px; margin-top: 6px; font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
   .meter .bar { flex: 1; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
   .meter .fill { height: 100%; background: linear-gradient(90deg, var(--r1), var(--accent), var(--r4)); width: 0; transition: width 0.4s; }
+  .float { position: absolute; pointer-events: none; font-weight: 700; animation: floatup 0.9s ease-out forwards; text-shadow: 0 2px 4px #000a; font-variant-numeric: tabular-nums; z-index: 3; }
+  @keyframes floatup { to { opacity: 0; transform: translateY(-50px); } }
+  .xpdrop { position: absolute; left: 50%; top: 40%; transform: translate(-50%, 0); font-family: var(--display); font-size: 1.4rem; pointer-events: none; animation: xpup 1.6s ease-out forwards; text-shadow: 0 2px 6px #000a; white-space: nowrap; z-index: 3; }
+  @keyframes xpup { from { opacity: 0; transform: translate(-50%, 20px) scale(0.8); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.1); } to { opacity: 0; transform: translate(-50%, -80px); } }
 
-  /* ---- collectie ---- */
+  /* ---- shared list styles ---- */
   .progress { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .progress .bar { flex: 1; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
   .progress .fill { height: 100%; background: var(--accent); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-  .tile {
-    display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px;
-    background: var(--panel); border: 1px solid var(--line); min-width: 0;
-  }
+  .tile { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); min-width: 0; }
   .tile .swatch { width: 18px; height: 30px; border-radius: 3px 3px 5px 5px; flex: none; border-top: 5px solid var(--foam, #fff); }
   .tile .t { min-width: 0; }
-  .tile .n { font-weight: 600; font-size: 0.9rem; line-height: 1.15; }
-  .tile .m { color: var(--muted); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+  .tile .n { font-weight: 600; font-size: 0.88rem; line-height: 1.15; }
+  .tile .m { color: var(--muted); font-size: 0.74rem; font-variant-numeric: tabular-nums; }
   .tile.locked { opacity: 0.5; }
   .tile.locked .swatch { background: var(--line) !important; border-top-color: var(--line); }
-  .odds { color: var(--muted); font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 6px; }
+  .odds { color: var(--muted); font-weight: 500; text-transform: none; letter-spacing: 0; -webkit-text-fill-color: var(--muted); }
   .ach { display: flex; flex-direction: column; gap: 6px; }
-  .ach .tile .swatch { display: none; }
   .ach .ico { font-size: 1.3rem; width: 28px; text-align: center; flex: none; }
 
-  /* ---- glazen ---- */
-  .skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
-  .skin {
-    background: var(--panel); border: 2px solid var(--line); border-radius: 12px; padding: 10px 6px 8px;
-    display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
-  }
+  /* ---- kroeg (idle) ---- */
+  .kroeg-head { position: sticky; top: 0; z-index: 2; background: var(--panel-solid); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .kroeg-head .amt { font-family: var(--display); font-size: 1.15rem; }
+  .kroeg-head .rate { font-size: 0.75rem; color: var(--muted); }
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex: none; }
+  .seg button { background: none; border: 0; padding: 5px 9px; font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+  .bld { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); text-align: left; width: 100%; }
+  .bld + .bld { margin-top: 6px; }
+  .bld .ico { font-size: 1.7rem; text-align: center; }
+  .bld .n { font-weight: 700; }
+  .bld .m { font-size: 0.74rem; color: var(--muted); line-height: 1.25; }
+  .bld .own { font-family: var(--display); font-size: 1.3rem; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 2ch; text-align: right; }
+  .bld .cost { font-size: 0.8rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .bld:disabled { cursor: default; }
+  .bld:disabled .cost { color: var(--r6); }
+  .bld.mystery { opacity: 0.45; }
+  .upgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+  .upg { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px; text-align: left; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .upg .n { font-weight: 700; font-size: 0.86rem; }
+  .upg .m { font-size: 0.72rem; color: var(--muted); line-height: 1.25; }
+  .upg .cost { font-size: 0.78rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .upg:disabled { cursor: default; }
+  .upg:disabled .cost { color: var(--r6); }
+  .prestige { margin-top: 16px; padding: 12px; border-radius: 12px; border: 1px solid var(--r10); background: linear-gradient(135deg, #3a2a0a, #1b1209); }
+  .prestige p { margin: 4px 0 8px; font-size: 0.82rem; color: var(--muted); line-height: 1.35; }
+  .prestige button { width: 100%; border: 0; border-radius: 10px; padding: 10px; font-weight: 700; background: var(--r10); color: var(--on-accent); }
+  .prestige button:disabled { background: var(--line); color: var(--muted); cursor: default; }
+  .empty { color: var(--muted); padding: 14px; text-align: center; border: 1px dashed var(--line); border-radius: 10px; font-size: 0.86rem; }
+
+  /* ---- skills ---- */
+  .sp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .sp-count { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tier { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+  .skill { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .skill.maxed { border-color: var(--accent); }
+  .skill.locked { opacity: 0.5; }
+  .skill .top { display: flex; align-items: center; gap: 6px; font-weight: 700; }
+  .skill .top span { font-size: 1.2rem; }
+  .skill .m { color: var(--muted); font-size: 0.78rem; line-height: 1.3; }
+  .skill .eff { font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+  .pips { display: flex; gap: 3px; }
+  .pips i { width: 12px; height: 6px; border-radius: 2px; background: var(--line); }
+  .pips i.on { background: var(--accent); }
+  .skill button { margin-top: 2px; border: 0; border-radius: 8px; padding: 7px; font-weight: 700; background: var(--accent); color: var(--on-accent); }
+  .skill button:disabled { background: var(--line); color: var(--muted); cursor: default; }
+  .ghost { border-radius: 8px; background: transparent; color: var(--muted); border: 1px solid var(--line); padding: 5px 10px; font-weight: 600; font-size: 0.8rem; }
+
+  /* ---- stijl ---- */
+  .skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+  .skin { background: var(--panel); border: 2px solid var(--line); border-radius: 12px; padding: 10px 6px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; min-width: 0; }
   .skin svg { width: 46px; height: 70px; }
-  .skin .n { font-weight: 600; font-size: 0.9rem; }
-  .skin .m { color: var(--muted); font-size: 0.72rem; line-height: 1.2; }
+  .skin .sw { width: 100%; height: 56px; border-radius: 8px; border: 1px solid var(--line); }
+  .skin .n { font-weight: 600; font-size: 0.86rem; }
+  .skin .m { color: var(--muted); font-size: 0.7rem; line-height: 1.2; }
   .skin.on { border-color: var(--accent); }
   .skin:disabled { cursor: default; opacity: 0.45; }
+  .skin:disabled .sw { filter: grayscale(1) brightness(0.6); animation: none; }
 
   /* ---- ranglijst ---- */
   .board { display: flex; flex-direction: column; gap: 6px; }
-  .row {
-    display: grid; grid-template-columns: 28px 32px 1fr auto; align-items: center; gap: 10px;
-    padding: 8px 10px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line);
-  }
-  .row.me { border-color: var(--accent); }
-  .row .rank { font-family: var(--display); text-align: center; font-variant-numeric: tabular-nums; }
-  .row img { width: 32px; height: 32px; border-radius: 50%; }
-  .row .who { min-width: 0; }
-  .row .nm { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .row .sub { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .row .pts { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
-  .empty { color: var(--muted); padding: 16px; text-align: center; border: 1px dashed var(--line); border-radius: 10px; }
+  .lrow { display: grid; grid-template-columns: 28px 32px 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); }
+  .lrow.me { border-color: var(--accent); }
+  .lrow .rank { font-family: var(--display); text-align: center; font-variant-numeric: tabular-nums; }
+  .lrow img { width: 32px; height: 32px; border-radius: 50%; }
+  .lrow .who { min-width: 0; }
+  .lrow .nm { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lrow .sub { font-size: 0.74rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .lrow .pts { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
 
   /* ---- tab bar ---- */
-  nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding-block: 8px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); }
-  nav button {
-    position: relative; background: none; border: 0; border-radius: 10px; padding: 6px 2px; color: var(--muted);
-    display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.75rem; font-weight: 600;
-  }
-  nav button span { font-size: 1.3rem; line-height: 1; }
-  nav button .dot { position: absolute; top: 2px; right: 18%; width: 9px; height: 9px; border-radius: 50%; background: var(--r4); }
+  nav { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; padding-block: 6px calc(8px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); }
+  nav button { position: relative; background: none; border: 0; border-radius: 10px; padding: 5px 0; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.68rem; font-weight: 600; min-width: 0; }
+  nav button span { font-size: 1.25rem; line-height: 1; }
   nav button[aria-selected="true"] { color: var(--accent); background: var(--panel); }
+  nav button .dot { position: absolute; top: 2px; right: 16%; width: 9px; height: 9px; border-radius: 50%; background: var(--r4); }
 
   /* ---- overlays ---- */
-  .toast {
-    position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -150%);
-    background: var(--panel); border: 1px solid var(--accent); color: var(--text); padding: 10px 16px; border-radius: 12px;
-    font-weight: 600; z-index: 20; transition: transform 0.35s ease, visibility 0.35s; max-width: calc(100% - 32px); text-align: center;
-    visibility: hidden;
-  }
-  .toast { transform: translate(-50%, calc(-100% - 40px)); }
+  .toast { position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top, 0px)); transform: translate(-50%, calc(-100% - 40px)); visibility: hidden; background: var(--panel-solid); border: 1px solid var(--accent); color: var(--text); padding: 10px 16px; border-radius: 12px; font-weight: 600; z-index: 30; transition: transform 0.35s ease, visibility 0.35s; max-width: calc(100% - 32px); text-align: center; }
   .toast.show { transform: translate(-50%, 0); visibility: visible; }
-  .mythic-overlay {
-    position: fixed; inset: 0; z-index: 15; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 8px; padding: 16px; text-align: center; background: radial-gradient(circle, #5a4210f8, #1b1209fc 70%); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-    animation: fadein 0.6s ease;
-  }
-  .mythic-overlay .big-t { font-family: var(--display); font-size: 2rem; color: var(--r5); text-shadow: 0 0 20px #ffd75e; text-wrap: balance; }
+  .overlay { position: fixed; inset: 0; z-index: 25; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; text-align: center; background: radial-gradient(circle, var(--ov, #5a4210) -40%, #0d0904fa 70%); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: fadein 0.5s ease; }
+  .overlay .big-t { font-family: var(--display); font-size: 1.9rem; text-wrap: balance; line-height: 1.15; }
+  .overlay .sub { color: var(--muted); font-size: 0.9rem; max-width: 34ch; line-height: 1.4; }
+  .overlay .cards { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .overlay .card { width: 104px; padding: 10px 8px; border-radius: 12px; background: var(--panel-solid); border: 2px solid currentColor; display: flex; flex-direction: column; align-items: center; gap: 4px; animation: pop 0.5s cubic-bezier(.2, 1.6, .4, 1) both; }
+  .overlay .card .nm { color: var(--text); font-weight: 700; font-size: 0.82rem; line-height: 1.15; -webkit-text-fill-color: var(--text); }
+  .overlay .card .swatch { width: 26px; height: 42px; border-radius: 4px 4px 7px 7px; border-top: 7px solid var(--foam, #fff); }
+  .overlay .ok { margin-top: 6px; border: 0; border-radius: 999px; padding: 10px 26px; font-weight: 700; background: var(--accent); color: var(--on-accent); }
   @keyframes fadein { from { opacity: 0; } }
-  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 14; width: 100%; height: 100%; }
+  .goldcap { position: fixed; z-index: 20; width: 58px; height: 58px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; background: radial-gradient(circle at 35% 30%, #fff6c0, #ffd75e 35%, #b88a00 70%); box-shadow: 0 0 18px #ffd75e, inset 0 0 0 5px #e0a800; animation: capspin 2.4s ease-in-out infinite, fadein 0.6s; font-size: 1.5rem; }
+  .goldcap::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; background: repeating-conic-gradient(#e0a800 0 10deg, transparent 10deg 20deg); z-index: -1; }
+  @keyframes capspin { 50% { transform: rotate(20deg) scale(1.08); } }
+  .puke { position: fixed; inset: 0; z-index: 24; display: flex; align-items: center; justify-content: center; touch-action: none; animation: pukein 0.25s ease-out; }
+  .puke svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .puke .drip { animation: drip 5s ease-in forwards; }
+  .puke .word { position: relative; font-family: var(--display); font-size: clamp(1.8rem, 9vw, 3rem); color: #d7f27a; text-shadow: 0 3px 0 #4a6b12, 0 0 20px #00000099; transform: rotate(-6deg); text-align: center; animation: retchshake 0.18s linear infinite; padding: 0 16px; overflow-wrap: anywhere; }
+  .puke .timer { position: absolute; bottom: 22%; left: 0; right: 0; text-align: center; font-weight: 700; color: #f2ffd0; text-shadow: 0 2px 4px #000; }
+  .puke.out { animation: pukeout 0.8s ease-in forwards; }
+  @keyframes pukein { from { opacity: 0; transform: scale(1.3); } }
+  @keyframes pukeout { to { opacity: 0; transform: translateY(40px); } }
+  @keyframes drip { to { transform: translateY(18%); } }
+  @keyframes retchshake { 0% { transform: rotate(-6deg) translate(0, 0); } 50% { transform: rotate(-4deg) translate(3px, -2px); } 100% { transform: rotate(-7deg) translate(-2px, 2px); } }
+  body.queasy .app { animation: queasy 0.12s linear 6; }
+  @keyframes queasy { 50% { transform: translateX(4px); } }
+  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 26; width: 100%; height: 100%; }
 
   @media (prefers-reduced-motion: reduce) {
     body[class*="zat-"] .stage { animation: none !important; filter: none !important; }
-    .glass-wrap, .beer-card.pop, .glass-wrap.mythic svg.glass { animation: none !important; transition: none !important; }
+    .glass-wrap, .beer-card.pop, .glass-wrap.halo svg.glass, .goldcap, .bg-regenboog, .float, .xpdrop, .puke, .puke .word, .puke .drip, body.queasy .app { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
-<body>
+<body class="bg-bruin">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="rainbowStroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff5f5f"/><stop offset="0.2" stop-color="#ffb347"/><stop offset="0.4" stop-color="#fff35c"/>
+      <stop offset="0.6" stop-color="#5fff8a"/><stop offset="0.8" stop-color="#5fc8ff"/><stop offset="1" stop-color="#b05fff"/>
+    </linearGradient>
+  </defs>
+</svg>
 <div class="app">
   <header>
     <h1>Pintje</h1>
@@ -233,15 +287,20 @@
       <div class="badge" id="lvlBadge">Lvl 1</div>
       <div class="xpwrap"><div class="bar"><div class="fill" id="xpFill"></div></div><span id="xpLabel">0 / 60 XP</span></div>
     </div>
-    <div class="points"><b id="hdrPoints">0</b>punten</div>
   </header>
+  <div class="ticker" id="ticker" aria-live="off"><b>NIEUWS</b><span id="tickerText">Het café is open.</span></div>
 
   <main>
     <!-- TAP -->
     <section class="panel" id="tap" role="tabpanel">
-      <div class="stage">
-        <div class="glass-wrap" id="glassWrap">
-          <svg class="glass" viewBox="0 0 200 300" aria-label="Glas bier">
+      <div class="wallet">
+        <div class="amt">🎟️ <span id="bon">0</span></div>
+        <div class="rate"><span id="bonRate">0</span> bonnekes/s · <span id="spsLabel">0</span> slokken/s</div>
+      </div>
+      <div class="buffs" id="buffs"></div>
+      <div class="stage" id="stage">
+        <div class="glass-wrap" id="glassWrap" role="button" tabindex="0" aria-label="Tik voor een slok">
+          <svg class="glass" viewBox="0 0 200 300" aria-hidden="true">
             <defs>
               <linearGradient id="beerGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop id="beerTop" offset="0" stop-color="#f7c548"/>
@@ -255,11 +314,8 @@
               <g id="bubbles"></g>
               <g id="foam">
                 <rect x="0" y="-20" width="200" height="24"/>
-                <circle cx="40" cy="-18" r="12"/>
-                <circle cx="70" cy="-22" r="14"/>
-                <circle cx="102" cy="-20" r="13"/>
-                <circle cx="134" cy="-23" r="14"/>
-                <circle cx="162" cy="-18" r="11"/>
+                <circle cx="40" cy="-18" r="12"/><circle cx="70" cy="-22" r="14"/><circle cx="102" cy="-20" r="13"/>
+                <circle cx="134" cy="-23" r="14"/><circle cx="162" cy="-18" r="11"/>
               </g>
             </g>
             <path id="outline" d="" fill="none" stroke-width="4" stroke-linejoin="round"/>
@@ -274,38 +330,46 @@
         <div class="beer-meta" id="beerMeta">5,2% · pils</div>
       </div>
 
-      <div class="status" id="status" aria-live="polite">Hou ingedrukt om te drinken</div>
+      <div class="status" id="status" aria-live="polite">Hou ingedrukt of tik op het glas</div>
 
       <div class="controls">
         <button class="big" id="drink">Hou vast om te drinken</button>
-        <button class="big hidden" id="refill">Nog ene! 🍻</button>
+        <button class="big outline hidden" id="refill">Nog ene! 🍻</button>
+        <div class="row2">
+          <button class="crate-btn hidden" id="crateBtn">📦 Bak openen (<span id="crateN">0</span>)</button>
+        </div>
         <button class="link hidden" id="tilt">Kantel je telefoon om te drinken</button>
       </div>
 
-      <div class="meter" title="Zatheidsmeter: hoeveel pintjes vandaag">
+      <div class="meter" title="Zatheidsmeter: hoeveel pintjes je vandaag zelf dronk">
         <span>Zatheidsmeter</span><div class="bar"><div class="fill" id="zatFill"></div></div><span id="zatLabel">nuchter</span>
       </div>
       <div class="stats">
-        <div><b id="today">0</b>vandaag</div>
+        <div><b id="today">0</b>zelf vandaag</div>
         <div><b id="total">0</b>in totaal</div>
         <div><b id="uniq">0</b>soorten</div>
+        <div><b id="ptsLabel">0</b>punten</div>
       </div>
     </section>
 
-    <!-- COLLECTIE -->
-    <section class="panel" id="collectie" role="tabpanel" hidden>
-      <h2>Collectie</h2>
-      <div class="progress"><div class="bar"><div class="fill" id="colFill"></div></div><span id="colLabel">0 / 21</span></div>
-      <div id="colList"></div>
-      <h3>Prestaties</h3>
-      <div class="ach" id="achList"></div>
-    </section>
-
-    <!-- GLAZEN -->
-    <section class="panel" id="glazen" role="tabpanel" hidden>
-      <h2>Glazen</h2>
-      <p class="lead">Speel glazen vrij door te drinken. Tik op een glas om het te gebruiken.</p>
-      <div class="skins" id="skinList"></div>
+    <!-- KROEG -->
+    <section class="panel" id="kroeg" role="tabpanel" hidden>
+      <div class="kroeg-head">
+        <div><div class="amt">🎟️ <span id="kBon">0</span></div><div class="rate"><span id="kRate">0</span> bonnekes/s</div></div>
+        <div class="seg" role="group" aria-label="Aantal kopen">
+          <button data-amt="1" aria-pressed="true">×1</button><button data-amt="10" aria-pressed="false">×10</button><button data-amt="100" aria-pressed="false">×100</button>
+        </div>
+      </div>
+      <h3>Verbeteringen</h3>
+      <div class="upgs" id="upgList"></div>
+      <h3>Personeel &amp; zaken <span class="odds">drinken automatisch mee, maar enkel gewone en ongewone bieren: de rest is voor jou</span></h3>
+      <div id="bldList"></div>
+      <div class="prestige">
+        <b>⭐ Nieuwe kroeg openen</b>
+        <p>Begin opnieuw met een nieuwe kroeg: je bonnekes, personeel en verbeteringen verdwijnen, maar je krijgt kroegsterren. Elke ster geeft voor altijd +5% bonnekes en slokken. Je collectie, level, skills en stijl blijven.</p>
+        <p id="prestigeInfo"></p>
+        <button id="prestigeBtn" disabled>Nieuwe kroeg openen</button>
+      </div>
     </section>
 
     <!-- SKILLS -->
@@ -314,23 +378,41 @@
         <h2>Skillboom</h2>
         <div><span class="sp-count" id="spCount">0</span> skillpunten <button class="ghost" id="respec">Reset</button></div>
       </div>
-      <p class="lead">Elk level geeft 1 skillpunt. Zeldzamere bieren geven meer XP: gewoon 10 · ongewoon 25 · zeldzaam 60 · episch 200 · legendarisch 1.000 · mythisch 25.000.</p>
+      <p class="lead">Elk level geeft 1 skillpunt. Zeldzamere bieren geven meer XP.</p>
       <div id="skillTree"></div>
+    </section>
+
+    <!-- COLLECTIE -->
+    <section class="panel" id="collectie" role="tabpanel" hidden>
+      <h2>Collectie</h2>
+      <div class="progress"><div class="bar"><div class="fill" id="colFill"></div></div><span id="colLabel">0</span></div>
+      <div id="colList"></div>
+      <h3>Prestaties <span class="odds">elke prestatie geeft een bak bier</span></h3>
+      <div class="ach" id="achList"></div>
+    </section>
+
+    <!-- STIJL -->
+    <section class="panel" id="stijl" role="tabpanel" hidden>
+      <h2>Glazen</h2>
+      <div class="skins" id="skinList"></div>
+      <h2>Achtergronden</h2>
+      <div class="skins" id="bgList"></div>
     </section>
 
     <!-- RANGLIJST -->
     <section class="panel" id="ranglijst" role="tabpanel" hidden>
       <h2>Ranglijst</h2>
-      <p class="lead">Punten per pint: gewoon 1 · ongewoon 3 · zeldzaam 10 · episch 40 · legendarisch 250 · mythisch 10.000</p>
+      <p class="lead">Gerangschikt op punten: elke pint telt mee volgens zijn zeldzaamheid.</p>
       <div class="board" id="board"><div class="empty">De ranglijst wordt geladen…</div></div>
     </section>
   </main>
 
   <nav role="tablist">
     <button role="tab" aria-selected="true" data-tab="tap"><span>🍺</span>Tap</button>
-    <button role="tab" aria-selected="false" data-tab="collectie"><span>📖</span>Collectie</button>
-    <button role="tab" aria-selected="false" data-tab="glazen"><span>🥂</span>Glazen</button>
+    <button role="tab" aria-selected="false" data-tab="kroeg"><span>🏪</span>Kroeg<i class="dot hidden" id="kroegDot"></i></button>
     <button role="tab" aria-selected="false" data-tab="skills"><span>🌳</span>Skills<i class="dot hidden" id="spDot"></i></button>
+    <button role="tab" aria-selected="false" data-tab="collectie"><span>📖</span>Collectie</button>
+    <button role="tab" aria-selected="false" data-tab="stijl"><span>🎨</span>Stijl</button>
     <button role="tab" aria-selected="false" data-tab="ranglijst"><span>🏆</span>Ranglijst</button>
   </nav>
 </div>
@@ -339,126 +421,267 @@
 
 <script>
 (() => {
-  // ================= DATA =================
+  // =====================================================================
+  // DATA
+  // =====================================================================
   const RARITIES = [
-    { key: 'gewoon',       label: 'Gewoon',       weight: 55,    pts: 1 },
-    { key: 'ongewoon',     label: 'Ongewoon',     weight: 25,    pts: 3 },
-    { key: 'zeldzaam',     label: 'Zeldzaam',     weight: 13,    pts: 10 },
-    { key: 'episch',       label: 'Episch',       weight: 5,     pts: 40 },
-    { key: 'legendarisch', label: 'Legendarisch', weight: 1.99,  pts: 250 },
-    { key: 'mythisch',     label: 'Mythisch',     weight: 0.01,  pts: 10000 },
+    { label: 'Gewoon',       weight: 50,   pts: 1,      xp: 10 },
+    { label: 'Ongewoon',     weight: 25,   pts: 3,      xp: 25 },
+    { label: 'Zeldzaam',     weight: 13,   pts: 10,     xp: 60 },
+    { label: 'Episch',       weight: 6,    pts: 40,     xp: 200 },
+    { label: 'Legendarisch', weight: 3,    pts: 250,    xp: 1000 },
+    { label: 'Smaragd',      weight: 1.5,  pts: 600,    xp: 2500,   halo: '#3ddc84' },
+    { label: 'Robijn',       weight: 0.8,  pts: 1500,   xp: 6000,   halo: '#ff4d6d' },
+    { label: 'Saffier',      weight: 0.4,  pts: 4000,   xp: 15000,  halo: '#5b8cff' },
+    { label: 'Diamant',      weight: 0.2,  pts: 10000,  xp: 40000,  halo: '#d9f6ff' },
+    { label: 'Regenboog',    weight: 0.09, pts: 30000,  xp: 100000, halo: '#fff35c' },
+    { label: 'Mythisch',     weight: 0.01, pts: 100000, xp: 250000, halo: '#ffd75e' },
   ];
-  const BEERS = [
-    { id: 'jupiler',      name: 'Jupiler',                  r: 0, abv: 5.2,  style: 'pils',          c: ['#f6c445', '#dc9417'], foam: '#fffaf0' },
-    { id: 'stella',       name: 'Stella Artois',            r: 0, abv: 5.2,  style: 'pils',          c: ['#f3c94e', '#d99a1c'], foam: '#fffaf0' },
-    { id: 'maes',         name: 'Maes',                     r: 0, abv: 5.2,  style: 'pils',          c: ['#f5c84a', '#d79318'], foam: '#fffaf0' },
-    { id: 'primus',       name: 'Primus',                   r: 0, abv: 5.2,  style: 'pils',          c: ['#f2be40', '#d08912'], foam: '#fffaf0' },
-    { id: 'cristal',      name: 'Cristal',                  r: 0, abv: 5.0,  style: 'pils',          c: ['#f8d360', '#e2a524'], foam: '#fffaf0' },
-    { id: 'duvel',        name: 'Duvel',                    r: 1, abv: 8.5,  style: 'sterk blond',   c: ['#f9d978', '#e8b23a'], foam: '#ffffff' },
-    { id: 'leffe',        name: 'Leffe Blond',              r: 1, abv: 6.6,  style: 'abdijbier',     c: ['#f0b232', '#c97a0e'], foam: '#fff6e6' },
-    { id: 'hoegaarden',   name: 'Hoegaarden',               r: 1, abv: 4.9,  style: 'witbier',       c: ['#f8e7b0', '#ecd28a'], foam: '#ffffff' },
-    { id: 'kwak',         name: 'Pauwel Kwak',              r: 1, abv: 8.4,  style: 'amber',         c: ['#d9822b', '#9c4a10'], foam: '#f5e6c8' },
-    { id: 'omer',         name: 'Omer',                     r: 1, abv: 8.0,  style: 'sterk blond',   c: ['#f7cf5a', '#e0a020'], foam: '#ffffff' },
-    { id: 'westmalle',    name: 'Westmalle Tripel',         r: 2, abv: 9.5,  style: 'trappist',      c: ['#f4c24a', '#d9961a'], foam: '#fff8ea', trappist: true },
-    { id: 'orval',        name: 'Orval',                    r: 2, abv: 6.2,  style: 'trappist',      c: ['#f0a03a', '#c86f17'], foam: '#fbf1dc', trappist: true },
-    { id: 'chimay',       name: 'Chimay Blauw',             r: 2, abv: 9.0,  style: 'trappist',      c: ['#7b3a1b', '#3b170a'], foam: '#e9d3ad', trappist: true },
-    { id: 'rodenbach',    name: 'Rodenbach Grand Cru',      r: 2, abv: 6.0,  style: 'Vlaams rood',   c: ['#a8351f', '#5c160c'], foam: '#f2d9b8' },
-    { id: 'karmeliet',    name: 'Tripel Karmeliet',         r: 2, abv: 8.4,  style: 'tripel',        c: ['#f6cf55', '#dfa224'], foam: '#ffffff' },
-    { id: 'westvleteren', name: 'Westvleteren 12',          r: 3, abv: 10.2, style: 'trappist',      c: ['#7a3b16', '#3a1806'], foam: '#ead2a8', trappist: true },
-    { id: 'rochefort',    name: 'Rochefort 10',             r: 3, abv: 11.3, style: 'trappist',      c: ['#5e2a12', '#2a0f05'], foam: '#e2c79c', trappist: true },
-    { id: 'bernardus',    name: 'St. Bernardus Abt 12',     r: 3, abv: 10.0, style: 'quadrupel',     c: ['#6b3015', '#2f1207'], foam: '#e6cda4' },
-    { id: 'cantillon',    name: 'Cantillon Gueuze',         r: 4, abv: 5.5,  style: 'lambiek',       c: ['#f4c14f', '#d9932a'], foam: '#fff6e0', lambic: true },
-    { id: 'fonteinen',    name: '3 Fonteinen Oude Geuze',   r: 4, abv: 6.0,  style: 'lambiek',       c: ['#f0b545', '#cf8622'], foam: '#fff3d6', lambic: true },
-    { id: 'arnoldus',     name: 'Het Gouden Pintje van Sint-Arnoldus', r: 5, abv: null, style: 'gebrouwen door de patroonheilige zelf', c: ['#fff1a8', '#e0a800'], foam: '#fffbe0' },
+  const GEM = 5, RAINBOW = 9, MYTHIC = 10;
+
+  // [id, name, tier, abv, style, top, bottom, foam, flags]   T = trappist, L = lambiek
+  const RAW = [
+    ['jupiler', 'Jupiler', 0, 5.2, 'pils', '#f6c445', '#dc9417', '#fffaf0'],
+    ['stella', 'Stella Artois', 0, 5.2, 'pils', '#f3c94e', '#d99a1c', '#fffaf0'],
+    ['maes', 'Maes', 0, 5.2, 'pils', '#f5c84a', '#d79318', '#fffaf0'],
+    ['primus', 'Primus', 0, 5.2, 'pils', '#f2be40', '#d08912', '#fffaf0'],
+    ['cristal', 'Cristal', 0, 5.0, 'pils', '#f8d360', '#e2a524', '#fffaf0'],
+    ['palm', 'Palm', 0, 5.2, 'Belgische amber', '#e39a3b', '#a95e17', '#fff4e0'],
+    ['bavik', 'Bavik Premium Pils', 0, 5.2, 'pils', '#f5cd52', '#dc9c1e', '#fffaf0'],
+    ['martens', 'Martens Pils', 0, 5.0, 'pils', '#f7d35c', '#e0a426', '#fffaf0'],
+    ['ginder', 'Ginder Ale', 0, 5.1, 'Belgische ale', '#d98c35', '#9a5615', '#fff1dc'],
+    ['duvel', 'Duvel', 1, 8.5, 'sterk blond', '#f9d978', '#e8b23a', '#ffffff'],
+    ['leffe', 'Leffe Blond', 1, 6.6, 'abdijbier', '#f0b232', '#c97a0e', '#fff6e6'],
+    ['hoegaarden', 'Hoegaarden', 1, 4.9, 'witbier', '#f8e7b0', '#ecd28a', '#ffffff'],
+    ['kwak', 'Pauwel Kwak', 1, 8.4, 'amber', '#d9822b', '#9c4a10', '#f5e6c8'],
+    ['omer', 'Omer', 1, 8.0, 'sterk blond', '#f7cf5a', '#e0a020', '#ffffff'],
+    ['vedett', 'Vedett Extra Blond', 1, 5.2, 'pils', '#f8dc70', '#e6b236', '#ffffff'],
+    ['grimbergen', 'Grimbergen Dubbel', 1, 6.5, 'abdijdubbel', '#6e2c12', '#331306', '#ead2a8'],
+    ['affligem', 'Affligem Blond', 1, 6.7, 'abdijbier', '#f2bc45', '#d38e1d', '#fff6e6'],
+    ['chouffe', 'La Chouffe', 1, 8.0, 'sterk blond', '#f2b247', '#cf8320', '#fff8ec'],
+    ['zot', 'Brugse Zot', 1, 6.0, 'blond', '#f4c552', '#d89a24', '#ffffff'],
+    ['kasteelrouge', 'Kasteel Rouge', 1, 8.0, 'kriekenbier', '#9c1f2e', '#5a0d18', '#f7d4d8'],
+    ['delirium', 'Delirium Tremens', 1, 8.5, 'sterk blond', '#f6d36a', '#e3a92c', '#ffffff'],
+    ['fruitesse', 'Liefmans Fruitesse', 1, 3.8, 'fruitbier', '#c2263b', '#7a1020', '#f9d6dc'],
+    ['mortsubite', 'Mort Subite Kriek', 1, 4.0, 'kriek', '#b3203a', '#6a0f1f', '#f6c9d2', 'L'],
+    ['westmalle', 'Westmalle Tripel', 2, 9.5, 'trappist', '#f4c24a', '#d9961a', '#fff8ea', 'T'],
+    ['westmalled', 'Westmalle Dubbel', 2, 7.0, 'trappist', '#6a2a10', '#2f1006', '#ead2a8', 'T'],
+    ['orval', 'Orval', 2, 6.2, 'trappist', '#f0a03a', '#c86f17', '#fbf1dc', 'T'],
+    ['chimay', 'Chimay Blauw', 2, 9.0, 'trappist', '#7b3a1b', '#3b170a', '#e9d3ad', 'T'],
+    ['rodenbach', 'Rodenbach Grand Cru', 2, 6.0, 'Vlaams rood', '#a8351f', '#5c160c', '#f2d9b8'],
+    ['karmeliet', 'Tripel Karmeliet', 2, 8.4, 'tripel', '#f6cf55', '#dfa224', '#ffffff'],
+    ['guldendraak', 'Gulden Draak', 2, 10.5, 'donker tripel', '#7a3414', '#3a1607', '#ecd3a8'],
+    ['dupont', 'Saison Dupont', 2, 6.5, 'saison', '#f2c35a', '#d69a2a', '#ffffff'],
+    ['duchesse', 'Duchesse de Bourgogne', 2, 6.2, 'Vlaams rood', '#8a2a17', '#4a120a', '#f0d6b4'],
+    ['straffe', 'Straffe Hendrik Quadrupel', 2, 11.0, 'quadrupel', '#5c2510', '#280e04', '#e6cda4'],
+    ['westvleteren', 'Westvleteren 12', 3, 10.2, 'trappist', '#7a3b16', '#3a1806', '#ead2a8', 'T'],
+    ['wv8', 'Westvleteren 8', 3, 8.0, 'trappist', '#6a2f12', '#2e1306', '#e8cfa4', 'T'],
+    ['wvblond', 'Westvleteren Blond', 3, 5.8, 'trappist', '#f3c450', '#d79622', '#fff8ea', 'T'],
+    ['rochefort', 'Rochefort 10', 3, 11.3, 'trappist', '#5e2a12', '#2a0f05', '#e2c79c', 'T'],
+    ['bernardus', 'St. Bernardus Abt 12', 3, 10.0, 'quadrupel', '#6b3015', '#2f1207', '#e6cda4'],
+    ['kasteelcuvee', 'Kasteel Cuvée du Château', 3, 11.0, 'gerijpte quadrupel', '#5a2610', '#250d04', '#e0c495'],
+    ['pannepot', 'De Struise Pannepot', 3, 10.0, 'Vlaamse quadrupel', '#3e1a0c', '#170803', '#d9bb8c'],
+    ['cantillon', 'Cantillon Gueuze', 4, 5.5, 'lambiek', '#f4c14f', '#d9932a', '#fff6e0', 'L'],
+    ['fonteinen', '3 Fonteinen Oude Geuze', 4, 6.0, 'lambiek', '#f0b545', '#cf8622', '#fff3d6', 'L'],
+    ['cantillonkriek', 'Cantillon Kriek', 4, 5.5, 'lambiek met krieken', '#a3172f', '#5d0a1a', '#f6c9d2', 'L'],
+    ['oudbeersel', 'Oud Beersel Oude Geuze', 4, 6.0, 'lambiek', '#f0b442', '#cf8a23', '#fff3d6', 'L'],
+    ['tilquin', 'Tilquin Oude Gueuze', 4, 7.0, 'lambiek', '#f2bc4f', '#d39428', '#fff3d6', 'L'],
+    ['girardin', 'Girardin Gueuze 1882', 4, 5.0, 'lambiek', '#f1b84a', '#d08f27', '#fff3d6', 'L'],
+    ['petiteorval', 'Petite Orval', 5, 4.5, 'trappist, enkel aan de abdij', '#f2b552', '#d58b2c', '#fbf1dc', 'T'],
+    ['rbvintage', 'Rodenbach Vintage', 5, 7.0, 'Vlaams rood, één jaargang', '#8e2a18', '#4f120a', '#f0d6b4'],
+    ['stillenacht', 'De Dolle Stille Nacht Reserva', 5, 12.0, 'kerstbier op vat', '#d8892e', '#99551a', '#fbe8c8'],
+    ['loupepe', 'Cantillon Lou Pepe Kriek', 6, 5.0, 'lambiek met krieken', '#b0122e', '#62081a', '#f8c6d0', 'L'],
+    ['intensrood', '3 Fonteinen Intens Rood', 6, 6.0, 'lambiek met krieken', '#9e0f2a', '#560614', '#f8c6d0', 'L'],
+    ['alexander', 'Rodenbach Alexander', 6, 5.6, 'Vlaams rood met krieken', '#a3241f', '#5c100c', '#f4cdc4'],
+    ['blabaer', 'Cantillon Blåbær Lambik', 7, 5.0, 'lambiek met bosbessen', '#5a2a7a', '#2a1240', '#e6d4f2', 'L'],
+    ['blauwemaandag', 'Blauwe Maandag Tripel', 7, 9.0, 'fantasiebier van café De Kater', '#3a7bd5', '#1b3f80', '#e0ecff'],
+    ['chimaygr', 'Chimay Grande Réserve 2008', 7, 9.0, 'gerijpte trappist', '#6a2c14', '#2c1106', '#e6cda4', 'T'],
+    ['wvbrick', "Westvleteren 12 'Brick' (2012)", 8, 10.2, 'trappist, eenmalige uitgave', '#6b3013', '#2d1206', '#ead2a8', 'T'],
+    ['zwanze', 'Cantillon Zwanze', 8, 5.0, 'lambiek, één dag per jaar', '#e8b04a', '#c4842a', '#fff3d6', 'L'],
+    ['armand4', "3 Fonteinen Armand'4", 8, 6.0, 'lambiek, seizoensreeks', '#efb447', '#cc8a22', '#fff3d6', 'L'],
+    ['kabouter', 'Kabouterbier Regenboog', 9, 7.7, 'fantasiebier, gebrouwen onder de regenboog', '#ff5f5f', '#5fc8ff', '#ffffff'],
+    ['prisma', 'Prisma Lambiek', 9, 6.6, 'fantasielambiek', '#b05fff', '#fff35c', '#ffffff', 'L'],
+    ['arnoldus', 'Het Gouden Pintje van Sint-Arnoldus', 10, null, 'gebrouwen door de patroonheilige zelf', '#fff1a8', '#e0a800', '#fffbe0'],
+    ['ambiorix', "Ambiorix' Laatste Vat", 10, null, 'Gallisch gerstenbier, 2.000 jaar gerijpt', '#c99a4a', '#5a3a12', '#f5e2bc'],
   ];
+  const BEERS = RAW.map(([id, name, r, abv, style, top, bottom, foam, f = '']) => ({ id, name, r, abv, style, c: [top, bottom], foam, trappist: f.includes('T'), lambic: f.includes('L') }));
   const BEER = Object.fromEntries(BEERS.map(b => [b.id, b]));
+  const BY_TIER = RARITIES.map((_, i) => BEERS.filter(b => b.r === i));
 
   // Glass shapes in a 200×300 box. Rim at y=20, full beer surface at y=40, `bottom` = deepest beer point.
+  const SHAPE = {
+    vaasje: { d: 'M30 20 L170 20 L152 280 Q150 290 140 290 L60 290 Q50 290 48 280 Z', bottom: 286, bx: [60, 140], hl: '<path d="M44 40 L56 260" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>' },
+    tulp:   { d: 'M55 20 C40 60 22 100 32 140 C42 180 80 200 92 212 L92 272 L60 284 L140 284 L108 272 L108 212 C120 200 158 180 168 140 C178 100 160 60 145 20 Z', bottom: 210, bx: [70, 130], hl: '<path d="M44 70 C36 110 40 140 52 160" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>' },
+    kwak:   { d: 'M70 20 L130 20 L122 170 C122 190 160 210 160 245 C160 280 130 292 100 292 C70 292 40 280 40 245 C40 210 78 190 78 170 Z', bottom: 290, bx: [75, 125], hl: '' },
+    kelk:   { d: 'M30 20 L170 20 C170 110 140 150 108 158 L108 255 L150 280 L150 288 L50 288 L50 280 L92 255 L92 158 C60 150 30 110 30 20 Z', bottom: 156, bx: [80, 120], hl: '<path d="M44 40 C44 90 58 120 76 136" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>' },
+    geuze:  { d: 'M50 20 L150 20 L146 284 Q146 290 140 290 L60 290 Q54 290 54 284 Z', bottom: 286, bx: [65, 135], hl: '<path d="M62 40 L66 270" stroke="rgba(255,255,255,0.3)" stroke-width="5" stroke-linecap="round"/>' },
+    pul:    { d: 'M40 20 L150 20 L150 280 Q150 290 140 290 L50 290 Q40 290 40 280 Z', bottom: 284, bx: [55, 135], hl: '' },
+  };
+  const KWAK_STAND_BACK = '<rect x="22" y="110" width="12" height="190" rx="3" fill="#8a5a2b"/><rect x="166" y="110" width="12" height="190" rx="3" fill="#8a5a2b"/><rect x="16" y="288" width="168" height="12" rx="3" fill="#6e4520"/>';
+  const KWAK_STAND_FRONT = '<rect x="22" y="150" width="156" height="12" rx="4" fill="#9b6833"/>';
+  const PUL_HANDLE = c => `<path d="M150 70 C196 70 196 210 150 210" fill="none" stroke="${c}" stroke-width="12" stroke-linecap="round"/><g fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="3"><circle cx="70" cy="90" r="12"/><circle cx="120" cy="90" r="12"/><circle cx="70" cy="150" r="12"/><circle cx="120" cy="150" r="12"/><circle cx="70" cy="210" r="12"/><circle cx="120" cy="210" r="12"/></g>`;
+  const SPARKLES = c => `<g fill="${c}"><path d="M40 60 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4z"/><path d="M160 150 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3z"/><path d="M60 230 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3z"/></g>`;
+  const hasTier = (s, t) => BY_TIER[t].some(b => s.counts[b.id] > 0);
   const SKINS = [
-    { id: 'vaasje', name: 'Vaasje', bottom: 286, bx: [60, 140], stroke: 'rgba(255,255,255,0.55)',
-      d: 'M30 20 L170 20 L152 280 Q150 290 140 290 L60 290 Q50 290 48 280 Z',
-      front: '<path d="M44 40 L56 260" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>',
-      unlock: 'Standaard', ok: () => true },
-    { id: 'tulp', name: 'Tulpglas', bottom: 210, bx: [70, 130], stroke: 'rgba(255,255,255,0.55)',
-      d: 'M55 20 C40 60 22 100 32 140 C42 180 80 200 92 212 L92 272 L60 284 L140 284 L108 272 L108 212 C120 200 158 180 168 140 C178 100 160 60 145 20 Z',
-      front: '<path d="M44 70 C36 110 40 140 52 160" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>',
-      unlock: 'Drink 10 pintjes', ok: s => s.total >= 10 },
-    { id: 'kwak', name: 'Kwakglas', bottom: 290, bx: [75, 125], stroke: 'rgba(255,255,255,0.55)',
-      d: 'M70 20 L130 20 L122 170 C122 190 160 210 160 245 C160 280 130 292 100 292 C70 292 40 280 40 245 C40 210 78 190 78 170 Z',
-      back: '<rect x="22" y="110" width="12" height="190" rx="3" fill="#8a5a2b"/><rect x="166" y="110" width="12" height="190" rx="3" fill="#8a5a2b"/><rect x="16" y="288" width="168" height="12" rx="3" fill="#6e4520"/>',
-      front: '<rect x="22" y="150" width="156" height="12" rx="4" fill="#9b6833"/>',
-      unlock: 'Drink ne Kwak', ok: s => s.counts.kwak > 0 },
-    { id: 'kelk', name: 'Trappistenkelk', bottom: 156, bx: [80, 120], stroke: 'rgba(255,255,255,0.55)',
-      d: 'M30 20 L170 20 C170 110 140 150 108 158 L108 255 L150 280 L150 288 L50 288 L50 280 L92 255 L92 158 C60 150 30 110 30 20 Z',
-      front: '<path d="M44 40 C44 90 58 120 76 136" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="6" stroke-linecap="round"/>',
-      unlock: 'Drink een trappist', ok: s => BEERS.some(b => b.trappist && s.counts[b.id] > 0) },
-    { id: 'geuze', name: 'Geuzeglas', bottom: 286, bx: [65, 135], stroke: 'rgba(255,255,255,0.55)',
-      d: 'M50 20 L150 20 L146 284 Q146 290 140 290 L60 290 Q54 290 54 284 Z',
-      front: '<path d="M62 40 L66 270" stroke="rgba(255,255,255,0.3)" stroke-width="5" stroke-linecap="round"/>',
-      unlock: 'Drink een geuze', ok: s => BEERS.some(b => b.lambic && s.counts[b.id] > 0) },
-    { id: 'pul', name: 'Bierpul', bottom: 284, bx: [55, 135], stroke: 'rgba(255,255,255,0.6)',
-      d: 'M40 20 L150 20 L150 280 Q150 290 140 290 L50 290 Q40 290 40 280 Z',
-      front: '<path d="M150 70 C196 70 196 210 150 210" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="12" stroke-linecap="round"/>' +
-             '<g fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="3"><circle cx="70" cy="90" r="12"/><circle cx="120" cy="90" r="12"/><circle cx="70" cy="150" r="12"/><circle cx="120" cy="150" r="12"/><circle cx="70" cy="210" r="12"/><circle cx="120" cy="210" r="12"/></g>',
-      unlock: 'Drink 50 pintjes', ok: s => s.total >= 50 },
-    { id: 'goud', name: 'Gouden Kelk', bottom: 156, bx: [80, 120], stroke: '#ffd75e',
-      d: 'M30 20 L170 20 C170 110 140 150 108 158 L108 255 L150 280 L150 288 L50 288 L50 280 L92 255 L92 158 C60 150 30 110 30 20 Z',
-      back: '<path d="M92 158 L108 158 L108 255 L150 280 L150 288 L50 288 L50 280 L92 255 Z" fill="#e0a800"/>',
-      front: '<path d="M30 20 L170 20" stroke="#fff1a8" stroke-width="8" stroke-linecap="round"/><g fill="#fff1a8"><circle cx="64" cy="268" r="4"/><circle cx="100" cy="274" r="4"/><circle cx="136" cy="268" r="4"/></g>',
-      unlock: 'Vind het Gouden Pintje', ok: s => s.counts.arnoldus > 0 },
+    { id: 'vaasje',   name: 'Vaasje',          shape: 'vaasje', stroke: 'rgba(255,255,255,0.55)', unlock: 'Standaard', ok: () => true },
+    { id: 'tulp',     name: 'Tulpglas',        shape: 'tulp',   stroke: 'rgba(255,255,255,0.55)', unlock: 'Drink 10 pintjes', ok: s => s.total >= 10 },
+    { id: 'kwak',     name: 'Kwakglas',        shape: 'kwak',   stroke: 'rgba(255,255,255,0.55)', back: KWAK_STAND_BACK, front: KWAK_STAND_FRONT, unlock: 'Drink ne Kwak', ok: s => s.counts.kwak > 0 },
+    { id: 'kelk',     name: 'Trappistenkelk',  shape: 'kelk',   stroke: 'rgba(255,255,255,0.55)', unlock: 'Drink een trappist', ok: s => BEERS.some(b => b.trappist && s.counts[b.id] > 0) },
+    { id: 'geuze',    name: 'Geuzeglas',       shape: 'geuze',  stroke: 'rgba(255,255,255,0.55)', unlock: 'Drink een lambiek', ok: s => BEERS.some(b => b.lambic && s.counts[b.id] > 0) },
+    { id: 'pul',      name: 'Bierpul',         shape: 'pul',    stroke: 'rgba(255,255,255,0.6)', front: PUL_HANDLE('rgba(255,255,255,0.6)'), unlock: 'Drink 50 pintjes', ok: s => s.total >= 50 },
+    { id: 'smaragd',  name: 'Smaragden tulp',  shape: 'tulp',   stroke: '#3ddc84', glow: '#3ddc84', unlock: 'Vind een smaragd-bier', ok: s => hasTier(s, 5) },
+    { id: 'robijn',   name: 'Robijnen kelk',   shape: 'kelk',   stroke: '#ff4d6d', glow: '#ff4d6d', back: '<path d="M92 158 L108 158 L108 255 L150 280 L150 288 L50 288 L50 280 L92 255 Z" fill="#a3102e"/>', unlock: 'Vind een robijn-bier', ok: s => hasTier(s, 6) },
+    { id: 'saffier',  name: 'Saffieren stange', shape: 'geuze', stroke: '#5b8cff', glow: '#5b8cff', unlock: 'Vind een saffier-bier', ok: s => hasTier(s, 7) },
+    { id: 'diamant',  name: 'Diamanten vaasje', shape: 'vaasje', stroke: '#e8fbff', glow: '#d9f6ff', front: SPARKLES('#ffffff'), unlock: 'Vind een diamant-bier', ok: s => hasTier(s, 8) },
+    { id: 'regenboog',name: 'Regenboogpul',    shape: 'pul',    stroke: 'url(#rainbowStroke)', front: PUL_HANDLE('url(#rainbowStroke)'), unlock: 'Vind een regenboogbier', ok: s => hasTier(s, 9) },
+    { id: 'goud',     name: 'Gouden kelk',     shape: 'kelk',   stroke: '#ffd75e', glow: '#ffd75e', back: '<path d="M92 158 L108 158 L108 255 L150 280 L150 288 L50 288 L50 280 L92 255 Z" fill="#e0a800"/>', front: '<path d="M30 20 L170 20" stroke="#fff1a8" stroke-width="8" stroke-linecap="round"/>' + SPARKLES('#fff1a8'), unlock: 'Vind een mythisch bier', ok: s => hasTier(s, 10) },
   ];
   const SKIN = Object.fromEntries(SKINS.map(s => [s.id, s]));
 
-  const ACH = [
-    { id: 'eerste',    ico: '🍺', name: 'Eerste pint',          desc: 'Drink je eerste pintje',              ok: s => s.total >= 1 },
-    { id: 'stamgast',  ico: '🪑', name: 'Stamgast',             desc: 'Drink 10 pintjes',                    ok: s => s.total >= 10 },
-    { id: 'pilier',    ico: '🏛️', name: 'Pilier van de toog',   desc: 'Drink 50 pintjes',                    ok: s => s.total >= 50 },
-    { id: 'legende',   ico: '👑', name: 'Levende legende',      desc: 'Drink 100 pintjes',                   ok: s => s.total >= 100 },
-    { id: 'adfundum',  ico: '⚡', name: 'Ad fundum',            desc: 'Drink een volle pint zonder loslaten', ok: s => !!s.flags.adfundum },
-    { id: 'nonkel',    ico: '🥴', name: 'Zatte nonkel',         desc: 'Drink 5 pintjes op één dag',          ok: s => s.today >= 5 },
-    { id: 'nachtuil',  ico: '🦉', name: 'Nachtuil',             desc: 'Drink een pint tussen middernacht en 5 uur', ok: s => !!s.flags.nachtuil },
-    { id: 'trappist',  ico: '⛪', name: 'Trappistenkenner',     desc: 'Proef alle vijf trappisten',          ok: s => BEERS.filter(b => b.trappist).every(b => s.counts[b.id] > 0) },
-    { id: 'lambiek',   ico: '🍾', name: 'Lambiekliefhebber',    desc: 'Proef beide geuzes',                  ok: s => BEERS.filter(b => b.lambic).every(b => s.counts[b.id] > 0) },
-    { id: 'half',      ico: '📖', name: 'Halve collectie',      desc: 'Verzamel 11 soorten',                 ok: s => uniqueCount(s) >= 11 },
-    { id: 'vol',       ico: '🏆', name: 'Volledige collectie',  desc: 'Verzamel alle 21 soorten',            ok: s => uniqueCount(s) >= BEERS.length },
-    { id: 'graal',     ico: '✨', name: 'De Heilige Graal',     desc: 'Vind het Gouden Pintje (0,01%)',      ok: s => s.counts.arnoldus > 0 },
+  const BGS = [
+    { id: 'bruin',     name: 'Bruin café',        unlock: 'Standaard',                ok: () => true },
+    { id: 'biljart',   name: 'Biljartlaken',      unlock: 'Haal level 10',            ok: s => levelInfo(s.xp).lvl >= 10 },
+    { id: 'kermis',    name: 'Kermis',            unlock: 'Koop een kermis-bierkraam', ok: s => (s.bld.kermis || 0) > 0 },
+    { id: 'abdij',     name: 'Abdij',             unlock: 'Koop een trappistenabdij', ok: s => (s.bld.abdij || 0) > 0 },
+    { id: 'festival',  name: 'Festivalweide',     unlock: 'Koop een bierfestival',    ok: s => (s.bld.festival || 0) > 0 },
+    { id: 'brugge',    name: 'Brugse reien',      unlock: 'Leg een bierpijpleiding',  ok: s => (s.bld.pijp || 0) > 0 },
+    { id: 'hemel',     name: 'Hemelpoort',        unlock: 'Bouw de hemelse brouwerij', ok: s => (s.bld.hemel || 0) > 0 },
+    { id: 'ster',      name: 'Sterrenhemel',      unlock: 'Open een nieuwe kroeg',    ok: s => s.stars > 0 },
+    { id: 'smaragd',   name: 'Smaragdgroen',      unlock: 'Vind een smaragd-bier',    ok: s => hasTier(s, 5) },
+    { id: 'robijn',    name: 'Robijnrood',        unlock: 'Vind een robijn-bier',     ok: s => hasTier(s, 6) },
+    { id: 'saffier',   name: 'Saffierblauw',      unlock: 'Vind een saffier-bier',    ok: s => hasTier(s, 7) },
+    { id: 'diamant',   name: 'Diamantglans',      unlock: 'Vind een diamant-bier',    ok: s => hasTier(s, 8) },
+    { id: 'regenboog', name: 'Regenboog',         unlock: 'Vind een regenboogbier',   ok: s => hasTier(s, 9) },
+    { id: 'goud',      name: 'Gouden zaal',       unlock: 'Vind een mythisch bier',   ok: s => hasTier(s, 10) },
   ];
 
-  // XP per pint, by rarity
-  const XP = [10, 25, 60, 200, 1000, 25000];
+  // Idle economy: everyone you hire drinks sips for you. 20 sips = 1 pint.
+  const SIPS_PER_PINT = 20;
+  const BUILDINGS = [
+    { id: 'rietje',    ico: '🥤', name: 'Rietje',                 sps: 0.1,    cost: 15,     desc: 'Slurpt heel traag mee.', up: ['Dubbel rietje', 'Krulrietje', 'Turborietje', 'Kwantumrietje'] },
+    { id: 'stamgast',  ico: '🧔', name: 'Stamgast',               sps: 1,      cost: 100,    desc: 'Zit altijd op dezelfde kruk.', up: ['Vaste plek aan de toog', 'Eigen bierkaart', 'Naam op de muur', 'Stamgast van het jaar'] },
+    { id: 'nonkel',    ico: '👴', name: 'Nonkel Jos',             sps: 8,      cost: 1100,   desc: 'Heeft nog nooit een glas laten staan.', up: ["Nonkel Jos z'n bierbuik", 'Nonkel Jos op familiefeest', 'Nonkel Jos met pensioen', 'Nonkel Jos, de legende'] },
+    { id: 'studenten', ico: '🎓', name: 'Studentenclub',          sps: 47,     cost: 12000,  desc: 'Cantus tot de zon opkomt.', up: ['Doop', 'Cantus', 'Clubavond', 'Praeses-mandaat'] },
+    { id: 'kermis',    ico: '🎡', name: 'Kermis-bierkraam',       sps: 260,    cost: 130000, desc: 'Tussen de smoutebollen en de botsauto’s.', up: ['Smoutebollen erbij', 'Botsauto-bar', 'Kermiszondag', 'Foorkramer van het jaar'] },
+    { id: 'festival',  ico: '🎪', name: 'Bierfestival',           sps: 1400,   cost: 1.4e6,  desc: 'Duizenden proevers, één doel.', up: ['Extra toog', 'VIP-tent', 'Headliner', 'Driedaags festival'] },
+    { id: 'abdij',     ico: '⛪', name: 'Trappistenabdij',        sps: 7800,   cost: 2e7,    desc: 'Monniken brouwen én drinken.', up: ['Extra monnik', 'Gebedsuren', 'Kloosterregel', 'Pauselijke zegen'] },
+    { id: 'pijp',      ico: '🛢️', name: 'Bierpijpleiding',       sps: 44000,  cost: 3.3e8,  desc: 'Zoals die in Brugge, maar dan tot aan je mond.', up: ['Dikkere buis', 'Tweede leiding', 'Ondergrondse ring', 'Europees netwerk'] },
+    { id: 'hemel',     ico: '😇', name: 'Hemelse brouwerij',      sps: 260000, cost: 5.1e9,  desc: 'Sint-Arnoldus zelf staat aan de ketel.', up: ['Engelenkoor', 'Hemelpoort-tap', 'Wolkenvat', 'Goddelijk recept'] },
+  ];
+  const BLD = Object.fromEntries(BUILDINGS.map(b => [b.id, b]));
+  const BLD_UP_AT = [1, 10, 25, 50], BLD_UP_COST = [10, 50, 500, 5000];
+
+  const UPGRADES = [
+    { id: 'zelftap', ico: '🚰', name: 'Zelftap-installatie', desc: 'Een leeg glas wordt automatisch bijgevuld, zodat je personeel blijft doordrinken.', cost: 50, show: () => true },
+    { id: 'klik1', ico: '👄', name: 'Grotere slokken', desc: 'Tikken en vasthouden ×2.', cost: 100, show: s => s.taps >= 10 || s.bonAll >= 50 },
+    { id: 'klik2', ico: '🦷', name: 'Keelgat van staal', desc: 'Tikken en vasthouden ×2.', cost: 5000, show: s => s.taps >= 100 },
+    { id: 'klik3', ico: '⚡', name: 'Ad fundum-techniek', desc: 'Elke tik drinkt ook 2% van je slokken/s.', cost: 5e5, show: s => s.taps >= 500 },
+    { id: 'klik4', ico: '🥇', name: 'Wereldkampioen bierdrinken', desc: 'Elke tik drinkt nog eens 5% van je slokken/s.', cost: 5e7, show: s => s.taps >= 2000 },
+    { id: 'bon1', ico: '🎟️', name: 'Happy hour', desc: 'Bonnekes per slok ×2.', cost: 1000, show: s => s.bonAll >= 300 },
+    { id: 'bon2', ico: '🗂️', name: 'Drankkaart met stempels', desc: 'Bonnekes per slok ×2.', cost: 1e5, show: s => s.bonAll >= 3e4 },
+    { id: 'bon3', ico: '🤝', name: 'Sponsor: lokale brouwer', desc: 'Bonnekes per slok ×2.', cost: 1e7, show: s => s.bonAll >= 3e6 },
+    { id: 'bon4', ico: '🦁', name: 'Hoofdsponsor van de Rode Duivels', desc: 'Bonnekes per slok ×2.', cost: 1e9, show: s => s.bonAll >= 3e8 },
+    { id: 'dop1', ico: '🧢', name: 'Kroonkurkenverzamelaar', desc: 'Gouden doppen verschijnen twee keer zo vaak.', cost: 77777, show: s => s.caps >= 1 },
+    { id: 'dop2', ico: '🧲', name: 'Gouden dop-magneet', desc: 'Effecten van gouden doppen duren twee keer zo lang.', cost: 7.77e6, show: s => s.caps >= 5 },
+    { id: 'kelder', ico: '🗝️', name: 'Bierkelder', desc: 'Je krijgt elke dag een extra bak bier.', cost: 2.5e6, show: s => s.bonAll >= 1e6 },
+  ];
+  BUILDINGS.forEach(b => b.up.forEach((name, i) => UPGRADES.push({
+    id: `${b.id}${i}`, ico: b.ico, name, desc: `${b.name} drinkt ×2.`, cost: b.cost * BLD_UP_COST[i], bld: b.id,
+    show: s => (s.bld[b.id] || 0) >= BLD_UP_AT[i],
+  })));
+  const UPG = Object.fromEntries(UPGRADES.map(u => [u.id, u]));
+
   const xpToNext = lvl => Math.round(60 * Math.pow(lvl, 1.35));
   function levelInfo(xp) {
     let lvl = 1, rest = xp;
-    while (rest >= xpToNext(lvl)) { rest -= xpToNext(lvl); lvl++; }
+    while (rest >= xpToNext(lvl) && lvl < 5000) { rest -= xpToNext(lvl); lvl++; }
     return { lvl, into: rest, need: xpToNext(lvl) };
   }
 
-  // Skill tree: tier 1 is open, deeper tiers need ranks in the skill above.
   const SKILLS = [
-    { id: 'slok',    tier: 1, ico: '💨', name: 'Snelle slokker',   max: 5, desc: 'Drink sneller.',                         eff: n => `−${n * 10}% drinktijd` },
-    { id: 'kenner',  tier: 1, ico: '🎓', name: 'Bierkenner',       max: 5, desc: 'Meer XP per pint.',                     eff: n => `+${n * 10}% XP` },
-    { id: 'geluk',   tier: 1, ico: '🍀', name: 'Gelukzak',         max: 5, desc: 'Zeldzame en betere bieren komen vaker.', eff: n => `×${(1 + n * 0.15).toFixed(2).replace('.', ',')} kans op zeldzaam+` },
-    { id: 'dubbel',  tier: 2, ico: '🍻', name: 'Dubbel tappen',    max: 5, desc: 'Kans dat een pint dubbel telt (2× XP, 2× in je collectie).', eff: n => `${n * 5}% kans`, req: ['slok', 2] },
-    { id: 'lever',   tier: 2, ico: '🫀', name: 'IJzeren lever',    max: 3, desc: 'De zatheidsmeter stijgt trager.',       eff: n => `${n * 2} pintjes uitstel`, req: ['kenner', 2] },
-    { id: 'kans',    tier: 2, ico: '🎲', name: 'Tweede kans',      max: 5, desc: 'Kans dat een gewone pint opnieuw getapt wordt.', eff: n => `${n * 8}% herkansing`, req: ['geluk', 2] },
-    { id: 'arnoldus',tier: 3, ico: '😇', name: 'Zegen van Sint-Arnoldus', max: 1, desc: 'Tien keer meer kans op het Gouden Pintje.', eff: n => n ? '0,1% mythisch' : '0,01% → 0,1%', req: ['dubbel', 3], req2: ['kans', 3] },
+    { id: 'slok',    tier: 1, ico: '💨', name: 'Snelle slokker',  max: 5, desc: 'Vasthouden drinkt sneller.',               eff: n => `−${n * 10}% drinktijd` },
+    { id: 'kenner',  tier: 1, ico: '🎓', name: 'Bierkenner',      max: 5, desc: 'Meer XP per pint.',                        eff: n => `+${n * 10}% XP` },
+    { id: 'geluk',   tier: 1, ico: '🍀', name: 'Gelukzak',        max: 5, desc: 'Zeldzame en betere bieren komen vaker.',    eff: n => `×${(1 + n * 0.15).toFixed(2).replace('.', ',')} kans op zeldzaam+` },
+    { id: 'tap',     tier: 2, ico: '🍺', name: 'Tapmeester',      max: 5, desc: 'Je personeel drinkt sneller.',              eff: n => `+${n * 10}% slokken/s`, req: ['slok', 2] },
+    { id: 'dubbel',  tier: 2, ico: '🍻', name: 'Dubbel tappen',   max: 5, desc: 'Kans dat een pint dubbel telt.',            eff: n => `${n * 5}% kans`, req: ['slok', 2] },
+    { id: 'lever',   tier: 2, ico: '🫀', name: 'IJzeren lever',   max: 3, desc: 'De zatheidsmeter stijgt trager en je brokt pas later.', eff: n => `${n * 2} pintjes uitstel`, req: ['kenner', 2] },
+    { id: 'kans',    tier: 2, ico: '🎲', name: 'Tweede kans',     max: 5, desc: 'Kans dat een gewone pint opnieuw getapt wordt.', eff: n => `${n * 8}% herkansing`, req: ['geluk', 2] },
+    { id: 'edel',    tier: 3, ico: '💎', name: 'Edelsteenoog',    max: 3, desc: 'Smaragd tot regenboog komen vaker.',        eff: n => `×${1 + n * 0.5} kans op edelstenen`.replace('.', ','), req: ['geluk', 4] },
+    { id: 'arnoldus',tier: 3, ico: '😇', name: 'Zegen van Sint-Arnoldus', max: 1, desc: 'Tien keer meer kans op mythische bieren.', eff: n => n ? '0,1% mythisch' : '0,01% → 0,1%', req: ['dubbel', 3], req2: ['kans', 3] },
   ];
   const SK = Object.fromEntries(SKILLS.map(k => [k.id, k]));
 
-  const TOASTS = ['Schol!', 'Santé!', 'Gezondheid!', 'Op ons!', 'Ad fundum!', 'Nog ene en dan naar huis…', 'Proost, maat!', 'Da was er ene!'];
+  const ACH = [
+    { id: 'eerste',   ico: '🍺', name: 'Eerste pint',         desc: 'Drink je eerste pintje',                    ok: s => s.total >= 1 },
+    { id: 'stamgast', ico: '🪑', name: 'Stamgast',            desc: 'Drink 10 pintjes',                          ok: s => s.total >= 10 },
+    { id: 'pilier',   ico: '🏛️', name: 'Pilier van de toog',  desc: 'Drink 50 pintjes',                          ok: s => s.total >= 50 },
+    { id: 'legende',  ico: '👑', name: 'Levende legende',     desc: 'Drink 1.000 pintjes',                       ok: s => s.total >= 1000 },
+    { id: 'brouwerij',ico: '🏭', name: 'Wandelende brouwerij', desc: 'Drink 1 miljoen pintjes',                  ok: s => s.total >= 1e6 },
+    { id: 'adfundum', ico: '⚡', name: 'Ad fundum',           desc: 'Drink een volle pint zonder loslaten',       ok: s => !!s.flags.adfundum },
+    { id: 'nonkel',   ico: '🥴', name: 'Zatte nonkel',        desc: 'Drink zelf 5 pintjes op één dag',           ok: s => s.today >= 5 },
+    { id: 'nachtuil', ico: '🦉', name: 'Nachtuil',            desc: 'Drink een pint tussen middernacht en 5 uur', ok: s => !!s.flags.nachtuil },
+    { id: 'klikvinger', ico: '👆', name: 'Klikvinger',        desc: 'Tik 1.000 keer op je glas',                 ok: s => s.taps >= 1000 },
+    { id: 'baas',     ico: '🏪', name: 'Kroegbaas',           desc: 'Neem je eerste personeel aan',              ok: s => Object.values(s.bld).some(n => n > 0) },
+    { id: 'rentenier',ico: '🛋️', name: 'Rentenier',           desc: 'Bezit 100 personeelsleden en zaken',        ok: s => Object.values(s.bld).reduce((a, b) => a + b, 0) >= 100 },
+    { id: 'miljonair',ico: '💰', name: 'Bonnekes-miljonair',  desc: 'Verdien in totaal 1 miljoen bonnekes',      ok: s => s.bonAll >= 1e6 },
+    { id: 'gouddop',  ico: '🧢', name: 'Gouden dop',          desc: 'Vang een gouden bierdop',                   ok: s => s.caps >= 1 },
+    { id: 'nieuwekroeg', ico: '⭐', name: 'Nieuwe kroeg',     desc: 'Open een nieuwe kroeg',                     ok: s => s.stars >= 1 },
+    { id: 'brokken',  ico: '🤮', name: 'Brokkenmaker',        desc: 'Brokkeeeuuuhhh na te veel pintjes',         ok: s => s.pukes >= 1 },
+    { id: 'kuisploeg',ico: '🪣', name: 'Vaste klant van de kuisploeg', desc: 'Brok 10 keer',                ok: s => s.pukes >= 10 },
+    { id: 'reeks7',   ico: '📅', name: 'Trouwe klant',        desc: 'Kom 7 dagen na elkaar langs',               ok: s => s.streak >= 7 },
+    { id: 'trappist', ico: '⛪', name: 'Trappistenkenner',    desc: 'Proef 6 verschillende trappisten',          ok: s => BEERS.filter(b => b.trappist && s.counts[b.id] > 0).length >= 6 },
+    { id: 'lambiek',  ico: '🍾', name: 'Lambiekliefhebber',   desc: 'Proef 6 verschillende lambieken',           ok: s => BEERS.filter(b => b.lambic && s.counts[b.id] > 0).length >= 6 },
+    { id: 'edel',     ico: '💚', name: 'Edelsteenjager',      desc: 'Vind een smaragd-bier of beter',            ok: s => [5, 6, 7, 8, 9, 10].some(t => hasTier(s, t)) },
+    { id: 'juwelier', ico: '💍', name: 'Juwelier',            desc: 'Vind smaragd, robijn, saffier én diamant',  ok: s => [5, 6, 7, 8].every(t => hasTier(s, t)) },
+    { id: 'regenboog',ico: '🌈', name: 'Over de regenboog',   desc: 'Vind een regenboogbier',                    ok: s => hasTier(s, 9) },
+    { id: 'half',     ico: '📖', name: 'Halve collectie',     desc: `Verzamel ${Math.ceil(BEERS.length / 2)} soorten`, ok: s => uniqueCount(s) >= Math.ceil(BEERS.length / 2) },
+    { id: 'vol',      ico: '🏆', name: 'Volledige collectie', desc: `Verzamel alle ${BEERS.length} soorten`,     ok: s => uniqueCount(s) >= BEERS.length },
+    { id: 'graal',    ico: '✨', name: 'De Heilige Graal',    desc: 'Vind een mythisch bier (0,01%)',            ok: s => hasTier(s, 10) },
+  ];
 
-  // ================= STATE =================
+  const TOASTS = ['Schol!', 'Santé!', 'Gezondheid!', 'Op ons!', 'Ad fundum!', 'Nog ene en dan naar huis…', 'Proost, maat!', 'Da was er ene!'];
+  const NEWS = [
+    { t: 'Lokaal café meldt record: iemand drinkt een pintje. Zonder pauze.' },
+    { t: 'Weerbericht: kans op schuim 80%, later opklaringen met een tripel.' },
+    { t: 'Peiling: 9 op 10 Belgen verkiezen een pintje boven werk. De tiende zat op café.' },
+    { t: 'Wetenschappers: "Een gouden bierdop is geen geldig betaalmiddel." Niemand luistert.' },
+    { t: 'Brouwers bezorgd: "Er is genoeg bier," zegt woordvoerder. "Voorlopig."', ok: s => s.total >= 20 },
+    { t: 'Rietjesfabriek draait overuren.', ok: s => (s.bld.rietje || 0) >= 5 },
+    { t: 'Stamgasten weigeren naar huis te gaan: "We zijn hier voor de collectie."', ok: s => (s.bld.stamgast || 0) >= 1 },
+    { t: 'Nonkel Jos gesignaleerd op drie familiefeesten tegelijk.', ok: s => (s.bld.nonkel || 0) >= 1 },
+    { t: 'Cantus loopt uit: "We zijn pas aan lied 47."', ok: s => (s.bld.studenten || 0) >= 1 },
+    { t: 'Smoutebollenkraam klaagt: niemand eet nog, iedereen drinkt.', ok: s => (s.bld.kermis || 0) >= 1 },
+    { t: 'Festivalganger vindt eindelijk de toog. Hij stond er al drie dagen naast.', ok: s => (s.bld.festival || 0) >= 1 },
+    { t: 'Monniken vragen meer gebedstijd. Tussen twee brouwsels door.', ok: s => (s.bld.abdij || 0) >= 1 },
+    { t: 'Brugge bevestigt: bierpijpleiding loopt nu ook onder Gent door.', ok: s => (s.bld.pijp || 0) >= 1 },
+    { t: 'Sint-Arnoldus gezien met een rondje voor het hele hemelrijk.', ok: s => (s.bld.hemel || 0) >= 1 },
+    { t: 'Westvleteren verhoogt de beveiliging na mysterieuze verdwijningen.', ok: s => (s.counts.westvleteren || 0) >= 3 },
+    { t: 'Juweliers in Antwerpen verbaasd: klanten vragen naar smaragden… in een glas.', ok: s => hasTier(s, 5) },
+    { t: 'Regenboog boven België. Experts: "Iemand heeft hem leeggedronken."', ok: s => hasTier(s, 9) },
+    { t: 'Kroegbaas opent nieuwe kroeg. De stamgasten verhuizen gewoon mee.', ok: s => s.stars >= 1 },
+    { t: 'Economen: bonnekes nu sterker dan de euro.', ok: s => s.bonAll >= 1e7 },
+    { t: 'Kuisploeg opgeroepen naar plaatselijk café: "Het was weer zover."', ok: s => s.pukes >= 1 },
+    { t: 'Dokter waarschuwt: "Na tien pintjes wordt alles een gok."', ok: s => s.today >= 8 },
+  ];
+
+  // =====================================================================
+  // STATE
+  // =====================================================================
   const TOP = 40;
-  const todayKey = () => new Date().toISOString().slice(0, 10);
-  const blank = () => ({ counts: {}, total: 0, day: todayKey(), today: 0, skin: 'vaasje', ach: [], flags: {}, xp: 0, skills: {} });
+  const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+  const blank = () => ({
+    counts: {}, total: 0, day: todayKey(), today: 0, skin: 'vaasje', bg: 'bruin', ach: [], flags: {}, xp: 0, skills: {},
+    seenSkins: [], seenBgs: [], bon: 0, bonLife: 0, bonAll: 0, bld: {}, upg: [], stars: 0, taps: 0, caps: 0,
+    crates: 0, streak: 0, lastDaily: '', lastLevel: 1, lastSeen: 0, pukes: 0,
+  });
   let S = blank();
   try {
     const saved = JSON.parse(localStorage.getItem('pintje2') || 'null');
     if (saved) S = Object.assign(blank(), saved);
     else {
-      const old = JSON.parse(localStorage.getItem('pintje') || 'null');  // eerdere versie van de app
+      const old = JSON.parse(localStorage.getItem('pintje') || 'null');  // eerste versie van de app
       if (old && old.total) {
-        S.total = old.total; S.today = old.day === todayKey() ? old.today : 0;
+        S.total = old.total;
         if (old.wv) S.counts.westvleteren = old.wv;
         if (old.total - (old.wv || 0) > 0) S.counts.jupiler = old.total - (old.wv || 0);
       }
@@ -466,37 +689,157 @@
   } catch (e) {}
   if (S.day !== todayKey()) { S.day = todayKey(); S.today = 0; }
   if (!SKIN[S.skin]) S.skin = 'vaasje';
-  if (!S.xp && S.total) S.xp = BEERS.reduce((x, b) => x + (S.counts[b.id] || 0) * XP[b.r], 0);  // retroactief
+  if (!S.xp && S.total) S.xp = BEERS.reduce((x, b) => x + (S.counts[b.id] || 0) * RARITIES[b.r].xp, 0);
+  const save = () => { S.lastSeen = Date.now(); try { localStorage.setItem('pintje2', JSON.stringify(S)); } catch (e) {} };
+
   const rank = id => S.skills[id] || 0;
+  const has = id => S.upg.includes(id);
   const spent = () => Object.values(S.skills).reduce((a, b) => a + b, 0);
   const freePoints = () => levelInfo(S.xp).lvl - 1 - spent();
-  const save = () => { try { localStorage.setItem('pintje2', JSON.stringify(S)); } catch (e) {} };
-
-  function uniqueCount(s) { return BEERS.filter(b => s.counts[b.id] > 0).length; }
-  function points(s) { return BEERS.reduce((p, b) => p + (s.counts[b.id] || 0) * RARITIES[b.r].pts, 0); }
-  function bestRarity(s) { return BEERS.reduce((m, b) => s.counts[b.id] > 0 ? Math.max(m, b.r) : m, -1); }
+  const uniqueCount = s => BEERS.filter(b => s.counts[b.id] > 0).length;
+  const points = s => BEERS.reduce((p, b) => p + (s.counts[b.id] || 0) * RARITIES[b.r].pts, 0);
+  const bestRarity = s => BEERS.reduce((m, b) => s.counts[b.id] > 0 ? Math.max(m, b.r) : m, -1);
   const fmtAbv = abv => abv == null ? '∞%' : abv.toFixed(1).replace('.', ',') + '%';
-  const nf = n => n.toLocaleString('nl-BE');
+  function fmt(n) {
+    if (!isFinite(n)) return '∞';
+    if (n < 1e6) return n < 100 && n % 1 ? n.toFixed(1).replace('.', ',') : Math.floor(n).toLocaleString('nl-BE');
+    const u = [[1e18, 'trln'], [1e15, 'bljd'], [1e12, 'bljn'], [1e9, 'mjd'], [1e6, 'mln']].find(([v]) => n >= v);
+    const x = n / u[0];
+    return x.toFixed(x < 10 ? 2 : x < 100 ? 1 : 0).replace('.', ',') + ' ' + u[1];
+  }
 
-  // ================= ELEMENTS =================
+  // =====================================================================
+  // ECONOMY
+  // =====================================================================
+  const buffs = { prod: null, click: null };
+  const buffMult = k => buffs[k] && buffs[k].until > performance.now() ? buffs[k].mult : 1;
+  const starMult = () => 1 + S.stars * 0.05;
+  function bldMult(id) { return UPGRADES.filter(u => u.bld === id && has(u.id)).reduce(m => m * 2, 1); }
+  function baseSps() { return BUILDINGS.reduce((t, b) => t + (S.bld[b.id] || 0) * b.sps * bldMult(b.id), 0) * (1 + rank('tap') * 0.1) * starMult(); }
+  const sps = () => baseSps() * buffMult('prod');
+  const clickMult = () => (has('klik1') ? 2 : 1) * (has('klik2') ? 2 : 1) * buffMult('click');
+  const bonPerSip = () => (has('bon1') ? 2 : 1) * (has('bon2') ? 2 : 1) * (has('bon3') ? 2 : 1) * (has('bon4') ? 2 : 1) * starMult();
+  const tapSipsBase = () => clickMult() + sps() * ((has('klik3') ? 0.02 : 0) + (has('klik4') ? 0.05 : 0));
+  const pintBonus = b => RARITIES[b.r].pts * 5 * bonPerSip();
+  function avgPintBonus() { const w = weights().slice(0, 2), ws = w[0] + w[1]; return w.reduce((t, wi, i) => t + wi / ws * RARITIES[i].pts, 0) * 5 * bonPerSip(); }
+  const incomePerSec = () => sps() * (bonPerSip() + (has('zelftap') ? avgPintBonus() / SIPS_PER_PINT : 0));
+  const bldCost = (b, n = 1) => { const own = S.bld[b.id] || 0; return Math.ceil(b.cost * Math.pow(1.15, own) * (Math.pow(1.15, n) - 1) / 0.15); };
+  function addBon(x) { S.bon += x; S.bonLife += x; S.bonAll += x; }
+
+  // =====================================================================
+  // ROLLING
+  // =====================================================================
+  function weights() {
+    const luck = 1 + rank('geluk') * 0.15, edel = 1 + rank('edel') * 0.5;
+    const w = RARITIES.map((r, i) => r.weight * (i >= 2 ? luck : 1) * (i >= GEM && i <= RAINBOW ? edel : 1));
+    if (rank('arnoldus')) w[MYTHIC] *= 10;
+    return w;
+  }
+  function tierProbs() {
+    const w = weights(), sum = w.reduce((a, b) => a + b, 0), p = w.map(x => x / sum);
+    const re = p[0] * rank('kans') * 0.08;            // commons that get a second roll
+    return p.map((pi, i) => (i === 0 ? pi - re : pi) + re * pi);
+  }
+  const STAFF_MAX = 1;   // your staff only ever pour gewoon and ongewoon; the good stuff is for you
+  function rollTier(min = 0, max = MYTHIC) {
+    const w = weights().map((x, i) => i < min || i > max ? 0 : x), sum = w.reduce((a, b) => a + b, 0);
+    let x = Math.random() * sum;
+    for (let i = w.length - 1; i >= 0; i--) { if (x < w[i]) return i; x -= w[i]; }
+    return min;
+  }
+  let secondChance = false;
+  function rollBeer(min = 0, max = MYTHIC) {
+    let tier = rollTier(min, max);
+    secondChance = false;
+    if (tier === 0 && max > 0 && Math.random() < rank('kans') * 0.08) { tier = rollTier(0, max); secondChance = true; }
+    const pool = BY_TIER[tier];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  // fast random counts for big batches of auto-drunk pints
+  function poisson(m) { let L = Math.exp(-m), k = 0, p = 1; do { k++; p *= Math.random(); } while (p > L); return k - 1; }
+  function gauss() { return Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random()); }
+  function binom(n, p) {
+    if (n <= 0 || p <= 0) return 0;
+    if (p >= 1) return n;
+    if (n <= 40) { let c = 0; for (let i = 0; i < n; i++) if (Math.random() < p) c++; return c; }
+    const m = n * p;
+    if (m < 30) return Math.min(n, poisson(m));
+    if (n - m < 30) return n - Math.min(n, poisson(n - m));
+    return Math.max(0, Math.min(n, Math.round(m + gauss() * Math.sqrt(m * (1 - p)))));
+  }
+
+  // =====================================================================
+  // PINT BOOKKEEPING
+  // =====================================================================
+  const xpMult = () => 1 + rank('kenner') * 0.1;
+  function gainPints(beer, n, quietNew) {
+    if (n <= 0) return;
+    const first = !(S.counts[beer.id] > 0);
+    S.counts[beer.id] = (S.counts[beer.id] || 0) + n;
+    S.total += n;
+    S.xp += Math.round(RARITIES[beer.r].xp * n * xpMult());
+    addBon(pintBonus(beer) * n);
+    if (first && !quietNew) queueToast(`📖 Nieuw in je collectie: ${beer.name}`);
+    dirty = true;
+  }
+  function batchPints(k) {
+    if (k <= 0) return;
+    const dbl = rank('dubbel') * 0.05;
+    if (k <= 25) {
+      for (let i = 0; i < k; i++) {
+        const b = rollBeer(0, STAFF_MAX);
+        gainPints(b, Math.random() < dbl ? 2 : 1, b.r < 2);
+        if (b.r >= GEM) reveal(b);
+      }
+      return;
+    }
+    const w = weights().slice(0, STAFF_MAX + 1), ws = w.reduce((a, b) => a + b, 0), p = w.map(x => x / ws);
+    let rem = k, remP = 1;
+    for (let t = STAFF_MAX; t >= 0; t--) {
+      const c = t === 0 ? rem : binom(rem, p[t] / remP);
+      rem -= c; remP -= p[t];
+      if (!c) continue;
+      let left = c;
+      const pool = BY_TIER[t];
+      pool.forEach((b, j) => {
+        const got = j === pool.length - 1 ? left : binom(left, 1 / (pool.length - j));
+        left -= got;
+        if (got) {
+          gainPints(b, got + binom(got, dbl), t < 2);
+          if (t >= GEM) reveal(b);
+        }
+      });
+    }
+  }
+
+  // =====================================================================
+  // ELEMENTS
+  // =====================================================================
   const $ = id => document.getElementById(id);
   const beerRect = $('beer'), foam = $('foam'), bubbles = $('bubbles'), glassWrap = $('glassWrap');
   const status = $('status'), drinkBtn = $('drink'), refillBtn = $('refill'), tiltBtn = $('tilt');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let dirty = true;
 
-  // ================= SOUND =================
+  // =====================================================================
+  // SOUND
+  // =====================================================================
   let audio;
   const ctx = () => (audio ||= new (window.AudioContext || window.webkitAudioContext)());
   function tone(freq, t, dur, type = 'sine', vol = 0.18) {
-    const a = ctx(), o = a.createOscillator(), g = a.createGain();
-    o.type = type; o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.02);
+    try {
+      const a = ctx(), o = a.createOscillator(), g = a.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.02);
+    } catch (e) {}
   }
+  const now = () => { try { return ctx().currentTime; } catch (e) { return 0; } };
   function gulp() {
     try {
       const a = ctx(), t = a.currentTime, o = a.createOscillator(), g = a.createGain();
       o.frequency.setValueAtTime(180, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.12);
-      g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      g.gain.setValueAtTime(0.22, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
       o.connect(g).connect(a.destination); o.start(t); o.stop(t + 0.16);
     } catch (e) {}
   }
@@ -512,58 +855,62 @@
   }
   function fanfare(r) {
     if (r < 2) return;
-    try {
-      const t = ctx().currentTime;
-      const notes = r >= 5 ? [523, 659, 784, 1047, 1319, 1568, 2093] : r >= 4 ? [523, 659, 784, 1047, 1319] : r >= 3 ? [523, 659, 784, 1047] : [659, 988];
-      notes.forEach((f, i) => tone(f, t + i * 0.09, r >= 5 ? 0.9 : 0.35, 'triangle', 0.12));
-    } catch (e) {}
+    const t = now();
+    const base = [523, 659, 784, 1047, 1319, 1568, 2093, 2637];
+    const notes = base.slice(0, Math.min(base.length, 2 + Math.ceil(r * 0.7)));
+    notes.forEach((f, i) => tone(f, t + i * 0.08, r >= GEM ? 0.8 : 0.35, 'triangle', 0.11));
   }
+  const ching = () => { const t = now(); tone(1320, t, 0.12, 'triangle', 0.1); tone(1760, t + 0.06, 0.18, 'triangle', 0.1); };
 
-  // ================= GLASS =================
-  let level = 1, drinking = false, last = 0, current = null, fullHold = false;
+  // =====================================================================
+  // GLASS
+  // =====================================================================
+  let level = 1, drinking = false, current = null, fullHold = false, lastBeerShown = 0, pendingBeer = false, pouring = false;
 
   function applySkin() {
-    const sk = SKIN[S.skin];
-    $('clipPath').setAttribute('d', sk.d);
-    $('outline').setAttribute('d', sk.d);
+    const sk = SKIN[S.skin], sh = SHAPE[sk.shape];
+    $('clipPath').setAttribute('d', sh.d);
+    $('outline').setAttribute('d', sh.d);
     $('outline').setAttribute('stroke', sk.stroke);
     $('decorBack').innerHTML = sk.back || '';
-    $('decorFront').innerHTML = sk.front || '';
+    $('decorFront').innerHTML = (sk.front || '') + (sk.shape === 'pul' || sk.shape === 'kwak' ? '' : sh.hl);
+    document.querySelector('svg.glass').style.filter = sk.glow && !(current && current.r >= GEM) ? `drop-shadow(0 0 10px ${sk.glow})` : '';
     render();
   }
   function applyBeer() {
     const b = current, r = RARITIES[b.r];
-    $('beerTop').setAttribute('stop-color', b.c[0]);
-    $('beerBottom').setAttribute('stop-color', b.c[1]);
+    if (b.r !== RAINBOW) { $('beerTop').setAttribute('stop-color', b.c[0]); $('beerBottom').setAttribute('stop-color', b.c[1]); }
     foam.setAttribute('fill', b.foam);
-    glassWrap.classList.toggle('mythic', b.r === 5);
+    glassWrap.classList.toggle('halo', b.r >= GEM);
+    glassWrap.style.setProperty('--halo', r.halo || 'transparent');
+    applySkin();
     const chip = $('beerRarity');
     chip.textContent = r.label; chip.className = 'chip r' + b.r;
     $('beerName').textContent = b.name;
     $('beerMeta').textContent = `${fmtAbv(b.abv)} · ${b.style}`;
     $('beerNew').classList.toggle('hidden', (S.counts[b.id] || 0) > 0);
     const card = $('beerCard'); card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop');
+    lastBeerShown = performance.now(); pendingBeer = false;
   }
   function render() {
-    const bottom = SKIN[S.skin].bottom;
+    const bottom = SHAPE[SKIN[S.skin].shape].bottom;
     const surface = TOP + (1 - level) * (bottom - TOP);
     beerRect.setAttribute('y', surface);
     beerRect.setAttribute('height', Math.max(0, bottom - surface + 6));
     foam.setAttribute('transform', `translate(0 ${surface})`);
     foam.style.opacity = level > 0.01 ? Math.min(1, 0.4 + level) : 0;
   }
-
   function spawnBubble() {
-    if (level <= 0.02 || document.hidden) return;
-    const sk = SKIN[S.skin], bottom = sk.bottom, mythic = current && current.r === 5;
+    if (level <= 0.02 || document.hidden || $('tap').hidden) return;
+    const sh = SHAPE[SKIN[S.skin].shape], bottom = sh.bottom, r = current ? current.r : 0;
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    const x = sk.bx[0] + Math.random() * (sk.bx[1] - sk.bx[0]);
-    c.setAttribute('r', (mythic ? 2 : 1.5) + Math.random() * 2.5);
-    c.setAttribute('fill', mythic ? '#fffbe0' : 'rgba(255,255,255,0.55)');
+    const x = sh.bx[0] + Math.random() * (sh.bx[1] - sh.bx[0]);
+    c.setAttribute('r', (r >= GEM ? 2 : 1.5) + Math.random() * 2.5);
+    c.setAttribute('fill', r >= GEM ? (r === RAINBOW ? `hsl(${Math.random() * 360} 100% 75%)` : RARITIES[r].halo) : 'rgba(255,255,255,0.55)');
     bubbles.appendChild(c);
     const dur = 1500 + Math.random() * 1500, start = performance.now();
-    (function rise(now) {
-      const p = (now - start) / dur;
+    (function rise(t) {
+      const p = (t - start) / dur;
       const surf = TOP + (1 - level) * (bottom - TOP);
       const y = bottom - 4 - p * (bottom - 4 - surf);
       c.setAttribute('cy', y); c.setAttribute('cx', x + Math.sin(p * 12) * 2);
@@ -572,210 +919,417 @@
   }
   setInterval(spawnBubble, 220);
 
-  // ================= TAPPING (the roll) =================
-  function weights() {
-    const luck = 1 + rank('geluk') * 0.15;
-    const w = RARITIES.map((r, i) => r.weight * (i >= 2 ? luck : 1));
-    if (rank('arnoldus')) w[5] *= 10;
-    return w;
-  }
-  function rollTier() {
-    const w = weights(), sum = w.reduce((a, b) => a + b, 0);
-    let x = Math.random() * sum;
-    for (let i = w.length - 1; i >= 0; i--) { if (x < w[i]) return i; x -= w[i]; }
-    return 0;
-  }
-  let secondChance = false;
-  function rollBeer() {
-    let tier = rollTier();
-    secondChance = false;
-    if (tier === 0 && Math.random() < rank('kans') * 0.08) { tier = rollTier(); secondChance = true; }
-    const pool = BEERS.filter(b => b.r === tier);
-    return pool[Math.floor(Math.random() * pool.length)];
-  }
-  function pourNew(animated) {
-    current = rollBeer();
-    applyBeer();
+  // =====================================================================
+  // POURING & DRINKING
+  // =====================================================================
+  const POUR_MSG = ['Vers getapt!', 'Oh, iets anders!', 'Zeldzaam! Goe gezien.', 'EPISCH! 🏆', 'LEGENDARISCH! 🔥', 'SMARAGD! 💚', 'ROBIJN! ❤️', 'SAFFIER! 💙', 'DIAMANT! 💎', 'REGENBOOG! 🌈', 'MYTHISCH! ✨'];
+  function pourNew({ quiet = false, beer = null } = {}) {
+    current = beer || (quiet ? rollBeer(0, STAFF_MAX) : rollBeer());
+    if (secondChance && !quiet) queueToast('🎲 Tweede kans! Opnieuw getapt.');
     const r = current.r;
-    if (secondChance) setTimeout(() => toast('🎲 Tweede kans! Opnieuw getapt.'), 300);
-    const msg = ['Vers getapt!', 'Oh, iets anders!', 'Zeldzaam! Goe gezien.', 'EPISCH! Rechtstreeks van de abdij 🏆', 'LEGENDARISCH! 🔥', ''][r];
-    if (r === 5) showMythic();
-    else if (r >= 3) confetti(r === 4 ? 160 : 90);
-    if (animated) fanfare(r);
+    // when the staff drinks many pints per second, only refresh the label now and then (rares always show)
+    if (!quiet || r >= 2 || performance.now() - lastBeerShown > 1500) applyBeer(); else pendingBeer = true;
+    if (r >= GEM) reveal(current);
+    else if (r >= 3) confetti(r === 4 ? 140 : 80);
+    if (r >= 2 && (!quiet || r >= 3)) fanfare(r);
     if (navigator.vibrate && r >= 3) navigator.vibrate(r >= 4 ? [80, 50, 80, 50, 200] : [60, 40, 60]);
-    return msg;
+    fullHold = drinking;
+    return POUR_MSG[r];
   }
 
-  // ================= DRINKING =================
-  const DRINK_MSG = ['Glug glug glug…', 'Mmm, lekker!', 'Ad fundum! 🍺'];
-  let gulpTimer = 0;
-  function drinkSeconds() { return (current.abv == null ? 7 : 3 + current.abv * 0.15) * (1 - rank('slok') * 0.1); }
-
-  function tick(now) {
-    if (!drinking) return;
-    const dt = Math.min(0.1, (now - last) / 1000);
-    last = now;
-    level = Math.max(0, level - dt / drinkSeconds());
-    gulpTimer -= dt;
-    if (gulpTimer <= 0) { gulp(); gulpTimer = 0.45; navigator.vibrate?.(20); }
-    status.textContent = level < 0.25 ? 'Bijna leeg…' : DRINK_MSG[Math.floor((1 - level) * 3) % 3];
+  // The glass takes sips from you (tap/hold) and from your staff. Overflow past one glass is batched.
+  let staffAcc = 0;
+  function addSips(n, manual) {
+    // staff never touch a zeldzaam-or-better glass: that one waits for you. They drink from the tap instead.
+    if (!manual && current && current.r >= 2 && level > 0) {
+      addBon(n * bonPerSip());
+      if (has('zelftap')) {
+        staffAcc += n;
+        const k = Math.floor(staffAcc / SIPS_PER_PINT);
+        if (k > 0) { staffAcc -= k * SIPS_PER_PINT; batchPints(k); }
+      }
+      return;
+    }
+    let guard = 0;
+    while (n > 1e-9 && guard++ < 6) {
+      if (level <= 0) {
+        if (!has('zelftap') || pouring) { showRefill(); return; }
+        const msg = pourNew({ quiet: !manual });
+        level = 1;
+        if (manual) status.textContent = msg;
+      }
+      const need = level * SIPS_PER_PINT;
+      if (n < need) { level -= n / SIPS_PER_PINT; addBon(n * bonPerSip()); n = 0; break; }
+      addBon(need * bonPerSip()); n -= need; level = 0;
+      finishGlass(manual);
+      if (has('zelftap') && n >= SIPS_PER_PINT * 2) {
+        const k = Math.floor(n / SIPS_PER_PINT) - 1;
+        batchPints(k); addBon(k * SIPS_PER_PINT * bonPerSip()); n -= k * SIPS_PER_PINT;
+      }
+    }
     render();
-    if (level <= 0) return finish();
-    requestAnimationFrame(tick);
   }
+
+  function finishGlass(manual) {
+    if (S.day !== todayKey()) { S.day = todayKey(); S.today = 0; }
+    const mult = Math.random() < rank('dubbel') * 0.05 ? 2 : 1;
+    const lvlBefore = levelInfo(S.xp).lvl;
+    gainPints(current, mult, false);
+    if (manual) {
+      S.today += mult;
+      if (fullHold && drinking) S.flags.adfundum = true;
+      if (new Date().getHours() < 5) S.flags.nachtuil = true;
+      const limit = 10 + rank('lever') * 2;
+      if (S.today > limit && Math.random() < Math.min(0.9, (S.today - limit) * 0.05)) setTimeout(puke, 250);
+      else { burp(); navigator.vibrate?.([60, 40, 120]); }
+      xpDrop(Math.round(RARITIES[current.r].xp * mult * xpMult()), mult);
+      status.textContent = mult === 2 ? `🍻 Dubbel getapt! ${current.name} telt 2×.` : `Burp! ${current.name} op. ${TOASTS[Math.floor(Math.random() * TOASTS.length)]}`;
+    } else if (sps() / SIPS_PER_PINT < 0.5) {
+      xpDrop(Math.round(RARITIES[current.r].xp * mult * xpMult()), mult);
+    }
+    if (levelInfo(S.xp).lvl > lvlBefore) dirty = true;
+    fullHold = false;
+    if (!has('zelftap')) {
+      drinking = false; glassWrap.classList.remove('drinking');
+      showRefill();
+    }
+  }
+  function showRefill() {
+    if (pouring) return;
+    drinkBtn.classList.add('hidden');
+    refillBtn.classList.remove('hidden');
+  }
+  function refill() {
+    if (pouring || puking()) return;
+    refillBtn.classList.add('hidden');
+    drinkBtn.classList.remove('hidden');
+    status.textContent = 'Wordt getapt…';
+    try { ctx().resume(); } catch (e) {}
+    const msg = pourNew();
+    pouring = true;
+    const from = level, t0 = performance.now();
+    (function pour(t) {
+      const p = Math.min(1, (t - t0) / 1000);
+      level = from + (1 - from) * (1 - Math.pow(1 - p, 3));
+      render();
+      if (p < 1) requestAnimationFrame(pour);
+      else { pouring = false; status.textContent = msg; }
+    })(t0);
+  }
+
+  const DRINK_MSG = ['Glug glug glug…', 'Mmm, lekker!', 'Ad fundum! 🍺'];
+  const holdRate = () => SIPS_PER_PINT / ((current.abv == null ? 7 : 3 + current.abv * 0.15) * (1 - rank('slok') * 0.1)) * clickMult();
+  let gulpTimer = 0;
+  let pukeUntil = 0;
+  const puking = () => performance.now() < pukeUntil;
   function start() {
-    if (level <= 0 || drinking) return;
+    if (drinking || pouring) return;
+    if (puking()) return;
+    if (level <= 0 && !has('zelftap')) return;
     try { ctx().resume(); } catch (e) {}
     drinking = true;
     fullHold = level >= 0.999;
     glassWrap.classList.add('drinking');
-    last = performance.now(); gulpTimer = 0;
-    requestAnimationFrame(tick);
+    gulpTimer = 0;
   }
   function stop() {
     if (!drinking) return;
     drinking = false; fullHold = false;
     glassWrap.classList.remove('drinking');
-    if (level > 0) status.textContent = 'Nog niet leeg, drink door!';
+    if (level > 0 && level < 1) status.textContent = 'Nog niet leeg, drink door!';
   }
-  function finish() {
-    drinking = false;
-    glassWrap.classList.remove('drinking');
-    if (S.day !== todayKey()) { S.day = todayKey(); S.today = 0; }
-    const mult = Math.random() < rank('dubbel') * 0.05 ? 2 : 1;
-    S.counts[current.id] = (S.counts[current.id] || 0) + mult;
-    S.total += mult; S.today += mult;
-    const gained = Math.round(XP[current.r] * mult * (1 + rank('kenner') * 0.1));
-    const lvlBefore = levelInfo(S.xp).lvl;
-    S.xp += gained;
-    const lvlAfter = levelInfo(S.xp).lvl;
-    xpDrop(gained, mult);
-    if (fullHold) S.flags.adfundum = true;
-    const h = new Date().getHours();
-    if (h < 5) S.flags.nachtuil = true;
-    fullHold = false;
-    const newAch = checkAchievements();
-    save(); renderAll(); pushScore();
-    burp();
-    navigator.vibrate?.([60, 40, 120]);
-    status.textContent = `Burp! ${current.name} op. ${TOASTS[Math.floor(Math.random() * TOASTS.length)]}`;
-    drinkBtn.classList.add('hidden');
-    refillBtn.classList.remove('hidden');
-    if (mult === 2) status.textContent = `🍻 Dubbel getapt! ${current.name} telt 2×.`;
-    if (lvlAfter > lvlBefore) {
-      setTimeout(() => {
-        toast(`⬆️ Level ${lvlAfter}! +${lvlAfter - lvlBefore} skillpunt${lvlAfter - lvlBefore > 1 ? 'en' : ''}`);
-        confetti(70); fanfare(3);
-      }, 400);
-    }
-    const delay = lvlAfter > lvlBefore ? 2900 : 600;
-    newAch.forEach((a, i) => setTimeout(() => toast(`🏅 ${a.name}!`), delay + i * 2600));
-    const unlocked = SKINS.filter(sk => sk.ok(S) && !S.seenSkins?.includes(sk.id) && sk.id !== 'vaasje');
-    if (unlocked.length) {
-      S.seenSkins = [...(S.seenSkins || []), ...unlocked.map(s => s.id)]; save();
-      unlocked.forEach((sk, i) => setTimeout(() => toast(`🥂 Nieuw glas: ${sk.name}`), delay + (newAch.length + i) * 2600));
-    }
-  }
-  function refill() {
-    refillBtn.classList.add('hidden');
-    drinkBtn.classList.remove('hidden');
-    status.textContent = 'Wordt getapt…';
-    try { ctx().resume(); } catch (e) {}
-    const msg = pourNew(true);
-    const from = level, t0 = performance.now();
-    (function pour(now) {
-      const p = Math.min(1, (now - t0) / 1200);
-      level = from + (1 - from) * (1 - Math.pow(1 - p, 3));
-      render();
-      if (p < 1) requestAnimationFrame(pour);
-      else status.textContent = msg || 'Hou ingedrukt om te drinken';
-    })(t0);
-  }
-
-  function checkAchievements() {
-    const fresh = ACH.filter(a => !S.ach.includes(a.id) && a.ok(S));
-    S.ach.push(...fresh.map(a => a.id));
-    return fresh;
+  function tapGlass(e) {
+    if (pouring || puking()) return;
+    if (level <= 0 && !has('zelftap')) { refill(); return; }
+    try { ctx().resume(); } catch (err) {}
+    S.taps++;
+    const n = tapSipsBase();
+    addSips(n, true);
+    gulp();
+    glassWrap.classList.remove('sip'); void glassWrap.offsetWidth; glassWrap.classList.add('sip');
+    floatText(e, `+${fmt(n * bonPerSip())} 🎟️`);
   }
 
   drinkBtn.addEventListener('pointerdown', e => { e.preventDefault(); start(); });
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => drinkBtn.addEventListener(ev, stop));
   refillBtn.addEventListener('click', refill);
+  glassWrap.addEventListener('pointerdown', e => { e.preventDefault(); tapGlass(e); });
+  glassWrap.addEventListener('keydown', e => { if (e.key === 'Enter') tapGlass(null); });
   document.addEventListener('keydown', e => {
     if (e.code !== 'Space' || e.repeat || $('tap').hidden) return;
-    e.preventDefault(); level > 0 ? start() : refill();
+    e.preventDefault();
+    if (level <= 0 && !has('zelftap')) refill(); else start();
   });
   document.addEventListener('keyup', e => { if (e.code === 'Space') stop(); });
 
   // tilt to drink (phones): upright ≈ 90°, tipping the top toward your face pushes beta past it
   function onOrient(e) {
     if (e.beta == null || $('tap').hidden) return;
-    if (e.beta > 115 && level > 0) start(); else stop();
+    if (e.beta > 115) start(); else stop();
   }
   if ('DeviceOrientationEvent' in window && matchMedia('(pointer: coarse)').matches) {
     tiltBtn.classList.remove('hidden');
     tiltBtn.addEventListener('click', async () => {
       try {
-        if (typeof DeviceOrientationEvent.requestPermission === 'function' &&
-            await DeviceOrientationEvent.requestPermission() !== 'granted') return;
+        if (typeof DeviceOrientationEvent.requestPermission === 'function' && await DeviceOrientationEvent.requestPermission() !== 'granted') return;
         window.addEventListener('deviceorientation', onOrient);
         tiltBtn.textContent = 'Kantelen staat aan 📱'; tiltBtn.disabled = true;
       } catch (e) {}
     });
   }
 
-  // ================= OVERLAYS =================
-  let toastTimer;
-  function toast(text) {
+  // =====================================================================
+  // BROKKEN: after too many pints you might throw up
+  // =====================================================================
+  const PUKE_MS = 5000;
+  function noiseBuffer(a, secs) {
+    const buf = a.createBuffer(1, Math.floor(a.sampleRate * secs), a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return buf;
+  }
+  function retchSound() {
+    try {
+      const a = ctx(), t = a.currentTime;
+      // three dry heaves
+      [0, 0.32, 0.62].forEach((off, i) => {
+        const src = a.createBufferSource(); src.buffer = noiseBuffer(a, 0.3);
+        const bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 3;
+        bp.frequency.setValueAtTime(250, t + off); bp.frequency.exponentialRampToValueAtTime(700 + i * 150, t + off + 0.2);
+        const g = a.createGain(); g.gain.setValueAtTime(0.0001, t + off); g.gain.exponentialRampToValueAtTime(0.35 + i * 0.15, t + off + 0.05); g.gain.exponentialRampToValueAtTime(0.001, t + off + 0.25);
+        src.connect(bp).connect(g).connect(a.destination); src.start(t + off); src.stop(t + off + 0.3);
+        const o = a.createOscillator(); o.type = 'sawtooth';
+        o.frequency.setValueAtTime(120 + i * 10, t + off); o.frequency.exponentialRampToValueAtTime(70, t + off + 0.22);
+        const og = a.createGain(); og.gain.setValueAtTime(0.0001, t + off); og.gain.exponentialRampToValueAtTime(0.12, t + off + 0.04); og.gain.exponentialRampToValueAtTime(0.001, t + off + 0.22);
+        const lp = a.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 500;
+        o.connect(lp).connect(og).connect(a.destination); o.start(t + off); o.stop(t + off + 0.25);
+      });
+      // the long "euuuhhh"
+      const v = t + 0.9;
+      const o = a.createOscillator(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(150, v); o.frequency.linearRampToValueAtTime(95, v + 1.1);
+      const lfo = a.createOscillator(), lg = a.createGain(); lfo.frequency.value = 9; lg.gain.value = 12; lfo.connect(lg).connect(o.frequency);
+      const f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(900, v); f.frequency.linearRampToValueAtTime(350, v + 1.1);
+      const og = a.createGain(); og.gain.setValueAtTime(0.0001, v); og.gain.exponentialRampToValueAtTime(0.22, v + 0.08); og.gain.setValueAtTime(0.22, v + 0.8); og.gain.exponentialRampToValueAtTime(0.001, v + 1.2);
+      o.connect(f).connect(og).connect(a.destination); o.start(v); lfo.start(v); o.stop(v + 1.25); lfo.stop(v + 1.25);
+      // gush + splash
+      const gush = a.createBufferSource(); gush.buffer = noiseBuffer(a, 1.3);
+      const gl = a.createBiquadFilter(); gl.type = 'lowpass'; gl.frequency.setValueAtTime(600, v); gl.frequency.linearRampToValueAtTime(1800, v + 0.4); gl.frequency.linearRampToValueAtTime(400, v + 1.2);
+      const gg = a.createGain(); gg.gain.setValueAtTime(0.0001, v); gg.gain.exponentialRampToValueAtTime(0.3, v + 0.1); gg.gain.exponentialRampToValueAtTime(0.001, v + 1.25);
+      gush.connect(gl).connect(gg).connect(a.destination); gush.start(v); gush.stop(v + 1.3);
+      const sp = t + 1.9, splash = a.createBufferSource(); splash.buffer = noiseBuffer(a, 0.9);
+      const hp = a.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 900;
+      const sg = a.createGain(); sg.gain.setValueAtTime(0.4, sp); sg.gain.exponentialRampToValueAtTime(0.001, sp + 0.8);
+      splash.connect(hp).connect(sg).connect(a.destination); splash.start(sp); splash.stop(sp + 0.9);
+      // a few wet plops afterwards
+      for (let i = 0; i < 5; i++) {
+        const pt = sp + 0.3 + i * (0.25 + Math.random() * 0.3), po = a.createOscillator(), pg = a.createGain();
+        po.frequency.setValueAtTime(500 + Math.random() * 300, pt); po.frequency.exponentialRampToValueAtTime(90, pt + 0.08);
+        pg.gain.setValueAtTime(0.12, pt); pg.gain.exponentialRampToValueAtTime(0.001, pt + 0.1);
+        po.connect(pg).connect(a.destination); po.start(pt); po.stop(pt + 0.12);
+      }
+    } catch (e) {}
+  }
+  function puke() {
+    stop();
+    pukeUntil = performance.now() + PUKE_MS;
+    S.pukes++;
+    S.today = Math.max(0, S.today - 3);   // you feel a bit better afterwards
+    dirty = true;
+    retchSound();
+    navigator.vibrate?.([100, 80, 100, 80, 400, 100, 600]);
+    document.body.classList.add('queasy');
+    setTimeout(() => document.body.classList.remove('queasy'), 900);
+    const greens = ['#9cc33b', '#b5d44f', '#7fa62a', '#c9dc6a', '#8db535'];
+    let blobs = '';
+    for (let i = 0; i < 26; i++) {
+      const cx = Math.random() * 100, cy = Math.random() * 100, rr = 6 + Math.random() * 16;
+      blobs += `<ellipse cx="${cx}" cy="${cy}" rx="${rr}" ry="${rr * (0.6 + Math.random() * 0.6)}" fill="${greens[i % greens.length]}" opacity="${0.75 + Math.random() * 0.25}"/>`;
+    }
+    for (let i = 0; i < 40; i++) {
+      const cx = Math.random() * 100, cy = Math.random() * 100;
+      blobs += `<circle cx="${cx}" cy="${cy}" r="${0.6 + Math.random() * 1.6}" fill="${['#d98c35', '#e8c26a', '#6e4520', '#f3e3a0'][i % 4]}"/>`;
+    }
+    let drips = '';
+    for (let i = 0; i < 12; i++) {
+      const x = Math.random() * 100, w = 1.5 + Math.random() * 3, h = 10 + Math.random() * 30, y = 40 + Math.random() * 40;
+      drips += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${w / 2}" fill="${greens[i % greens.length]}"/>`;
+    }
+    const o = document.createElement('div');
+    o.className = 'puke';
+    o.setAttribute('role', 'alert');
+    o.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g>${blobs}</g><g class="drip">${drips}</g></svg>` +
+      `<div class="word">BRRROKKEEEEUUUHHH 🤮</div><div class="timer">Even bekomen…</div>`;
+    document.body.appendChild(o);
+    status.textContent = 'Bah. Even niks drinken…';
+    const timer = o.querySelector('.timer');
+    const iv = setInterval(() => {
+      const left = Math.ceil((pukeUntil - performance.now()) / 1000);
+      if (left > 0) { timer.textContent = `Even bekomen… ${left}`; return; }
+      clearInterval(iv);
+      o.classList.add('out');
+      setTimeout(() => o.remove(), 800);
+      status.textContent = 'Oef, beter. Nog ene?';
+    }, 250);
+  }
+
+  // =====================================================================
+  // OVERLAYS, TOASTS, CONFETTI
+  // =====================================================================
+  const toastQ = []; let toastBusy = false;
+  function queueToast(text) { if (toastQ.length < 8) toastQ.push(text); if (!toastBusy) nextToast(); }
+  function nextToast() {
     const t = $('toast');
-    t.textContent = text; t.classList.add('show');
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2300);
+    if (!toastQ.length) { toastBusy = false; t.classList.remove('show'); return; }
+    toastBusy = true;
+    t.textContent = toastQ.shift(); t.classList.add('show');
+    setTimeout(() => { t.classList.remove('show'); setTimeout(nextToast, 350); }, 2200);
+  }
+  function floatText(e, text) {
+    const stage = $('stage'), r = stage.getBoundingClientRect();
+    const d = document.createElement('div');
+    d.className = 'float';
+    d.textContent = text;
+    d.style.left = ((e && e.clientX ? e.clientX - r.left : r.width / 2) - 20) + 'px';
+    d.style.top = ((e && e.clientY ? e.clientY - r.top : r.height / 2) - 30) + 'px';
+    stage.appendChild(d);
+    setTimeout(() => d.remove(), 950);
   }
   function xpDrop(n, mult) {
+    if ($('tap').hidden) return;
     const d = document.createElement('div');
     d.className = 'xpdrop r' + current.r;
-    d.textContent = `+${nf(n)} XP` + (mult > 1 ? ' ×2' : '');
-    document.querySelector('.stage').appendChild(d);
+    d.textContent = `+${fmt(n)} XP` + (mult > 1 ? ' ×2' : '');
+    $('stage').appendChild(d);
     setTimeout(() => d.remove(), 1700);
   }
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function confetti(n, gold) {
+  function confetti(n, palette) {
     if (reduceMotion) return;
     const cv = $('confetti'), c = cv.getContext('2d');
     cv.hidden = false; cv.width = innerWidth; cv.height = innerHeight;
-    const colors = gold ? ['#ffd75e', '#fff1a8', '#e0a800', '#ffffff'] : ['#f7c548', '#b88aee', '#58a9e6', '#6cc070', '#f0913a', '#fffaf0'];
+    const colors = palette || ['#f7c548', '#b88aee', '#58a9e6', '#6cc070', '#f0913a', '#fffaf0'];
     const ps = Array.from({ length: n }, () => ({
       x: innerWidth / 2, y: innerHeight * 0.4, vx: (Math.random() - 0.5) * 14, vy: -Math.random() * 14 - 4,
       s: 4 + Math.random() * 5, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.4, col: colors[Math.floor(Math.random() * colors.length)],
     }));
     const t0 = performance.now();
-    (function frame(now) {
+    (function frame(t) {
       c.clearRect(0, 0, cv.width, cv.height);
       ps.forEach(p => {
         p.vy += 0.35; p.x += p.vx; p.y += p.vy; p.vx *= 0.99; p.rot += p.vr;
         c.save(); c.translate(p.x, p.y); c.rotate(p.rot); c.fillStyle = p.col; c.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); c.restore();
       });
-      if (now - t0 < 3000) requestAnimationFrame(frame); else { c.clearRect(0, 0, cv.width, cv.height); cv.hidden = true; }
+      if (t - t0 < 3000) requestAnimationFrame(frame); else { c.clearRect(0, 0, cv.width, cv.height); cv.hidden = true; }
     })(t0);
   }
-  function showMythic() {
+  const GEM_PALETTE = { 5: ['#3ddc84', '#b8ffd6', '#0f8f4f'], 6: ['#ff4d6d', '#ffc2cc', '#a3102e'], 7: ['#5b8cff', '#cfdcff', '#1b3f80'], 8: ['#ffffff', '#d9f6ff', '#9fe3ff'], 9: ['#ff5f5f', '#ffb347', '#fff35c', '#5fff8a', '#5fc8ff', '#b05fff'], 10: ['#ffd75e', '#fff1a8', '#e0a800', '#ffffff'] };
+
+  let overlayOpen = null;
+  function overlay(html, tint) {
+    if (overlayOpen) overlayOpen.remove();
     const o = document.createElement('div');
-    o.className = 'mythic-overlay';
-    o.innerHTML = '<div class="chip r5">Mythisch · 0,01%</div><div class="big-t">✨ Het Gouden Pintje ✨</div><div class="beer-meta">Gebrouwen door Sint-Arnoldus, patroonheilige van de brouwers. Eén op tienduizend.</div><div class="beer-meta">Tik om verder te gaan</div>';
-    o.addEventListener('click', () => o.remove());
+    o.className = 'overlay';
+    if (tint) o.style.setProperty('--ov', tint);
+    o.innerHTML = html + '<button class="ok">Schol!</button>';
+    const close = () => { o.remove(); if (overlayOpen === o) overlayOpen = null; };
+    o.querySelector('.ok').addEventListener('click', close);
     document.body.appendChild(o);
-    confetti(260, true);
-    setTimeout(() => o.remove(), 6000);
+    overlayOpen = o;
+    return o;
+  }
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function beerCardHtml(b, delay = 0) {
+    return `<div class="card r${b.r}" style="animation-delay:${delay}ms"><div class="swatch" style="background:linear-gradient(${b.c[0]},${b.c[1]});--foam:${b.foam}"></div>` +
+      `<div class="chip r${b.r}">${RARITIES[b.r].label}</div><div class="nm">${esc(b.name)}</div></div>`;
+  }
+  let lastReveal = 0;
+  function reveal(b) {
+    if (performance.now() - lastReveal < 2500) { queueToast(`${RARITIES[b.r].label}! ${b.name}`); return; }
+    lastReveal = performance.now();
+    const r = RARITIES[b.r];
+    const pct = (r.weight).toString().replace('.', ',');
+    overlay(`<div class="chip r${b.r}">${r.label} · ${pct}%</div><div class="big-t r${b.r}">${esc(b.name)}</div>` +
+      `<div class="sub">${esc(fmtAbv(b.abv))} · ${esc(b.style)}<br>+${fmt(Math.round(r.xp * xpMult()))} XP · +${fmt(r.pts)} punten</div>`, r.halo + '88');
+    confetti(b.r >= RAINBOW ? 260 : 180, GEM_PALETTE[b.r]);
+    fanfare(b.r);
   }
 
-  // ================= PANELS =================
+  // ---- beer crates (rewards) ----
+  function openCrate() {
+    if (S.crates <= 0) return;
+    S.crates--;
+    try { ctx().resume(); } catch (e) {}
+    const got = [rollBeer(), rollBeer(), rollBeer()];
+    if (got.every(b => b.r < 2)) got[2] = rollBeer(2);
+    got.forEach(b => gainPints(b, 1, true));
+    const best = got.reduce((m, b) => Math.max(m, b.r), 0);
+    overlay(`<div class="big-t">📦 Bak bier</div><div class="cards">${got.map((b, i) => beerCardHtml(b, i * 250)).join('')}</div>` +
+      `<div class="sub">+${fmt(Math.round(got.reduce((x, b) => x + RARITIES[b.r].xp, 0) * xpMult()))} XP</div>`, best >= GEM ? RARITIES[best].halo + '88' : null);
+    fanfare(Math.max(2, best));
+    if (best >= 3) confetti(120, GEM_PALETTE[best]);
+    save(); dirty = true;
+  }
+  $('crateBtn').addEventListener('click', openCrate);
+
+  // ---- golden bottle caps (random events) ----
+  let nextCapAt = performance.now() + (40 + Math.random() * 60) * 1000, capEl = null;
+  function spawnCap() {
+    capEl = document.createElement('button');
+    capEl.className = 'goldcap';
+    capEl.setAttribute('aria-label', 'Gouden bierdop');
+    capEl.textContent = '🍺';
+    capEl.style.left = (16 + Math.random() * (innerWidth - 90)) + 'px';
+    capEl.style.top = (90 + Math.random() * (innerHeight - 240)) + 'px';
+    capEl.addEventListener('click', clickCap);
+    document.body.appendChild(capEl);
+    const el = capEl;
+    setTimeout(() => { if (capEl === el) { el.remove(); capEl = null; } }, 13000);
+  }
+  function clickCap() {
+    if (!capEl) return;
+    capEl.remove(); capEl = null;
+    S.caps++;
+    try { ctx().resume(); } catch (e) {}
+    const dur = has('dop2') ? 2 : 1, x = Math.random(), t = performance.now();
+    let msg;
+    if (x < 0.45) { buffs.prod = { mult: 7, until: t + 77000 * dur, name: 'Happy Hour ×7' }; msg = '🎉 Happy Hour! Je personeel drinkt ×7.'; }
+    else if (x < 0.8) {
+      const gain = Math.max(25, Math.min(S.bon * 0.15, incomePerSec() * 900)) + 13;
+      addBon(gain); msg = `🍻 Rondje van de zaak! +${fmt(gain)} bonnekes`;
+    }
+    else if (x < 0.95) { buffs.click = { mult: 77, until: t + 15000 * dur, name: 'Slokkenstorm ×77' }; msg = '🌪️ Slokkenstorm! Tikken ×77.'; }
+    else {
+      level = 1; pourNew({ beer: rollBeer(3) }); msg = '🛢️ Gouden fust! Een episch bier of beter.';
+      drinkBtn.classList.remove('hidden'); refillBtn.classList.add('hidden');
+    }
+    queueToast(msg);
+    ching(); confetti(60, GEM_PALETTE[10]);
+    dirty = true;
+  }
+
+  // =====================================================================
+  // PANELS
+  // =====================================================================
+  function renderWallet() {
+    const s = sps(), inc = incomePerSec();
+    $('bon').textContent = fmt(S.bon);
+    $('bonRate').textContent = fmt(inc);
+    $('spsLabel').textContent = fmt(s);
+    $('kBon').textContent = fmt(S.bon);
+    $('kRate').textContent = fmt(inc);
+    const t = performance.now();
+    const b = [buffs.prod, buffs.click].filter(x => x && x.until > t).map(x => `<span class="buff">${x.name} · ${Math.ceil((x.until - t) / 1000)}s</span>`).join('');
+    if ($('buffs').innerHTML !== b) $('buffs').innerHTML = b;
+    $('crateN').textContent = S.crates;
+    $('crateBtn').classList.toggle('hidden', S.crates <= 0);
+    const anyAffordable = BUILDINGS.some(bd => isBldVisible(bd) && bldCost(bd) <= S.bon) || UPGRADES.some(u => !has(u.id) && u.show(S) && u.cost <= S.bon);
+    $('kroegDot').classList.toggle('hidden', !anyAffordable);
+  }
   function renderTapStats() {
-    $('today').textContent = S.today;
-    $('total').textContent = S.total;
+    $('today').textContent = fmt(S.today);
+    $('total').textContent = fmt(S.total);
     $('uniq').textContent = uniqueCount(S);
-    $('hdrPoints').textContent = nf(points(S));
-    const eff = Math.max(0, S.today - rank('lever') * 2);
-    const zat = Math.min(eff, 10);
+    $('ptsLabel').textContent = fmt(points(S));
+    const eff = Math.max(0, S.today - rank('lever') * 2), zat = Math.min(eff, 10);
     $('zatFill').style.width = zat * 10 + '%';
     $('zatLabel').textContent = ['nuchter', 'nuchter', 'tipsy', 'tipsy', 'aangeschoten', 'aangeschoten', 'zat', 'zat', 'stomzat', 'stomzat', 'lazarus'][zat];
     document.body.classList.remove('zat-1', 'zat-2', 'zat-3');
@@ -783,25 +1337,109 @@
     const li = levelInfo(S.xp);
     $('lvlBadge').textContent = 'Lvl ' + li.lvl;
     $('xpFill').style.width = (li.into / li.need * 100) + '%';
-    $('xpLabel').textContent = `${nf(li.into)} / ${nf(li.need)} XP`;
+    $('xpLabel').textContent = `${fmt(li.into)} / ${fmt(li.need)} XP`;
     $('spDot').classList.toggle('hidden', freePoints() <= 0);
   }
+
+  // ---- kroeg: built once, updated in place so buttons stay clickable ----
+  let buyAmt = 1;
+  document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+    buyAmt = +b.dataset.amt;
+    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    renderKroeg();
+  }));
+  const isBldVisible = b => (S.bld[b.id] || 0) > 0 || S.bonAll >= b.cost * 0.4 || b.id === 'rietje';
+  const bldEls = {};
+  BUILDINGS.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'bld';
+    el.innerHTML = '<div class="ico"></div><div><div class="n"></div><div class="m"></div><div class="cost"></div></div><div class="own"></div>';
+    el.addEventListener('click', () => {
+      const cost = bldCost(b, buyAmt);
+      if (cost > S.bon) return;
+      S.bon -= cost; S.bld[b.id] = (S.bld[b.id] || 0) + buyAmt;
+      ching(); dirty = true; renderKroeg(); renderWallet(); save();
+    });
+    $('bldList').appendChild(el);
+    bldEls[b.id] = el;
+  });
+  function renderKroeg() {
+    BUILDINGS.forEach((b, i) => {
+      const el = bldEls[b.id], vis = isBldVisible(b), own = S.bld[b.id] || 0;
+      const prevVisible = i === 0 || isBldVisible(BUILDINGS[i - 1]);
+      el.hidden = !vis && !prevVisible;
+      el.classList.toggle('mystery', !vis);
+      const cost = bldCost(b, buyAmt);
+      el.disabled = !vis || cost > S.bon;
+      el.querySelector('.ico').textContent = vis ? b.ico : '❔';
+      el.querySelector('.n').textContent = vis ? b.name : '???';
+      const each = b.sps * bldMult(b.id) * (1 + rank('tap') * 0.1) * starMult();
+      el.querySelector('.m').textContent = vis ? `${b.desc} ${fmt(each)} slokken/s per stuk${own ? ` · samen ${fmt(each * own)}/s` : ''}` : 'Verdien meer bonnekes om dit te ontdekken.';
+      el.querySelector('.cost').textContent = vis ? `🎟️ ${fmt(cost)}${buyAmt > 1 ? ` voor ${buyAmt}` : ''}` : '';
+      el.querySelector('.own').textContent = own || '';
+    });
+    const list = $('upgList');
+    const avail = UPGRADES.filter(u => !has(u.id) && u.show(S)).sort((a, b) => a.cost - b.cost);
+    const key = avail.map(u => u.id).join(',');
+    if (list.dataset.key !== key) {
+      list.dataset.key = key;
+      list.textContent = '';
+      if (!avail.length) list.innerHTML = '<div class="empty">Nieuwe verbeteringen verschijnen naarmate je kroeg groeit.</div>';
+      avail.forEach(u => {
+        const el = document.createElement('button');
+        el.className = 'upg'; el.dataset.id = u.id;
+        el.innerHTML = '<div class="n"></div><div class="m"></div><div class="cost"></div>';
+        el.querySelector('.n').textContent = `${u.ico} ${u.name}`;
+        el.querySelector('.m').textContent = u.desc;
+        el.querySelector('.cost').textContent = `🎟️ ${fmt(u.cost)}`;
+        el.addEventListener('click', () => {
+          if (has(u.id) || u.cost > S.bon) return;
+          S.bon -= u.cost; S.upg.push(u.id);
+          ching(); queueToast(`${u.ico} ${u.name} gekocht`);
+          if (u.id === 'zelftap' && level <= 0) refill();
+          dirty = true; renderKroeg(); renderWallet(); save();
+        });
+        list.appendChild(el);
+      });
+    }
+    list.querySelectorAll('.upg').forEach(el => { el.disabled = UPG[el.dataset.id].cost > S.bon; });
+    const pot = Math.floor(Math.cbrt(S.bonAll / 1e6)), claim = pot - S.stars;
+    $('prestigeInfo').textContent = `Je hebt ${S.stars} ⭐. ${claim > 0 ? `Een nieuwe kroeg geeft je er nu ${claim} bij.` : `Volgende ster bij ${fmt(Math.pow(S.stars + 1, 3) * 1e6)} bonnekes in totaal (nu ${fmt(S.bonAll)}).`}`;
+    const pb = $('prestigeBtn');
+    pb.disabled = claim < 1;
+    if (!prestigeArmed) pb.textContent = claim > 0 ? `Nieuwe kroeg openen (+${claim} ⭐)` : 'Nog geen nieuwe ster';
+  }
+  let prestigeArmed = false;
+  $('prestigeBtn').addEventListener('click', () => {
+    const claim = Math.floor(Math.cbrt(S.bonAll / 1e6)) - S.stars;
+    if (claim < 1) return;
+    const pb = $('prestigeBtn');
+    if (!prestigeArmed) { prestigeArmed = true; pb.textContent = 'Zeker? Tik nog eens om te bevestigen'; setTimeout(() => { prestigeArmed = false; renderKroeg(); }, 4000); return; }
+    prestigeArmed = false;
+    S.stars += claim; S.bon = 0; S.bonLife = 0; S.bld = {}; S.upg = [];
+    buffs.prod = buffs.click = null;
+    level = 0; drinking = false; glassWrap.classList.remove('drinking'); showRefill();
+    overlay(`<div class="big-t r10">⭐ Nieuwe kroeg!</div><div class="sub">+${claim} kroegster${claim > 1 ? 'ren' : ''}. Alles drinkt nu ${Math.round(S.stars * 5)}% sneller en levert ${Math.round(S.stars * 5)}% meer bonnekes op.</div>`, '#ffd75e88');
+    confetti(200, GEM_PALETTE[10]);
+    dirty = true; save(); renderKroeg(); schedulePush();
+  });
 
   function renderCollection() {
     const u = uniqueCount(S);
     $('colFill').style.width = (u / BEERS.length * 100) + '%';
     $('colLabel').textContent = `${u} / ${BEERS.length}`;
     const list = $('colList'); list.textContent = '';
+    const p = tierProbs();
     RARITIES.forEach((r, i) => {
       const h = document.createElement('h3');
-      h.className = 'r' + i;
-      h.textContent = r.label;
+      const lab = document.createElement('span'); lab.className = 'r' + i; lab.textContent = r.label;
       const odds = document.createElement('span'); odds.className = 'odds';
-      odds.textContent = (r.weight < 1 ? r.weight.toFixed(2) : r.weight).toString().replace('.', ',') + '% kans';
-      h.appendChild(odds);
+      const pct = p[i] * 100;
+      odds.textContent = `${pct >= 1 ? pct.toFixed(1) : pct >= 0.1 ? pct.toFixed(2) : pct.toFixed(3)}% kans`.replace('.', ',') + ` · ${fmt(r.xp)} XP`;
+      h.append(lab, odds);
       list.appendChild(h);
       const g = document.createElement('div'); g.className = 'grid';
-      BEERS.filter(b => b.r === i).forEach(b => {
+      BY_TIER[i].forEach(b => {
         const n = S.counts[b.id] || 0;
         const t = document.createElement('div'); t.className = 'tile' + (n ? '' : ' locked');
         const sw = document.createElement('div'); sw.className = 'swatch';
@@ -809,7 +1447,7 @@
         const tx = document.createElement('div'); tx.className = 't';
         const nm = document.createElement('div'); nm.className = 'n'; nm.textContent = n ? b.name : '???';
         const m = document.createElement('div'); m.className = 'm';
-        m.textContent = n ? `${fmtAbv(b.abv)} · ${n}× gedronken` : 'nog niet gevonden';
+        m.textContent = n ? `${fmtAbv(b.abv)} · ${fmt(n)}×` : 'nog niet gevonden';
         tx.append(nm, m); t.append(sw, tx); g.appendChild(t);
       });
       list.appendChild(g);
@@ -826,27 +1464,44 @@
     });
   }
 
-  function renderSkins() {
+  const skinOk = sk => sk.ok(S) || S.seenSkins.includes(sk.id);
+  const bgOk = bg => bg.ok(S) || S.seenBgs.includes(bg.id);
+  function renderStyle() {
     const list = $('skinList'); list.textContent = '';
     SKINS.forEach(sk => {
-      const ok = sk.ok(S);
+      const ok = skinOk(sk), sh = SHAPE[sk.shape];
       const b = document.createElement('button');
       b.className = 'skin' + (S.skin === sk.id ? ' on' : '');
       b.disabled = !ok;
       b.setAttribute('aria-pressed', S.skin === sk.id);
-      b.innerHTML = `<svg viewBox="0 0 200 300"><defs><clipPath id="pv-${sk.id}"><path d="${sk.d}"/></clipPath></defs>${sk.back || ''}` +
-        `<rect clip-path="url(#pv-${sk.id})" x="0" y="${ok ? 40 : 300}" width="200" height="${sk.bottom - 34}" fill="#e8a52a"/>` +
-        `<path d="${sk.d}" fill="none" stroke="${sk.stroke}" stroke-width="8"/>${sk.front || ''}</svg><div class="n"></div><div class="m"></div>`;
+      b.innerHTML = `<svg viewBox="0 0 200 300" aria-hidden="true"><defs><clipPath id="pv-${sk.id}"><path d="${sh.d}"/></clipPath></defs>${sk.back || ''}` +
+        `<rect clip-path="url(#pv-${sk.id})" x="0" y="${ok ? 40 : 300}" width="200" height="${sh.bottom - 34}" fill="#e8a52a"/>` +
+        `<path d="${sh.d}" fill="none" stroke="${sk.stroke}" stroke-width="8"/>${sk.front || ''}</svg><div class="n"></div><div class="m"></div>`;
       b.querySelector('.n').textContent = sk.name;
       b.querySelector('.m').textContent = ok ? (S.skin === sk.id ? 'In gebruik' : 'Vrijgespeeld') : '🔒 ' + sk.unlock;
-      b.addEventListener('click', () => { S.skin = sk.id; save(); applySkin(); renderSkins(); pushScore(); });
+      b.addEventListener('click', () => { S.skin = sk.id; save(); applySkin(); renderStyle(); schedulePush(); });
       list.appendChild(b);
     });
+    const bl = $('bgList'); bl.textContent = '';
+    BGS.forEach(bg => {
+      const ok = bgOk(bg);
+      const b = document.createElement('button');
+      b.className = 'skin' + (S.bg === bg.id ? ' on' : '');
+      b.disabled = !ok;
+      b.setAttribute('aria-pressed', S.bg === bg.id);
+      b.innerHTML = `<div class="sw bg-${bg.id}"></div><div class="n"></div><div class="m"></div>`;
+      b.querySelector('.n').textContent = bg.name;
+      b.querySelector('.m').textContent = ok ? (S.bg === bg.id ? 'In gebruik' : 'Vrijgespeeld') : '🔒 ' + bg.unlock;
+      b.addEventListener('click', () => { S.bg = bg.id; save(); applyBg(); renderStyle(); });
+      bl.appendChild(b);
+    });
+  }
+  function applyBg() {
+    [...document.body.classList].filter(c => c.startsWith('bg-')).forEach(c => document.body.classList.remove(c));
+    document.body.classList.add('bg-' + (BGS.some(b => b.id === S.bg) ? S.bg : 'bruin'));
   }
 
-  function reqMet(k) {
-    return [k.req, k.req2].every(q => !q || rank(q[0]) >= q[1]);
-  }
+  const reqMet = k => [k.req, k.req2].every(q => !q || rank(q[0]) >= q[1]);
   function renderSkills() {
     const free = freePoints();
     $('spCount').textContent = free;
@@ -873,8 +1528,8 @@
         b.disabled = n >= k.max || !open || free <= 0;
         b.addEventListener('click', () => {
           if (freePoints() <= 0 || rank(k.id) >= k.max || !reqMet(k)) return;
-          S.skills[k.id] = rank(k.id) + 1; save(); renderAll(); pushScore();
-          try { ctx().resume(); tone(660, ctx().currentTime, 0.15, 'triangle', 0.12); tone(990, ctx().currentTime + 0.08, 0.2, 'triangle', 0.12); } catch (e) {}
+          S.skills[k.id] = rank(k.id) + 1; save(); dirty = true; renderSkills(); renderTapStats(); schedulePush();
+          const t0 = now(); tone(660, t0, 0.15, 'triangle', 0.12); tone(990, t0 + 0.08, 0.2, 'triangle', 0.12);
         });
         row.appendChild(c);
       });
@@ -886,29 +1541,99 @@
     const b = $('respec');
     if (!respecArmed) { respecArmed = true; b.textContent = 'Zeker?'; setTimeout(() => { respecArmed = false; b.textContent = 'Reset'; }, 3000); return; }
     respecArmed = false; b.textContent = 'Reset';
-    S.skills = {}; save(); renderAll(); pushScore(); toast('Skillpunten teruggezet');
+    S.skills = {}; save(); dirty = true; renderSkills(); renderTapStats(); schedulePush(); queueToast('Skillpunten teruggezet');
   });
 
-  function renderAll() { renderTapStats(); renderCollection(); renderSkins(); renderSkills(); renderBoard(); }
-
+  function renderVisible() {
+    const tab = document.querySelector('nav button[aria-selected="true"]').dataset.tab;
+    renderTapStats();
+    if (tab === 'kroeg') renderKroeg();
+    if (tab === 'skills') renderSkills();
+    if (tab === 'collectie') renderCollection();
+    if (tab === 'stijl') renderStyle();
+    if (tab === 'ranglijst') renderBoard();
+  }
   document.querySelectorAll('nav button').forEach(btn => btn.addEventListener('click', () => {
     stop();
     document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b === btn));
     document.querySelectorAll('.panel').forEach(p => { p.hidden = p.id !== btn.dataset.tab; });
-    if (btn.dataset.tab === 'ranglijst') renderBoard();
+    renderVisible();
   }));
 
-  // ================= LEADERBOARD (shared db) =================
-  let db = null, user = null, uid = null, boardDocs = null, boardState = 'loading', canWrite = true;
+  // ---- progress checks: achievements, level rewards, unlocks ----
+  function checkProgress() {
+    const fresh = ACH.filter(a => !S.ach.includes(a.id) && a.ok(S));
+    fresh.forEach(a => { S.ach.push(a.id); S.crates++; queueToast(`🏅 ${a.name}! +1 bak bier`); });
+    const lvl = levelInfo(S.xp).lvl;
+    if (lvl > S.lastLevel) {
+      let crates = 0, bon = 0;
+      for (let L = S.lastLevel + 1; L <= lvl; L++) { bon += 25 * L * L; if (L % 5 === 0) crates++; }
+      addBon(bon); S.crates += crates;
+      queueToast(`⬆️ Level ${lvl}! +${lvl - S.lastLevel} skillpunt · +${fmt(bon)} 🎟️${crates ? ` · +${crates} bak` : ''}`);
+      if (!overlayOpen) confetti(70);
+      fanfare(3);
+      S.lastLevel = lvl;
+    }
+    SKINS.forEach(sk => { if (sk.ok(S) && !S.seenSkins.includes(sk.id)) { S.seenSkins.push(sk.id); if (sk.id !== 'vaasje') queueToast(`🥂 Nieuw glas: ${sk.name}`); } });
+    BGS.forEach(bg => { if (bg.ok(S) && !S.seenBgs.includes(bg.id)) { S.seenBgs.push(bg.id); if (bg.id !== 'bruin') queueToast(`🎨 Nieuwe achtergrond: ${bg.name}`); } });
+    if (fresh.length) dirty = true;
+  }
 
+  // ---- news ticker ----
+  function nextNews() {
+    const pool = NEWS.filter(n => !n.ok || n.ok(S));
+    const el = $('ticker');
+    el.style.opacity = 0;
+    setTimeout(() => { $('tickerText').textContent = pool[Math.floor(Math.random() * pool.length)].t; el.style.opacity = 1; }, 400);
+  }
+  setInterval(nextNews, 9000);
+
+  // =====================================================================
+  // MAIN LOOP
+  // =====================================================================
+  let lastFrame = performance.now(), uiAcc = 0, slowAcc = 0, saveAcc = 0, hue = 0;
+  function frame(t) {
+    let dt = (t - lastFrame) / 1000;
+    lastFrame = t;
+    if (dt < 0) dt = 0;
+    dt = Math.min(dt, 8 * 3600);
+    const s = sps();
+    if (s > 0) addSips(s * dt, false);
+    if (drinking && current) {
+      addSips(holdRate() * Math.min(dt, 0.1), true);
+      gulpTimer -= dt;
+      if (gulpTimer <= 0) { gulp(); gulpTimer = 0.45; navigator.vibrate?.(20); }
+      if (level > 0) status.textContent = level < 0.25 ? 'Bijna leeg…' : DRINK_MSG[Math.floor((1 - level) * 3) % 3];
+    }
+    if (current && current.r === RAINBOW) {
+      hue = (hue + dt * 120) % 360;
+      $('beerTop').setAttribute('stop-color', `hsl(${hue} 90% 65%)`);
+      $('beerBottom').setAttribute('stop-color', `hsl(${(hue + 120) % 360} 90% 45%)`);
+    }
+    if (pendingBeer && t - lastBeerShown > 1500) applyBeer();
+    if (capEl === null && t > nextCapAt) { spawnCap(); nextCapAt = t + (60 + Math.random() * 120) * 1000 / (has('dop1') ? 2 : 1); }
+    uiAcc += dt; slowAcc += dt; saveAcc += dt;
+    if (uiAcc > 0.1) { uiAcc = 0; renderWallet(); if (!$('kroeg').hidden) renderKroeg(); }
+    if (slowAcc > 1) { slowAcc = 0; checkProgress(); if (dirty) { dirty = false; renderVisible(); schedulePush(); } }
+    if (saveAcc > 5) { saveAcc = 0; save(); }
+    requestAnimationFrame(frame);
+  }
+  addEventListener('pagehide', save);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+
+  // =====================================================================
+  // LEADERBOARD (shared db)
+  // =====================================================================
+  let db = null, user = null, uid = null, boardDocs = null, boardState = 'loading', canWrite = true;
   function summary() {
     return {
       points: points(S), total: S.total, unique: uniqueCount(S), best: bestRarity(S),
-      counts: S.counts, ach: S.ach, skin: S.skin, xp: S.xp, level: levelInfo(S.xp).lvl, skills: S.skills, updatedAt: Date.now(),
+      counts: S.counts, ach: S.ach, skin: S.skin, xp: S.xp, level: levelInfo(S.xp).lvl, skills: S.skills,
+      bonAll: S.bonAll, stars: S.stars, updatedAt: Date.now(),
     };
   }
-
-  let writing = false, writePending = false;
+  let writing = false, writePending = false, pushTimer = null;
+  function schedulePush() { if (!pushTimer) pushTimer = setTimeout(() => { pushTimer = null; pushScore(); }, 8000); }
   async function pushScore() {
     if (!db || !uid || !canWrite) return;
     writePending = true;
@@ -925,49 +1650,39 @@
     }
     writing = false;
   }
-
   let boardSeq = 0;
   async function renderBoard() {
-    const el = $('board');
-    const seq = ++boardSeq;
-    if (boardState === 'off') {
-      el.innerHTML = '<div class="empty">De ranglijst werkt als je Pintje opent via de gedeelde link op claude.ai, ingelogd. Je eigen score blijft hier gewoon bewaard.</div>';
-      return;
-    }
+    const el = $('board'), seq = ++boardSeq;
+    if (boardState === 'off') { el.innerHTML = '<div class="empty">De ranglijst werkt als je Pintje opent via de gedeelde link op claude.ai, ingelogd. Je eigen voortgang blijft hier gewoon bewaard.</div>'; return; }
     if (!boardDocs) { el.innerHTML = '<div class="empty">De ranglijst wordt geladen…</div>'; return; }
     const rows = boardDocs.filter(d => d.exists).map(d => ({ id: d.id, ...d.data() }));
-    if (!rows.length) {
-      el.innerHTML = '<div class="empty">Nog niemand op de ranglijst. Drink een pintje en sta als eerste bovenaan!</div>';
-      return;
-    }
+    if (!rows.length) { el.innerHTML = '<div class="empty">Nog niemand op de ranglijst. Drink een pintje en sta als eerste bovenaan!</div>'; return; }
     const ps = user ? await user.profiles(rows.map(r => r.id)) : {};
     if (seq !== boardSeq) return;
     el.textContent = '';
     rows.forEach((r, i) => {
-      const p = ps[r.id] || {};
-      const isMe = r.id === uid;
-      const row = document.createElement('div'); row.className = 'row' + (isMe ? ' me' : '');
-      const rank = document.createElement('div'); rank.className = 'rank'; rank.textContent = ['🥇', '🥈', '🥉'][i] || (i + 1);
+      const p = ps[r.id] || {}, isMe = r.id === uid;
+      const row = document.createElement('div'); row.className = 'lrow' + (isMe ? ' me' : '');
+      const rk = document.createElement('div'); rk.className = 'rank'; rk.textContent = ['🥇', '🥈', '🥉'][i] || (i + 1);
       const img = document.createElement('img'); img.alt = ''; if (p.avatarUrl) img.src = p.avatarUrl;
       const who = document.createElement('div'); who.className = 'who';
       const nm = document.createElement('div'); nm.className = 'nm';
       nm.textContent = (p.name || (isMe ? 'Jij' : 'Anonieme drinker')) + (isMe ? ' (jij)' : '');
       const sub = document.createElement('div'); sub.className = 'sub';
-      const best = Number.isInteger(r.best) && r.best >= 0 ? RARITIES[r.best] : null;
-      sub.textContent = `Lvl ${r.level || 1} · ${nf(r.total || 0)} pintjes · ${r.unique || 0}/${BEERS.length} soorten`;
-      if (best) { const c = document.createElement('span'); c.className = 'chip r' + r.best; c.style.marginLeft = '6px'; c.textContent = best.label; sub.appendChild(c); }
+      sub.textContent = `Lvl ${r.level || 1} · ${fmt(r.total || 0)} pintjes · ${r.unique || 0}/${BEERS.length}` + (r.stars ? ` · ${r.stars}⭐` : '');
+      const best = Number.isInteger(r.best) && RARITIES[r.best] ? r.best : -1;
+      if (best >= 0) { const c = document.createElement('span'); c.className = 'chip r' + best; c.style.marginLeft = '6px'; c.textContent = RARITIES[best].label; sub.appendChild(c); }
       who.append(nm, sub);
-      const pts = document.createElement('div'); pts.className = 'pts'; pts.textContent = nf(r.points || 0);
-      row.append(rank, img, who, pts);
+      const pts = document.createElement('div'); pts.className = 'pts'; pts.textContent = fmt(r.points || 0);
+      row.append(rk, img, who, pts);
       el.appendChild(row);
     });
     if (!canWrite) {
       const n = document.createElement('div'); n.className = 'empty';
-      n.textContent = 'Je kan meekijken, maar je eigen score komt niet op de ranglijst: vraag de eigenaar om je toegang te geven.';
+      n.textContent = 'Je kan meekijken, maar je eigen score komt niet op de ranglijst: vraag de eigenaar om je als Contributor toe te voegen.';
       el.appendChild(n);
     }
   }
-
   async function initShared() {
     if (!window.claude || typeof window.claude.use !== 'function') { boardState = 'off'; renderBoard(); return; }
     try {
@@ -976,41 +1691,72 @@
     } catch (e) { db = null; }
     if (!db) { boardState = 'off'; renderBoard(); return; }
     boardState = 'on';
-    if (user && typeof user.can === 'function') {
-      try { if (await user.can('data.write') === false) canWrite = false; } catch (e) {}
-    }
+    if (user && typeof user.can === 'function') { try { if (await user.can('data.write') === false) canWrite = false; } catch (e) {} }
     db.collection('scores').orderBy('points', 'desc').limit(50).onSnapshot(
       snap => { boardDocs = snap.docs; renderBoard(); },
       () => { boardState = 'off'; renderBoard(); }
     );
     if (!uid) { canWrite = false; return; }
-    // Merge progress from another device: keep the highest count per beer.
+    // Merge progress from another device: keep the highest of each.
     try {
       const mine = await db.doc('scores/' + uid).get();
       if (mine.exists) {
         const r = mine.data();
         let changed = false;
-        for (const [id, n] of Object.entries(r.counts || {})) {
-          if (BEER[id] && n > (S.counts[id] || 0)) { S.counts[id] = n; changed = true; }
-        }
+        for (const [id, n] of Object.entries(r.counts || {})) if (BEER[id] && n > (S.counts[id] || 0)) { S.counts[id] = n; changed = true; }
         const sum = Object.values(S.counts).reduce((a, b) => a + b, 0);
-        S.total = Math.max(S.total, r.total || 0, sum);
+        if (Math.max(S.total, r.total || 0, sum) !== S.total) { S.total = Math.max(S.total, r.total || 0, sum); changed = true; }
         (r.ach || []).forEach(a => { if (!S.ach.includes(a)) { S.ach.push(a); changed = true; } });
-        if ((r.xp || 0) > S.xp) { S.xp = r.xp; changed = true; }
+        if ((r.xp || 0) > S.xp) { S.xp = r.xp; S.lastLevel = Math.max(S.lastLevel, levelInfo(r.xp).lvl); changed = true; }
         const rs = r.skills || {};
         if (Object.values(rs).reduce((a, b) => a + b, 0) > spent()) { S.skills = { ...rs }; changed = true; }
-        if (changed) { checkAchievements(); save(); renderAll(); }
-        if (changed || points(S) !== r.points || S.total !== r.total || S.xp !== r.xp) pushScore();
+        if ((r.stars || 0) > S.stars) { S.stars = r.stars; changed = true; }
+        if ((r.bonAll || 0) > S.bonAll) { S.bonAll = r.bonAll; changed = true; }
+        if (changed) { save(); dirty = true; }
+        if (changed || points(S) !== r.points || S.xp !== r.xp) pushScore();
       } else if (S.total > 0) pushScore();
     } catch (e) {}
   }
 
-  // ================= BOOT =================
-  checkAchievements(); save();
-  pourNew(false);
-  status.textContent = current.r >= 2 ? (['', '', 'Zeldzaam! Goe gezien.', 'EPISCH! Rechtstreeks van de abdij 🏆', 'LEGENDARISCH! 🔥', ''][current.r] || 'Hou ingedrukt om te drinken') : 'Hou ingedrukt om te drinken';
-  applySkin();
-  renderAll();
+  // =====================================================================
+  // BOOT
+  // =====================================================================
+  function dailyReward() {
+    const today = todayKey();
+    if (S.lastDaily === today) return;
+    const y = new Date(); y.setDate(y.getDate() - 1);
+    const yKey = `${y.getFullYear()}-${y.getMonth() + 1}-${y.getDate()}`;
+    S.streak = S.lastDaily === yKey ? S.streak + 1 : 1;
+    S.lastDaily = today;
+    const crates = 1 + (S.streak % 7 === 0 ? 1 : 0) + (has('kelder') ? 1 : 0);
+    const bon = Math.round((100 + incomePerSec() * 300) * Math.min(S.streak, 7));
+    S.crates += crates; addBon(bon);
+    return { crates, bon };
+  }
+
+  // offline earnings: your staff kept drinking at half speed (max 8 hours)
+  const away = S.lastSeen ? Math.min((Date.now() - S.lastSeen) / 1000, 8 * 3600) : 0;
+  const before = { total: S.total, bon: S.bon };
+  current = rollBeer();
+  if (away > 60 && baseSps() > 0) {
+    lastReveal = performance.now() + 1e9;      // collect gem finds silently, show them in the summary
+    const finds = [];
+    const orig = reveal; reveal = b => finds.push(b);
+    addSips(baseSps() * away * 0.5, false);
+    reveal = orig; lastReveal = 0;
+    const pints = S.total - before.total, bon = S.bon - before.bon;
+    const h = Math.floor(away / 3600), m = Math.round((away % 3600) / 60);
+    setTimeout(() => overlay(`<div class="big-t">Welkom terug!</div><div class="sub">Terwijl je ${h ? `${h} u ` : ''}${m} min weg was, dronk je personeel ${fmt(pints)} pintjes en verdiende ${fmt(bon)} bonnekes.</div>` +
+      (finds.length ? `<div class="cards">${finds.slice(0, 6).map((b, i) => beerCardHtml(b, i * 200)).join('')}</div>` : '')), 300);
+  }
+  const daily = dailyReward();
+  if (daily) setTimeout(() => queueToast(`📅 Dagelijks rondje, dag ${S.streak}! +${daily.crates} bak · +${fmt(daily.bon)} 🎟️`), away > 60 ? 1500 : 600);
+
+  applyBg(); applySkin(); applyBeer();
+  status.textContent = current.r >= 2 ? POUR_MSG[current.r] : (S.total ? 'Hou ingedrukt of tik op het glas' : 'Welkom! Tik op het glas of hou de knop ingedrukt.');
+  checkProgress(); save();
+  renderWallet(); renderTapStats(); renderKroeg();
+  requestAnimationFrame(t => { lastFrame = t; requestAnimationFrame(frame); });
   initShared();
 })();
 </script>
