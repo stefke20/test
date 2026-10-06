@@ -21,6 +21,10 @@ A Belgian beer idle game. Open `index.html` in a browser (works great on a phone
 - **Caféhond Bobbie**: pet him every 20 minutes and feed him to level up (+2% bonnekes per level). He brings gifts and bites thieves.
 - **Clock bonuses**: happy hour 17–19 h (own sips ×2), weekend evenings (staff ×1.5), Sunday matinee (XP ×1.5) and blauwe maandag (luck ×1.2).
 - **Vitrinekast**: your six rarest beers on display.
+- **Tap combos**: fast tapping builds a combo up to ×3.5, with 4% "perfecte slok" crits (×10).
+- **Golden bubbles** rise in your glass every 15–35 s. Tap them for bonnekes, XP or a short ×3 boost.
+- **Uitdagingen**: short timed challenges (taps, combos, pints, ad fundum, bubbles) for bonnekes and XP.
+- **Vlaamse memes**: 18 memes, including "Gij hed het lef nie veur in mijne auto te zitten" from Nonkel Jos, collected in a memeboek.
 - **Nu in het café**: see who else has Pintje open, shout "Schol!" for a shared bonus, and hear about other players' rare finds live.
 - **Alles wissen**: wipe all progress (local and on the leaderboard) from the Stijl tab.
 - **Ranglijst**: a shared leaderboard when opened through the claude.ai artifact link.
